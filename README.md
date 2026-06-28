@@ -1,253 +1,146 @@
-# ReviOS Professional Workstation Setup
+# HOME BASE
 
-Production-ready PowerShell suite for **performance**, **privacy**, **hardening**, and a **dark hacker-style terminal** — without enabling Microsoft Defender Antivirus.
+**Персональная операционная среда инженера на Windows + PowerShell 7**
 
----
-
-## Policy
-
-| Rule | Status |
-|------|--------|
-| Microsoft Defender AV | **Must remain disabled** — no script here enables, installs, or reactivates it |
-| Windows Update security patches | **Remain enabled** |
-| Illegal / unauthorized access | **Not supported** — lab use only with authorization |
+| | |
+|---|---|
+| **Модуль** | `KGreen.Workstation` |
+| **Версия** | 2.0.0 |
+| **Лицензия** | [MIT](LICENSE) |
+| **Язык UI** | RU-first |
+| **Статус** | Production-ready |
 
 ---
 
-## Quick Start
+## Что такое HOME BASE?
+
+HOME BASE — это не «папка со скриптами», а **command center**: единая точка входа для разработки, диагностики, обслуживания, резервного копирования, проверки доверия к системе и security/anonymity workflow (Tor + OpenPGP).
+
+HOME BASE отвечает на вопросы:
+
+- **Можно ли верить панели `home`?** → Trust system (live-probe)
+- **Всё ли установлено и работает?** → `doctor` (75 проверок)
+- **Что делать дальше?** → `go` / `[следующий]`
+- **Как навести порядок?** → `revise`
+- **Как работать анонимно?** → `anon` (Tor + PGP)
+
+---
+
+## Возможности
+
+| Область | Команды / компоненты |
+|---------|----------------------|
+| **Cockpit** | `home`, `go`, `devstart` |
+| **Диагностика** | `doctor`, `trustcheck`, `scan`, `windowsstatus` |
+| **Обслуживание** | `revise`, `organize`, `cleanup`, `housekeeping` |
+| **Backup** | `backupconfig`, `restoreconfig`, `_Archive` |
+| **Безопасность** | `sec`, `anon`, `tor-*`, `pgp-*` |
+| **Сеть / tools** | `nettools`, `toolcheck`, `sysaudit` |
+| **Восстановление** | `repairterminal`, `fixprofile`, `reloadprofile` |
+
+**Hotkeys:** Ctrl+Alt+G (`go`) · Ctrl+Alt+S (`anon`) · Ctrl+Alt+B (`home`) · Ctrl+Alt+K (`komandy`)
+
+---
+
+## Принципы (кратко)
+
+1. HOME BASE **не врёт** — при проблемах trust показывает UNTRUSTED/STALE.
+2. Любое изменение **можно откатить** — backup-before-mutate.
+3. **Один источник истины** — registry, locale, paths (целевое состояние v2.2+).
+4. **Repository ≠ Runtime** — код в git, состояние на диске отдельно.
+5. **Обратная совместимость** — deprecate → alias → remove (мин. 2 minor).
+
+Полный текст: [docs/charter/PHILOSOPHY.md](docs/charter/PHILOSOPHY.md)
+
+---
+
+## Быстрый старт
 
 ```powershell
-# 1. User-level setup (no admin)
+# Установка
 pwsh -File C:\Scripts\Workstation\Install-Workstation.ps1
 
-# 2. Full setup including hardening (elevated)
-Start-Process pwsh -Verb RunAs -ArgumentList '-File C:\Scripts\Workstation\Install-Workstation.ps1 -Force'
-
-# 3. Reload shell
-. $PROFILE
+# После установки
+fixprofile                    # deploy profile + terminal
+# Закрыть все терминалы → открыть Windows Terminal (wt.exe)
+reloadprofile
+home                          # cockpit
+go                            # меню действий
+revise                        # полный цикл (doctor + trust)
+trustcheck                    # spot-check доверия
 ```
 
----
-
-## Folder Structure
-
-| Path | Purpose |
-|------|---------|
-| `C:\Tools` | Portable binaries, Sysinternals, custom tools |
-| `C:\Scripts` | Automation scripts (this suite lives in `Workstation\`) |
-| `C:\Projects` | Development projects |
-| `C:\Logs` | Application and workstation logs |
-| `C:\Backups` | Configuration backups before changes |
-| `C:\Security` | Policies, exports, Alfa adapter guidelines |
+Подробно: [docs/charter/QUICKSTART.md](docs/charter/QUICKSTART.md)
 
 ---
 
-## Scripts Reference
+## Основные команды
 
-| Script | Admin | Description |
-|--------|-------|-------------|
-| `Install-Workstation.ps1` | Mixed | Master orchestrator |
-| `Install-Software.ps1` | No* | winget packages + PS modules |
-| `Install-ShellProfile.ps1` | No | Profile, Terminal theme, default shell |
-| `Optimize-Performance.ps1` | Yes | Telemetry tasks, services, visual tuning |
-| `Configure-Privacy.ps1` | Yes | Telemetry, ads, DoH DNS |
-| `Harden-Security.ps1` | Yes | Firewall, UAC, SMB, RDP, exploit mitigations |
-| `Configure-Network.ps1` | Yes | Firewall rules, Alfa guidelines |
-| `Backup-Configuration.ps1` | No | Export settings before/after changes |
-| `Rollback-Workstation.ps1` | Yes | Restore from latest backup |
+| Команда | Назначение |
+|---------|------------|
+| `home` | Neural cockpit — health, trust, next steps |
+| `go` | Двухуровневое меню: [anon] + [следующий] + категории |
+| `doctor` | Validate-Workstation — 75 проверок |
+| `trustcheck` | Live integrity probe |
+| `revise` | PATH + sync + doctor + trust + next actions |
+| `backupconfig` | Снимок профиля и конфигов |
+| `cleanup -WhatIf` | Безопасная очистка (сначала preview) |
+| `anon` | Швейцарский нож Tor + PGP |
 
-\*Some winget installs may prompt for elevation.
-
----
-
-## Single winget Command
-
-```powershell
-winget install -e `
-  --id Microsoft.PowerShell `
-  --id Microsoft.WindowsTerminal `
-  --id Git.Git `
-  --id Microsoft.VisualStudioCode `
-  --id Python.Python.3.12 `
-  --id Microsoft.Sysinternals `
-  --id WiresharkFoundation.Wireshark `
-  --id Insecure.Nmap `
-  --id Fastfetch-cli.Fastfetch `
-  --id 7zip.7zip `
-  --id KeePassXC.KeePassXC `
-  --id Bitwarden.Bitwarden `
-  --id voidtools.Everything `
-  --id Notepad++.Notepad++ `
-  --id OBSProject.OBSStudio `
-  --id JanDeDobbeleer.OhMyPosh `
-  --id junegunn.fzf `
-  --id sharkdp.bat `
-  --id eza-community.eza `
-  --id ajeetdsouza.zoxide `
-  --accept-package-agreements `
-  --accept-source-agreements `
-  --disable-interactivity
-```
-
-PowerShell modules (user scope):
-
-```powershell
-Install-Module PSReadLine, posh-git, Terminal-Icons -Scope CurrentUser -Force
-```
+Справка: `имя -help` · `komandy` · [docs/ru/COMMANDS.md](docs/ru/COMMANDS.md)
 
 ---
 
-## PowerShell Profile Features
+## Политика и безопасность
 
-Canonical profile: `C:\Scripts\Workstation\profile\Microsoft.PowerShell_profile.ps1`
+| Документ | Назначение |
+|----------|------------|
+| [LICENSE](LICENSE) | MIT License |
+| [SECURITY.md](SECURITY.md) | Responsible disclosure |
+| [docs/charter/SECURITY-POLICY.md](docs/charter/SECURITY-POLICY.md) | Цепочка безопасных операций |
 
-- **Oh My Posh** — Tokyo Night / hacker palette (`terminal\revios-hacker.omp.json`)
-- **PSReadLine** — syntax colors, history + plugin predictions, Ctrl+R fzf search
-- **posh-git** — branch/status in prompt
-- **Terminal Icons** — file type icons in listings
-- **zoxide** — `z` directory jumping
-- **eza** — modern `ls` / `ll` / `lt`
-- **bat** — syntax-highlighted `cat`
-- **fastfetch** — session banner
-- **Git aliases** — `gs`, `ga`, `gc`, `gp`, `gl`, `gd`, `glog`
-- **Navigation** — `projects`, `tools`, `scripts`, `logs`, `Open-Project`
-- **Lazy loading** — fast non-interactive startup
+> HOME BASE включает security-автоматизацию для **авторизованного lab use**.
+> Пользователь отвечает за соблюдение местного законодательства.
+> Microsoft Defender AV **намеренно не включается** этим проектом.
 
 ---
 
-## Section Details
+## Charter Pack — официальная «Конституция»
 
-### 1. Performance (`Optimize-Performance.ps1`)
-
-| Change | Why |
-|--------|-----|
-| Visual effects tuned | Less compositor overhead |
-| Telemetry scheduled tasks disabled | Less background CPU (if present on ReviOS) |
-| DiagTrack / dmwappush disabled | Telemetry services |
-| SysMain → Manual | SSD-friendly; reduces idle disk activity |
-| WSearch → Manual | Optional if using Everything search |
-
-**Not disabled:** critical services (RPC, DNS, DHCP client, network stack, Windows Update).
-
-### 2. Security (`Harden-Security.ps1`)
-
-| Change | Why |
-|--------|-----|
-| UAC secure prompt | Blocks silent elevation |
-| SMB1 disabled | Legacy protocol attack surface |
-| TLS 1.0/1.1 disabled | Weak crypto |
-| LLMNR disabled | Spoofing on untrusted LANs |
-| RDP disabled by default | Reduce remote attack surface |
-| Firewall block inbound | Default deny inbound all profiles |
-| Exploit Protection mitigations | DEP/ASLR/CFG on browsers + PowerShell |
-| SmartScreen warn | App reputation (not Defender AV) |
-| PS script block logging | Audit trail in Event Viewer |
-| PS transcription | Logs to `C:\Logs\Workstation\PowerShellTranscripts` |
-| Audit policies | Logon, lockout, process creation |
-
-**Limitation:** Attack Surface Reduction (ASR) rules require **Microsoft Defender Antivirus** — intentionally **not** configured here.
-
-### 3. Privacy (`Configure-Privacy.ps1`)
-
-| Change | Why |
-|--------|-----|
-| AllowTelemetry = 0 | Minimize diagnostic data |
-| Advertising ID off | No ad tracking ID |
-| Consumer features off | No suggested apps/tips |
-| Activity feed off | No cross-device activity upload |
-| Setting sync restricted | Less cloud metadata |
-| DNS → Quad9/Cloudflare/Mullvad | Privacy-focused resolvers |
-| DoH enabled | Encrypted DNS where supported |
-| Windows Update **not** disabled | Security patches continue |
-
-### 4. Networking (`Configure-Network.ps1`)
-
-- Public profile: block inbound SMB/NetBIOS
-- Firewall logging enabled (check `%systemroot%\system32\LogFiles\Firewall\`)
-- Policy export: `C:\Security\exports\firewall-policy.wfw`
-- Alfa guidelines: `C:\Security\Alfa-Adapter-Guidelines.md`
+| # | Документ | Назначение |
+|---|----------|------------|
+| 1 | [docs/charter/README.md](docs/charter/README.md) | Обзор charter |
+| 2 | [QUICKSTART.md](docs/charter/QUICKSTART.md) | Установка и ежедневная работа |
+| 3 | [ARCHITECTURE.md](docs/charter/ARCHITECTURE.md) | Архитектура системы |
+| 4 | [PHILOSOPHY.md](docs/charter/PHILOSOPHY.md) | Миссия и принципы |
+| 5 | [CODING-STANDARD.md](docs/charter/CODING-STANDARD.md) | Стандарт разработки |
+| 6 | [UI-STYLE-GUIDE.md](docs/charter/UI-STYLE-GUIDE.md) | Единый интерфейс |
+| 7 | [LANGUAGE-POLICY.md](docs/charter/LANGUAGE-POLICY.md) | Локализация RU/EN |
+| 8 | [SECURITY-POLICY.md](docs/charter/SECURITY-POLICY.md) | Безопасность операций |
+| 9 | [BACKUP-POLICY.md](docs/charter/BACKUP-POLICY.md) | Backup / restore / archive |
+| 10 | [LOGGING-STANDARD.md](docs/charter/LOGGING-STANDARD.md) | Логирование |
+| 11 | [COMMAND-STANDARD.md](docs/charter/COMMAND-STANDARD.md) | Стандарт команд |
+| 12 | [TESTING-STANDARD.md](docs/charter/TESTING-STANDARD.md) | Тестирование |
+| 13 | [VERSIONING.md](docs/charter/VERSIONING.md) | Semver |
+| 14 | [LIFECYCLE.md](docs/charter/LIFECYCLE.md) | Жизненный цикл команд |
+| 15 | [ROADMAP.md](docs/charter/ROADMAP.md) | Дорожная карта |
+| 16 | [CONTRIBUTING.md](docs/charter/CONTRIBUTING.md) | Участие в проекте |
+| 17 | [CHANGELOG.md](docs/charter/CHANGELOG.md) | История изменений |
+| 18 | [adr/](docs/charter/adr/) | Architecture Decision Records |
+| 19 | [EXECUTION-PLAN.md](docs/charter/EXECUTION-PLAN.md) | План модернизации |
+| 20 | [EXECUTIVE-SUMMARY.md](docs/charter/EXECUTIVE-SUMMARY.md) | Итоговый отчёт |
 
 ---
 
-## DNS Providers
+## Связанная документация
 
-| Provider | DNS | DoH |
-|----------|-----|-----|
-| **Quad9** (default) | 9.9.9.9, 149.112.112.112 | dns.quad9.net |
-| **Cloudflare** | 1.1.1.1, 1.0.0.1 | cloudflare-dns.com |
-| **Mullvad** | 194.242.2.2, 194.242.2.3 | dns.mullvad.net |
-
-```powershell
-Configure-Privacy.ps1 -DnsProvider Cloudflare -Force
-```
+| Путь | Содержание |
+|------|------------|
+| [docs/ru/QUICKREF.md](docs/ru/QUICKREF.md) | Быстрая справка (auto-sync) |
+| [docs/ru/COMMANDS.md](docs/ru/COMMANDS.md) | Каталог команд |
+| [docs/ru/TRUST.md](docs/ru/TRUST.md) | Trust system |
+| [docs/ru/PGP-TOR-BASICS.md](docs/ru/PGP-TOR-BASICS.md) | Tor + PGP |
 
 ---
 
-## Rollback
-
-Automatic backups: `C:\Backups\Workstation\<timestamp>\`
-
-```powershell
-# Restore latest backup (admin)
-Start-Process pwsh -Verb RunAs -ArgumentList '-File C:\Scripts\Workstation\Rollback-Workstation.ps1 -Force'
-
-# Restore specific backup
-Rollback-Workstation.ps1 -BackupFolder 'C:\Backups\Workstation\20250628-120000' -Force
-```
-
-Manual rollback:
-1. Import `.reg` files from backup `registry\` folder
-2. Copy profile + Terminal JSON from backup
-3. `netsh advfirewall import C:\Backups\Workstation\<ts>\firewall-policy.wfw`
-
-**Defender is never re-enabled by rollback.**
-
----
-
-## Maintenance Schedule
-
-| Frequency | Task |
-|-----------|------|
-| Weekly | `winget upgrade --all`; review `C:\Logs\Workstation` |
-| Monthly | `Backup-Configuration.ps1`; review firewall logs |
-| Monthly | Audit startup apps (Task Manager) |
-| Quarterly | Review `Harden-Security.ps1` for new mitigations |
-| After major updates | Re-run `Install-ShellProfile.ps1 -Force` if Terminal resets |
-
----
-
-## Windows Terminal
-
-- Default profile: **PowerShell 7**
-- Color scheme: **ReviOS Hack Dark**
-- Font: **Caskaydia Cove Nerd Font**
-- Start directory: `C:\Projects`
-
----
-
-## Without Defender — Compensating Controls
-
-1. Keep **Windows Update** enabled
-2. **Firewall** default deny inbound
-3. **SmartScreen** warnings for unknown apps
-4. **Exploit Protection** mitigations
-5. **UAC** always on
-6. **PowerShell logging** for forensics
-7. **DNS-over-HTTPS** against tampering
-8. Consider periodic on-demand scans of downloads (your choice — not installed here)
-
----
-
-## Logs
-
-| Location | Content |
-|----------|---------|
-| `C:\Logs\Workstation\workstation.log` | Setup script log |
-| `C:\Logs\Workstation\PowerShellTranscripts\` | PS transcription (if hardening applied) |
-| `%systemroot%\system32\LogFiles\Firewall\pfirewall.log` | Blocked/allowed connections |
-
----
-
-## License / Responsibility
-
-For **authorized** security research and professional use only. You are responsible for compliance with applicable laws and network policies.
+*HOME BASE v2.0.0 · MIT License · See [SECURITY.md](SECURITY.md) for vulnerability reporting*
