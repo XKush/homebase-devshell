@@ -110,3 +110,14 @@ function Confirm-WorkstationAction {
 function Assert-DefenderUntouched {
     Write-WorkstationLog 'Policy: Microsoft Defender AV must remain disabled — no Defender enable/install actions in this suite.' 'INFO'
 }
+
+function Initialize-OpenSslPath {
+    if (Get-Command openssl -ErrorAction SilentlyContinue) { return $true }
+    foreach ($bin in @('C:\Program Files\OpenSSL-Win64\bin', 'C:\Program Files\OpenSSL\bin')) {
+        if (Test-Path (Join-Path $bin 'openssl.exe')) {
+            if ($env:Path -notlike "*$bin*") { $env:Path = "$env:Path;$bin" }
+            return $true
+        }
+    }
+    return $false
+}

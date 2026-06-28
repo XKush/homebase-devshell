@@ -128,9 +128,19 @@ function Ensure-TorBrowserProfileDir {
     return $default
 }
 
+function Get-KGreenTorFirewallRules {
+    Get-NetFirewallRule -ErrorAction SilentlyContinue |
+        Where-Object { $_.DisplayName -like 'KGreen-Tor-*' }
+}
+
+function Remove-KGreenTorFirewallRules {
+    Get-KGreenTorFirewallRules | Remove-NetFirewallRule -ErrorAction SilentlyContinue
+}
+
 function Test-TorKillSwitchActive {
-    $rules = Get-NetFirewallRule -DisplayGroup 'KGreen-Tor-Lock' -ErrorAction SilentlyContinue
-    return [bool]($rules | Where-Object { $_.Enabled -eq 'True' })
+    $rules = Get-KGreenTorFirewallRules | Where-Object { $_.Enabled -eq 'True' }
+    if ($rules) { return $true }
+    return $env:WORKSTATION_TOR_LOCK -eq '1'
 }
 
 function Enable-TorKillSwitch {
@@ -143,17 +153,17 @@ function Enable-TorKillSwitch {
     if (-not $torExe) { throw 'Tor Browser not found — run tor-setup first.' }
 
     $torDir = Split-Path $torExe -Parent
-    $group = 'KGreen-Tor-Lock'
+    Remove-KGreenTorFirewallRules
 
-    Remove-NetFirewallRule -DisplayGroup $group -ErrorAction SilentlyContinue
+    $ruleCommon = @{ Group = 'KGreen-Tor-Lock'; Direction = 'Outbound'; Profile = 'Any'; Enabled = 'True' }
 
-    New-NetFirewallRule -DisplayName 'KGreen-Tor-Allow-TorBrowser' -DisplayGroup $group `
-        -Direction Outbound -Action Allow -Program $torExe -Profile Any -Enabled True | Out-Null
+    New-NetFirewallRule @ruleCommon -DisplayName 'KGreen-Tor-Allow-TorBrowser' `
+        -Action Allow -Program $torExe | Out-Null
 
     $torProcess = Join-Path $torDir 'TorBrowser\Tor\tor.exe'
     if (Test-Path $torProcess) {
-        New-NetFirewallRule -DisplayName 'KGreen-Tor-Allow-tor' -DisplayGroup $group `
-            -Direction Outbound -Action Allow -Program $torProcess -Profile Any -Enabled True | Out-Null
+        New-NetFirewallRule @ruleCommon -DisplayName 'KGreen-Tor-Allow-tor' `
+            -Action Allow -Program $torProcess | Out-Null
     }
 
     $blockPrograms = @(
@@ -169,8 +179,8 @@ function Enable-TorKillSwitch {
         if (-not (Test-Path $prog)) { continue }
         if ($prog -like "$torDir*") { continue }
         $name = Split-Path $prog -Leaf
-        New-NetFirewallRule -DisplayName "KGreen-Tor-Block-$name" -DisplayGroup $group `
-            -Direction Outbound -Action Block -Program $prog -Profile Any -Enabled True | Out-Null
+        New-NetFirewallRule @ruleCommon -DisplayName "KGreen-Tor-Block-$name" `
+            -Action Block -Program $prog | Out-Null
     }
 
     [Environment]::SetEnvironmentVariable('WORKSTATION_TOR_LOCK', '1', 'User')
@@ -181,7 +191,7 @@ function Disable-TorKillSwitch {
             [Security.Principal.WindowsBuiltInRole]::Administrator)) {
         throw 'tor-unlock requires Administrator.'
     }
-    Remove-NetFirewallRule -DisplayGroup 'KGreen-Tor-Lock' -ErrorAction SilentlyContinue
+    Remove-KGreenTorFirewallRules
     [Environment]::SetEnvironmentVariable('WORKSTATION_TOR_LOCK', $null, 'User')
 }
 

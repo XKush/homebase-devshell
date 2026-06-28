@@ -1,8 +1,10 @@
 # Network — сетевая панель и инструменты
+. (Join-Path $script:WSRoot 'lib\WorkstationCommon.ps1')
 
 $script:NetworkingHome = if ($env:NETWORKING_HOME) { $env:NETWORKING_HOME } else { 'C:\Networking' }
 
 function Get-WorkstationToolInventory {
+    Initialize-OpenSslPath | Out-Null
     $tools = @(
         @{ Group = 'Сеть'; Name = 'Nmap';       Cmd = 'nmap';       VersionArg = '--version' }
         @{ Group = 'Сеть'; Name = 'Wireshark';   Cmd = 'wireshark';  VersionArg = '--version' }
