@@ -3,7 +3,7 @@
 .SYNOPSIS
     Comprehensive workstation validation — run after setup or changes.
 .OUTPUTS
-    JSON report at C:\Logs\Workstation\validation-<timestamp>.json
+    JSON report at {LogsRoot}/validation-<timestamp>.json (via Get-HomeBasePath)
 #>
 param(
     [switch]$Fix,
@@ -12,6 +12,28 @@ param(
 
 $ErrorActionPreference = 'Continue'
 . "$PSScriptRoot\lib\WorkstationCommon.ps1"
+
+$repoRoot       = if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) { Get-HomeBasePath -Name RepositoryRoot } else { $PSScriptRoot }
+$logsRoot       = Get-WorkstationLogsRoot
+$modulePath     = Join-Path $repoRoot 'modules\KGreen.Workstation.psm1'
+$canonical      = Join-Path $repoRoot 'profile\Microsoft.PowerShell_profile.ps1'
+$ompConfig      = Join-Path $repoRoot 'terminal\revios-hacker.omp.json'
+$centerScript   = Join-Path $repoRoot 'lib\WorkstationCommandCenter.ps1'
+$wocScript      = Join-Path $repoRoot 'lib\WorkstationOperationsCenter.ps1'
+$menuAuditPath  = Join-Path $repoRoot 'Test-MenuAudit.ps1'
+$toolkitLegacy  = Join-Path $repoRoot 'lib\WorkstationToolkit.ps1'
+$fontStatusPath = Join-Path $logsRoot 'font-status.json'
+$structureDirs  = @(
+    (Get-HomeBasePath -Name Tools)
+    (Get-HomeBasePath -Name Scripts)
+    (Get-HomeBasePath -Name Projects)
+    (Split-Path (Get-HomeBasePath -Name Logs) -Parent)
+    (Split-Path (Get-HomeBasePath -Name Backups) -Parent)
+    (Get-HomeBasePath -Name Security)
+    (Get-HomeBasePath -Name Networking)
+    (Split-Path (Get-HomeBasePath -Name Configs) -Parent)
+    (Split-Path (Get-HomeBasePath -Name Temp) -Parent)
+)
 
 $report = [ordered]@{
     Timestamp = (Get-Date).ToString('o')
@@ -69,7 +91,6 @@ foreach ($mod in $requiredModules) {
 
 # ── 3. Profile integrity ─────────────────────────────────────────────────────
 Write-WorkstationStep 'Profile integrity'
-$canonical = 'C:\Scripts\Workstation\profile\Microsoft.PowerShell_profile.ps1'
 $live      = Join-Path $HOME 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'
 if (Test-Path $canonical) { Add-Pass 'Canonical profile exists' } else { Add-Fail 'Canonical profile missing' }
 if (Test-Path $live) {
@@ -102,7 +123,6 @@ Add-Pass "pwsh cold start: $($sw2.ElapsedMilliseconds)ms"
 
 # ── 5. Oh My Posh ────────────────────────────────────────────────────────────
 Write-WorkstationStep 'Oh My Posh'
-$ompConfig = 'C:\Scripts\Workstation\terminal\revios-hacker.omp.json'
 if (Test-Path $ompConfig) {
     Add-Pass 'OMP theme file exists'
     try {
@@ -189,7 +209,7 @@ foreach ($pc in $pathChecks) {
 
 # ── 11. Folder structure ─────────────────────────────────────────────────────
 Write-WorkstationStep 'Folder structure'
-foreach ($dir in @('C:\Tools','C:\Scripts','C:\Projects','C:\Logs','C:\Backups','C:\Security','C:\Networking','C:\Configs','C:\Temp')) {
+foreach ($dir in $structureDirs) {
     if (Test-Path $dir) { Add-Pass "Directory: $dir" } else { Add-Fail "Directory missing: $dir" }
 }
 
@@ -252,10 +272,9 @@ try {
 
 # ── 13b. SHADOW OPS readiness ───────────────────────────────────────────────────
 Write-WorkstationStep 'SHADOW OPS readiness'
-$modPath = 'C:\Scripts\Workstation\modules\KGreen.Workstation.psm1'
-if (Test-Path $modPath) {
+if (Test-Path $modulePath) {
     $secTest = pwsh -NoProfile -Command @"
-Import-Module '$modPath' -Force
+Import-Module '$modulePath' -Force
 `$r = Get-SecurityReadinessReport
 Write-Output "PGP:`$(`$r.PgpReady)"
 Write-Output "TOR:`$(`$r.TorReady)"
@@ -274,13 +293,12 @@ Write-Output "LVL:`$(`$r.Level)"
 
 # ── 14. Onboarding helpers & command center ──────────────────────────────────
 Write-WorkstationStep 'Command center'
-$centerScript = 'C:\Scripts\Workstation\lib\WorkstationCommandCenter.ps1'
 $requiredCmds = @(
     'doctor','repairterminal','updateall','backupconfig','restoreconfig','cleanup',
     'healthcheck','workstationstatus','securitycheck','devstart','workspace',
     'cheatsheet','helpme','fixprofile','reloadprofile','sysreport','logs','networkstatus','learn',
     'nettools','toolbox','toolcheck','sysaudit',
-    'jarvis','dashboard','home','menu','scan','trustcheck','sec','revise','komandy','palette'
+    'jarvis','dashboard','home','menu','go','scan','trustcheck','sec','revise','organize','downloads','komandy','palette'
 )
 $helperTest = pwsh -NoProfile -Command @"
 `$env:WORKSTATION_DASHBOARD='0'; `$env:WORKSTATION_DASHBOARD_SHOWN='1'; `$env:WORKSTATION_WELCOMED='1'; `$env:CI='1'
@@ -292,9 +310,34 @@ $missingHelpers = $helperTest | Where-Object { $_ -like 'MISSING:*' }
 if (-not $missingHelpers) { Add-Pass 'Command center commands loaded' }
 else { Add-Fail ($missingHelpers -join ', ') }
 
-if (Test-Path 'C:\Scripts\Workstation\modules\KGreen.Workstation.psm1') { Add-Pass 'KGreen.Workstation module present' }
-elseif (Test-Path 'C:\Scripts\Workstation\lib\WorkstationToolkit.ps1') { Add-Pass 'Toolkit module present (legacy)' }
+if (Test-Path $modulePath) { Add-Pass 'KGreen.Workstation module present' }
+elseif (Test-Path $toolkitLegacy) { Add-Pass 'Toolkit module present (legacy)' }
 else { Add-Fail 'Command center module missing' }
+
+Write-WorkstationStep 'go menu integrity'
+if (Test-Path $menuAuditPath) {
+    $menuOut = pwsh -NoLogo -NoProfile -File $menuAuditPath 2>&1 | Out-String
+    if ($LASTEXITCODE -eq 0) { Add-Pass 'go menu audit OK' }
+    else { Add-Fail "go menu audit: $($menuOut.Trim())" }
+} else {
+    Add-Warn 'Test-MenuAudit.ps1 missing'
+}
+
+$menuDeepPath = Join-Path $PSScriptRoot 'Test-MenuDeepAudit.ps1'
+if (Test-Path $menuDeepPath) {
+    $deepOut = pwsh -NoLogo -NoProfile -File $menuDeepPath 2>&1 | Out-String
+    if ($LASTEXITCODE -eq 0) { Add-Pass 'menu deep audit OK' }
+    else { Add-Fail "menu deep audit: $($deepOut.Trim())" }
+}
+
+$anonAuditPath = Join-Path $PSScriptRoot 'Test-AnonymityKitAudit.ps1'
+if (Test-Path $anonAuditPath) {
+    $anonOut = pwsh -NoLogo -NoProfile -File $anonAuditPath 2>&1 | Out-String
+    if ($LASTEXITCODE -eq 0) { Add-Pass 'anon kit audit OK' }
+    else { Add-Fail "anon kit audit: $($anonOut.Trim())" }
+} else {
+    Add-Warn 'Test-AnonymityKitAudit.ps1 missing'
+}
 
 Write-WorkstationStep 'Network tools'
 @(
@@ -312,14 +355,14 @@ Write-WorkstationStep 'Network tools'
     else { Add-Pass "Optional network tool absent: $($_.Name)" }
 }
 
-if (Test-Path 'C:\Scripts\Workstation\lib\WorkstationOperationsCenter.ps1') { Add-Pass 'WOC module present' }
+if (Test-Path $wocScript) { Add-Pass 'WOC module present' }
 else { Add-Fail 'WOC module missing' }
 
 Write-WorkstationStep 'Startup command center benchmark'
 $ccBench = pwsh -NoProfile -Command @"
 `$env:CI=''
 `$sw = [Diagnostics.Stopwatch]::StartNew()
-. 'C:\Scripts\Workstation\lib\WorkstationOperationsCenter.ps1'
+. '$wocScript'
 Show-Woc -Mode minimal -Force -NoHeal | Out-Null
 `$sw.Stop()
 Write-Output `$sw.ElapsedMilliseconds
@@ -329,9 +372,9 @@ $report.Metrics['CommandCenterMs'] = $ccMs
 if ($ccMs -le 1000) { Add-Pass "Command center render: ${ccMs}ms <= 1000ms" }
 else { Add-Warn "Command center render: ${ccMs}ms (target 1000ms)" }
 
-if (Test-Path 'C:\Logs\Workstation\font-status.json') {
+if (Test-Path $fontStatusPath) {
     try {
-        $fs = Get-Content 'C:\Logs\Workstation\font-status.json' -Raw | ConvertFrom-Json
+        $fs = Get-Content $fontStatusPath -Raw | ConvertFrom-Json
         if ($fs.FontFace -eq 'CaskaydiaCove NF') { Add-Pass 'Font status: CaskaydiaCove NF' }
         else { Add-Warn "Font status: $($fs.FontFace)" }
     } catch { Add-Warn 'font-status.json unreadable' }
@@ -365,7 +408,7 @@ $report.Metrics['FailCount']  = $report.Failed.Count
 $report.Metrics['WarnCount']  = $report.Warnings.Count
 $report.Metrics['Complete']   = ($report.Failed.Count -eq 0)
 
-$outDir = 'C:\Logs\Workstation'
+$outDir = $logsRoot
 if (-not (Test-Path $outDir)) { New-Item -ItemType Directory -Force -Path $outDir | Out-Null }
 $outFile = Join-Path $outDir ("validation-{0}.json" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
 $report | ConvertTo-Json -Depth 6 | Set-Content $outFile -Encoding UTF8
@@ -388,4 +431,7 @@ if ($report.Warnings.Count -gt 0) {
     $report.Warnings | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
 }
 
-exit $(if ($report.Failed.Count -eq 0) { 0 } else { 1 })
+$exitCode = if ($report.Failed.Count -eq 0) { 0 } else { 1 }
+$global:LASTEXITCODE = $exitCode
+if ($MyInvocation.InvocationName -eq '.') { exit $exitCode }
+return
