@@ -130,6 +130,27 @@ trustcheck                    # spot-check доверия
 | 19 | [EXECUTION-PLAN.md](docs/charter/EXECUTION-PLAN.md) | План модернизации |
 | 20 | [EXECUTIVE-SUMMARY.md](docs/charter/EXECUTIVE-SUMMARY.md) | Итоговый отчёт |
 
+### Release (Phase 1.5)
+
+| Документ | Назначение |
+|----------|------------|
+| [RELEASE-CHECKLIST.md](docs/charter/RELEASE-CHECKLIST.md) | Чек-лист перед tag |
+| [RELEASE-REQUIREMENTS.md](docs/charter/RELEASE-REQUIREMENTS.md) | PATCH / MINOR / MAJOR |
+| [SUPPORT-POLICY.md](docs/charter/SUPPORT-POLICY.md) | Supported / Deprecated |
+| [COMPATIBILITY.md](docs/charter/COMPATIBILITY.md) | PowerShell / Windows |
+| [ENVIRONMENT-MATRIX.md](docs/charter/ENVIRONMENT-MATRIX.md) | Протестированные окружения |
+
+```powershell
+pwsh -File C:\Scripts\Workstation\Test-ReleaseVersion.ps1
+```
+
+**Rollback anchor:** `git checkout v2.0.0` (product) · docs commits без tag
+
+| Документ | Назначение |
+|----------|------------|
+| [MIGRATION.md](docs/charter/MIGRATION.md) | Migration policy — контракт Phase 2 |
+| [ARCHITECTURE-FREEZE.md](docs/charter/ARCHITECTURE-FREEZE.md) | Freeze до завершения Phase 2 |
+
 ---
 
 ## Связанная документация
