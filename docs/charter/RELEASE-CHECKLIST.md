@@ -2,7 +2,7 @@
 
 Единый чек-лист выпуска релиза. Использовать **перед каждым** Git tag `vX.Y.Z`.
 
-**Rollback anchor:** `v2.0.0` — process/docs commits do **not** create new tags. — последняя проверенная OSS baseline до Phase 2.
+**Rollback anchor:** `v2.0.0` (product) · **Phase 2 compare:** [phase2-step1-stable.json](../baselines/phase2-step1-stable.json)
 
 ---
 
@@ -56,6 +56,7 @@ trustcheck
 revise -Quick
 Test-MenuDeepAudit.ps1
 Test-WorkstationCommands.ps1 -Quick
+Test-LegacyEquivalence.ps1          # Phase 2: behavior unchanged vs step1 baseline
 ```
 
 | Gate | Pass criteria |
