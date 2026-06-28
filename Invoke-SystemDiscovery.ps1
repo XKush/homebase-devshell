@@ -3,9 +3,22 @@
 .SYNOPSIS
     Phase 1 — Full system discovery (read-only audit, no modifications).
 #>
-param([string]$OutDir = 'C:\Logs\Workstation')
+param([string]$OutDir)
 
 $ErrorActionPreference = 'Continue'
+. "$PSScriptRoot\lib\WorkstationCommon.ps1"
+
+if (-not $OutDir) {
+    $OutDir = Get-WorkstationLogsRoot
+}
+
+$repoRoot = if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+    Get-HomeBasePath -Name RepositoryRoot
+} else {
+    $PSScriptRoot
+}
+$backupsRoot = Get-WorkstationBackupsRoot
+
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 if (-not (Test-Path $OutDir)) { New-Item -ItemType Directory -Force -Path $OutDir | Out-Null }
 
@@ -24,6 +37,14 @@ $discovery = [ordered]@{
     Issues    = [System.Collections.Generic.List[string]]::new()
 }
 
+$env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' +
+    [Environment]::GetEnvironmentVariable('Path', 'User')
+
+$toolFallbacks = @{
+    node = 'C:\Program Files\nodejs\node.exe'
+    rg   = 'C:\Users\Admin\AppData\Local\Microsoft\WinGet\Links\rg.exe'
+}
+
 # OS
 $os = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
 $discovery.OS = [ordered]@{
@@ -37,8 +58,12 @@ $discovery.OS = [ordered]@{
 $toolList = @('pwsh','git','python','winget','code','oh-my-posh','fzf','bat','eza','zoxide','fastfetch','rg','nmap','7z','node','pipx')
 foreach ($t in $toolList) {
     $c = Get-Command $t -ErrorAction SilentlyContinue
+    if (-not $c -and $toolFallbacks.ContainsKey($t) -and (Test-Path $toolFallbacks[$t])) {
+        $discovery.Tools[$t] = $toolFallbacks[$t]
+        continue
+    }
     $discovery.Tools[$t] = if ($c) { $c.Source } else { $null }
-    if (-not $c) { $discovery.Issues.Add("Missing tool: $t") }
+    if (-not $discovery.Tools[$t]) { $discovery.Issues.Add("Missing tool: $t") }
 }
 
 # Modules
@@ -81,7 +106,7 @@ $discovery.PathEnv = [ordered]@{
 if ($dupes) { $discovery.Issues.Add("PATH duplicates: $($dupes.Count)") }
 
 # Profile
-$canon = 'C:\Scripts\Workstation\profile\Microsoft.PowerShell_profile.ps1'
+$canon = Join-Path $repoRoot 'profile\Microsoft.PowerShell_profile.ps1'
 $live  = Join-Path $HOME 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'
 $discovery.Profile = [ordered]@{
     CanonicalExists = Test-Path $canon
@@ -111,10 +136,14 @@ Get-CimInstance Win32_StartupCommand -EA SilentlyContinue | ForEach-Object {
 }
 
 # Backups
-$bak = Get-ChildItem 'C:\Backups\Workstation' -Directory -EA SilentlyContinue | Sort-Object Name -Descending | Select-Object -First 1
+$bak = Get-ChildItem $backupsRoot -Directory -EA SilentlyContinue |
+    Where-Object { $_.Name -notmatch '^_' } |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -First 1
 $discovery.Backups = [ordered]@{
     Latest = if ($bak) { $bak.Name } else { 'none' }
-    Count  = (Get-ChildItem 'C:\Backups\Workstation' -Directory -EA SilentlyContinue).Count
+    Count  = (Get-ChildItem $backupsRoot -Directory -EA SilentlyContinue |
+        Where-Object { $_.Name -notmatch '^_' }).Count
 }
 
 # Benchmark
