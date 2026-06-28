@@ -9,8 +9,9 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$wsRoot = 'C:\Scripts\Workstation'
-Import-Module (Join-Path $wsRoot 'modules\KGreen.Workstation.psm1') -Force
+. "$PSScriptRoot\lib\WorkstationCommon.ps1"
+$wsRoot = Get-HomeBasePath -Name RepositoryRoot
+Ensure-WorkstationModuleLoaded -Root $wsRoot | Out-Null
 
 $catalog = Get-WorkstationHelpCatalog
 $registry = Get-WorkstationCommandRegistry
@@ -42,10 +43,11 @@ if (-not $CheckOnly) {
         ''
         '| Команда | Назначение |'
         '|---------|------------|'
-        '| `sec` | SHADOW OPS — Tor + PGP меню |'
-        '| `menu` / `hack` | Главное hacker-меню |'
+        '| `sec` | Tor + PGP |'
+        '| `menu` | Главное меню |'
+        '| `palette` | Поиск команд (fzf) |'
         '| `trustcheck` | Live integrity |'
-        '| `tor-check` | Preflight перед Tor |'
+        '| `tor-check` | Preflight Tor |'
         ''
     )
 
@@ -62,15 +64,14 @@ if (-not $CheckOnly) {
 
     $quick += @(
         ''
-        '## SHADOW OPS playbook'
+        '## Tor + PGP — порядок'
         ''
         '1. `sec` или `tor-check`'
         '2. `tor-harden` (один раз)'
-        '3. `tor-lock` (admin, перед сессией)'
-        '4. только Tor Browser + `pgp-fingerprint`'
-        '5. `tor-unlock` (admin, после)'
+        '3. Tor Browser + `pgp-fingerprint`'
+        '4. закрой Tor Browser после сессии'
         ''
-        '## Env'
+        '## Переменные'
         ''
         '- WORKSTATION_STARTUP_MODE = minimal|normal|full'
         '- WORKSTATION_TRUST_MODE = strict|normal|fast'
