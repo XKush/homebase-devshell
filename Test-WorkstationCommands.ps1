@@ -9,14 +9,16 @@
 param(
     [switch]$Quick,
     [switch]$ReportOnly,
-    [string]$OutputPath = 'C:\Logs\Workstation\command-health.json'
+    [string]$OutputPath
 )
 
 $ErrorActionPreference = 'Continue'
 $wsRoot = 'C:\Scripts\Workstation'
+. (Join-Path $wsRoot 'lib\HomeBasePaths.ps1')
+if (-not $OutputPath) { $OutputPath = Join-Path (Get-HomeBasePath -Name Logs) 'command-health.json' }
 $modulePath = Join-Path $wsRoot 'modules\KGreen.Workstation.psm1'
-$logPath = 'C:\Logs\Workstation\commands.log'
-$reportDir = 'C:\Logs\Workstation'
+$logPath = Join-Path (Get-HomeBasePath -Name Logs) 'commands.log'
+$reportDir = Get-HomeBasePath -Name Logs
 
 if (-not (Test-Path $reportDir)) { New-Item -ItemType Directory -Force -Path $reportDir | Out-Null }
 
@@ -95,7 +97,7 @@ foreach ($entry in $registry) {
     if ($cmdExists) {
         try {
             $cmdObj = Get-Command $name -ErrorAction SilentlyContinue
-            if ($cmdObj -and $cmdObj.Parameters.ContainsKey('Help')) { $helpOk = $true }
+            if ($cmdObj -and $cmdObj.Parameters -and $cmdObj.Parameters.ContainsKey('Help')) { $helpOk = $true }
         } catch { }
     }
 

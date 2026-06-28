@@ -1,7 +1,24 @@
 # Workstation Operations Center (WOC) — KGreen
 # C:\Scripts\Workstation\lib\WorkstationOperationsCenter.ps1
 
-$script:WocLogDir    = 'C:\Logs\Workstation'
+$pathsLib = Join-Path $PSScriptRoot 'HomeBasePaths.ps1'
+if (Test-Path $pathsLib) { . $pathsLib }
+
+function Get-WocLogsRoot {
+    if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+        return Get-HomeBasePath -Name Logs
+    }
+    return 'C:\Logs\Workstation'
+}
+
+function Get-WocBackupsRoot {
+    if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+        return Get-HomeBasePath -Name Backups
+    }
+    return 'C:\Backups\Workstation'
+}
+
+$script:WocLogDir    = Get-WocLogsRoot
 $script:WocStatePath = Join-Path $script:WocLogDir 'woc-last-session.json'
 $script:WocCachePath = Join-Path $script:WocLogDir 'woc-cache.json'
 $script:WocOwner     = 'KGreen'
@@ -198,8 +215,10 @@ function Get-WocBackupBlock {
             SizeMB = $b.SizeMB; Status = $b.Status; RestoreTest = $b.RestoreTest ?? 'never recorded'
         }
     }
-    $root = 'C:\Backups\Workstation'
-    $dirs = @(Get-ChildItem $root -Directory -EA SilentlyContinue | Sort-Object Name -Descending)
+    $root = Get-WocBackupsRoot
+    $dirs = @(Get-ChildItem $root -Directory -EA SilentlyContinue |
+        Where-Object { $_.Name -ne '_Archive' } |
+        Sort-Object LastWriteTime -Descending)
     $latest = $dirs | Select-Object -First 1
     $block = [ordered]@{ Count = $dirs.Count; Latest = $null; DaysAgo = $null; SizeMB = 0; Status = 'ERROR'; RestoreTest = 'never recorded' }
     if ($latest) {

@@ -1,6 +1,35 @@
 # Workstation setup shared helpers
 # C:\Scripts\Workstation\lib\WorkstationCommon.ps1
 
+$pathsLib = Join-Path $PSScriptRoot 'HomeBasePaths.ps1'
+if (Test-Path $pathsLib) { . $pathsLib }
+
+function Get-WorkstationLogsRoot {
+    if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+        return Get-HomeBasePath -Name Logs
+    }
+    return 'C:\Logs\Workstation'
+}
+
+function Get-WorkstationBackupsRoot {
+    if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+        return Get-HomeBasePath -Name Backups
+    }
+    return 'C:\Backups\Workstation'
+}
+
+function Ensure-WorkstationModuleLoaded {
+    param([string]$Root = 'C:\Scripts\Workstation')
+    if (Get-Module KGreen.Workstation) { return $true }
+    if ((Get-Command Get-WorkstationCommandHealth, Test-ShowCommandHelp -ErrorAction SilentlyContinue).Count -ge 2) {
+        return $true
+    }
+    $modPath = Join-Path $Root 'modules\KGreen.Workstation.psm1'
+    if (-not (Test-Path $modPath)) { return $false }
+    Import-Module $modPath -DisableNameChecking -Force -Scope Global -ErrorAction Stop
+    return [bool](Get-Module KGreen.Workstation)
+}
+
 function Test-WorkstationAdmin {
     $current = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
     return $current.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -14,7 +43,7 @@ function Assert-WorkstationAdmin {
 
 function Get-WorkstationLogPath {
     param([string]$Name)
-    $dir = 'C:\Logs\Workstation'
+    $dir = Get-WorkstationLogsRoot
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
     return Join-Path $dir $Name
 }
@@ -49,7 +78,7 @@ function Backup-RegistryKey {
         [Parameter(Mandatory)][string]$Path,
         [string]$Label
     )
-    $backupRoot = 'C:\Backups\Workstation\registry'
+    $backupRoot = Join-Path (Get-WorkstationBackupsRoot) 'registry'
     if (-not (Test-Path $backupRoot)) {
         New-Item -ItemType Directory -Force -Path $backupRoot | Out-Null
     }

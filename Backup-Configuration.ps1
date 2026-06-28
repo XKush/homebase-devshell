@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 . "$PSScriptRoot\lib\WorkstationCommon.ps1"
 
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$dest = Join-Path 'C:\Backups\Workstation' $stamp
+$dest = Join-Path (Get-WorkstationBackupsRoot) $stamp
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
 
 Write-WorkstationStep "Backup destination: $dest"
