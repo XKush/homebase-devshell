@@ -36,11 +36,18 @@ function Get-HomeBaseRecommendationsRu {
 
     if (-not $hasProblems) {
         $rec.Add('deploy: devstart · projects')
-        $rec.Add('intel: komandy · instrumenty · hack')
+        $rec.Add('intel: sec · menu · komandy')
         $rec.Add('integrity confirmed — trustcheck')
     }
 
-    return @($rec | Select-Object -Unique | Select-Object -First 5)
+    if (Get-Command Get-SecurityReadinessReport -ErrorAction SilentlyContinue) {
+        $sec = Get-SecurityReadinessReport
+        if (-not $sec.PgpReady) { $rec.Insert(0, 'sec — PGP: pgp-repair или pgp-setup') }
+        if (-not $sec.TorReady) { $rec.Insert(0, 'sec — Tor: tor-setup → tor-harden') }
+        elseif (-not $sec.Hardened) { $rec.Insert(0, 'tor-harden — профиль Tor Browser') }
+    }
+
+    return @($rec | Select-Object -Unique | Select-Object -First 6)
 }
 
 function Show-HomeBase {
@@ -170,6 +177,10 @@ function Show-HomeBase {
     }
 
     Show-HackerRecommendations -Items $recommendations
+
+    if ($mode -ne 'minimal' -and (Get-Command Show-SecurityStatusPanel -ErrorAction SilentlyContinue)) {
+        Show-SecurityStatusPanel
+    }
 
     if ($mode -eq 'minimal') {
         Show-HackerFooter -Mode 'minimal'

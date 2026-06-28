@@ -1,5 +1,5 @@
 # Shared command center infrastructure
-$script:WSRoot = 'C:\Scripts\Workstation'
+if (-not $script:WSRoot) { $script:WSRoot = 'C:\Scripts\Workstation' }
 $script:WSLog  = 'C:\Logs\Workstation\commands.log'
 $script:WSOwner = 'KGreen'
 
@@ -69,6 +69,30 @@ function Get-WorkstationCommandRegistry {
         @{ Name = 'trustcheck';       Backend = 'trustcheck';       Module = 'Trust';        Safe = 'trustcheck' }
         @{ Name = 'scan';             Backend = 'scan';             Module = 'Scan';         Safe = 'scan -Quiet' }
         @{ Name = 'windowsstatus';    Backend = 'windowsstatus';    Module = 'Windows';     Safe = 'windowsstatus -Quiet' }
+        @{ Name = 'singularity';      Backend = 'singularity';      Module = 'Genesis';     Safe = $null }
+        @{ Name = 'genesis';          Backend = 'genesis';          Module = 'Genesis';     Safe = $null }
+        @{ Name = 'dna';              Backend = 'dna';              Module = 'Genesis';     Safe = 'dna' }
+        @{ Name = 'trustchain';       Backend = 'trustchain';       Module = 'Genesis';     Safe = 'trustchain' }
+        @{ Name = 'sec';              Backend = 'sec';              Module = 'Privacy';      Safe = 'sec -Status' }
+        @{ Name = 'sec-help';         Backend = 'sec-help';         Module = 'Privacy';      Safe = 'sec-help' }
+        @{ Name = 'revise';           Backend = 'revise';           Module = 'Revision';    Safe = 'revise -Quick' }
+        @{ Name = 'poriadok';         Backend = 'poriadok';         Module = 'Revision';    Safe = 'revise -Quick' }
+        @{ Name = 'privacy';          Backend = 'privacy';          Module = 'Privacy';      Safe = 'sec -Status' }
+        @{ Name = 'pgp-setup';        Backend = 'pgp-setup';        Module = 'Pgp';          Safe = $null }
+        @{ Name = 'pgp-repair';       Backend = 'pgp-repair';       Module = 'Pgp';          Safe = $null }
+        @{ Name = 'pgp-status';       Backend = 'pgp-status';       Module = 'Pgp';          Safe = 'pgp-status' }
+        @{ Name = 'pgp-export';       Backend = 'pgp-export';       Module = 'Pgp';          Safe = $null }
+        @{ Name = 'pgp-fingerprint';  Backend = 'pgp-fingerprint';  Module = 'Pgp';          Safe = 'pgp-fingerprint' }
+        @{ Name = 'pgp-help';         Backend = 'pgp-help';         Module = 'Pgp';          Safe = 'pgp-help' }
+        @{ Name = 'pgp-encrypt';      Backend = 'pgp-encrypt';      Module = 'Pgp';          Safe = $null }
+        @{ Name = 'pgp-decrypt';      Backend = 'pgp-decrypt';      Module = 'Pgp';          Safe = $null }
+        @{ Name = 'tor-setup';        Backend = 'tor-setup';        Module = 'Tor';          Safe = $null }
+        @{ Name = 'tor-harden';       Backend = 'tor-harden';       Module = 'Tor';          Safe = $null }
+        @{ Name = 'tor-check';        Backend = 'tor-check';        Module = 'Tor';          Safe = 'tor-check' }
+        @{ Name = 'tor-status';       Backend = 'tor-status';       Module = 'Tor';          Safe = 'tor-status' }
+        @{ Name = 'tor-lock';         Backend = 'tor-lock';         Module = 'Tor';          Safe = $null }
+        @{ Name = 'tor-unlock';       Backend = 'tor-unlock';       Module = 'Tor';          Safe = $null }
+        @{ Name = 'tor-help';         Backend = 'tor-help';         Module = 'Tor';          Safe = 'tor-help' }
         @{ Name = 'palette';          Backend = 'palette';          Module = 'Palette';      Safe = $null }
         @{ Name = 'menu';             Backend = 'menu';             Module = 'Palette';      Safe = $null }
         @{ Name = 'toolcheck';        Backend = 'Invoke-ToolCheck'; Module = 'Network';      Safe = 'toolcheck' }
@@ -76,6 +100,7 @@ function Get-WorkstationCommandRegistry {
         @{ Name = 'toolbox';          Backend = 'Show-Toolbox';     Module = 'Network';      Safe = 'toolbox' }
         @{ Name = 'sysaudit';         Backend = 'Invoke-SysAudit';  Module = 'Network';      Safe = 'sysaudit' }
         @{ Name = 'networkstatus';    Backend = 'networkstatus';    Module = 'Network';      Safe = 'networkstatus' }
+        @{ Name = 'portscan';         Backend = 'portscan';         Module = 'Network';      Safe = 'portscan -Help' }
         @{ Name = 'workspace';        Backend = 'workspace';        Module = 'Workspace';    Safe = 'workspace' }
         @{ Name = 'devstart';         Backend = 'devstart';         Module = 'Workspace';    Safe = 'devstart' }
         @{ Name = 'projects';         Backend = 'projects';         Module = 'Shell';        Safe = 'projects' }

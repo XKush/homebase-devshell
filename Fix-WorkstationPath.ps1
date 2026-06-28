@@ -12,6 +12,8 @@ $pathsToEnsure = @(
     'C:\Program Files\Everything'
     'C:\Program Files\Git\cmd'
     'C:\Program Files\OpenSSL-Win64\bin'
+    'C:\Program Files (x86)\GnuPG\bin'
+    'C:\Program Files\GnuPG\bin'
     'C:\Tools'
     'C:\Tools\Sysinternals'
     'C:\Scripts'

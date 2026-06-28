@@ -55,14 +55,25 @@ function help {
   learn -Topic git обучение
 '@
         security = @'
-[Безопасность]
-  securitycheck    обзор UAC, firewall (брандмауэр), SMB1
-  admin            PowerShell от администратора
+[SHADOW OPS — Tor + PGP]
+  sec              меню: статус + все действия
+  sec -Guide       playbook безопасной сессии
+  tor-check        чеклист перед Tor
+  tor-harden       hardening Tor Browser
+  tor-lock         kill switch (admin, перед .onion)
+  tor-unlock       после сессии (admin)
+  pgp-fingerprint  отпечаток для контактов
+  pgp-export       публичный ключ (.asc)
+  sec-help         полная шпаргалка
+
+[Windows hardening]
+  securitycheck    UAC, firewall, SMB1
+  windowsstatus    privacy + performance score
 '@
     }
 
     Write-Host "`n  Справка HOME BASE — $script:WSOwner" -ForegroundColor Cyan
-    Write-Host "  Темы: help -Topic git | python | nav | tools | maintenance`n" -ForegroundColor DarkGray
+    Write-Host "  Темы: help -Topic git | python | nav | tools | maintenance | security`n" -ForegroundColor DarkGray
 
     if ($Topic -eq 'all') {
         foreach ($key in @('nav','git','python','tools','maintenance','security')) {
@@ -112,8 +123,8 @@ function quickstart {
 
 function learn {
     param(
-        [ValidateSet('git','python','powershell','vscode','debug','venv','pip','homebase','all')][string]$Topic = 'all',
-        [ValidateSet('1','2','3','4','5')][string]$Quest,
+        [ValidateSet('git','python','powershell','vscode','debug','venv','pip','homebase','security','all')][string]$Topic = 'all',
+        [ValidateSet('1','2','3','4','5','6')][string]$Quest,
         [switch]$Help
     )
     if ($Help) { Show-WorkstationCommandHelp -Name 'learn'; return }
@@ -150,9 +161,18 @@ function learn {
         '5' = @(
             'Квест 5: MAX mode'
             '  1. hack / menu    — hacker menu'
-            '  2. palette        — fzf палитра (Ctrl+Alt+H)'
-            '  3. explain cmd    — справка по команде'
-            '  4. docs\\ru\\QUICKREF.md — шпаргалка'
+            '  2. sec            — SHADOW OPS (Tor + PGP)'
+            '  3. palette        — fzf палитра (Ctrl+Alt+H)'
+            '  4. sec -Guide     — playbook безопасной сессии'
+        )
+        '6' = @(
+            'Квест 6: SHADOW OPS (Tor + PGP)'
+            '  1. sec            — главное меню безопасности'
+            '  2. tor-check      — чеклист перед сессией'
+            '  3. tor-harden     — hardening Tor Browser'
+            '  4. pgp-fingerprint — отпечаток для контактов'
+            '  5. tor-lock       — kill switch (admin, перед .onion)'
+            '  6. tor-unlock     — после сессии (admin)'
         )
     }
 
@@ -160,7 +180,7 @@ function learn {
         Invoke-WorkstationCmd 'learn' {
             Write-Host ''
             $quests[$Quest] | ForEach-Object { Write-Host $_ -ForegroundColor $(if ($_ -match '^Квест') { 'Cyan' } else { 'Green' }) }
-            Write-Host "  Другие квесты: learn -Quest 1|2|3|4|5`n" -ForegroundColor DarkGray
+            Write-Host "  Другие квесты: learn -Quest 1|2|3|4|5|6`n" -ForegroundColor DarkGray
         }
         return
     }
@@ -215,16 +235,26 @@ function learn {
         homebase = @'
 [HOME BASE — центр управления]
   home / hack / menu    панель и hacker menu
+  sec / sec -Guide      Tor + PGP (SHADOW OPS)
   scan / trustcheck     быстрая и live проверка
   palette               fzf палитра команд
-  learn -Quest 1        guided квесты 1–5
+  learn -Quest 1        guided квесты 1–6
   explain <cmd>         справка по команде
+'@
+        security = @'
+[SHADOW OPS — Tor + PGP]
+  sec                   меню: статус + все действия
+  sec -Guide            playbook безопасной сессии
+  tor-check             чеклист перед Tor
+  tor-lock / tor-unlock kill switch (admin)
+  pgp-fingerprint       сверка отпечатка out-of-band
+  sec-help              полная шпаргалка
 '@
     }
     Invoke-WorkstationCmd 'learn' {
         Write-Host "`n  Обучение — $Topic" -ForegroundColor Cyan
         if ($Topic -eq 'all') {
-            Write-Host "  Квесты: learn -Quest 1|2|3|4|5`n" -ForegroundColor Yellow
+            Write-Host "  Квесты: learn -Quest 1|2|3|4|5|6`n" -ForegroundColor Yellow
             $topics.Values | ForEach-Object { Write-Host $_ -ForegroundColor Green }
         }
         else { Write-Host $topics[$Topic] -ForegroundColor Green }

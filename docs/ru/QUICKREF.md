@@ -1,23 +1,54 @@
 # HOME BASE — Quick Reference (RU)
 
-Generated: 2026-06-28 21:31
+Generated: 2026-06-28 22:19
 
-## Команды быстрого доступа
+## Быстрый доступ
 
 | Команда | Назначение |
 |---------|------------|
+| `sec` | SHADOW OPS — Tor + PGP меню |
+| `menu` / `hack` | Главное hacker-меню |
+| `trustcheck` | Live integrity |
+| `tor-check` | Preflight перед Tor |
+
 
 ## Система
 
+- **dna** — SHA256 отпечаток: MachineGuid + profile + module + git + trust. → `dna`
 - **doctor** — Запускает полную автоматическую проверку рабочей станции (68+ тестов). → `doctor`
+- **genesis** — Обновляет OP-DNA, append Trust Chain, экспорт C:\\Security\\exports\\genesis-certificate.txt → `genesis`
 - **healthcheck** — Синоним команды doctor — полная проверка системы. → `healthcheck`
 - **instrumenty** — Показывает все установленные программы с объяснением на русском. → `instrumenty`
 - **scan** — Мини-скан: trust score + self-check ключевых команд за ~2 с. → `scan`
 - **securitycheck** — Показывает состояние UAC, firewall (брандмауэр), SMB1 и телеметрии. → `securitycheck`
+- **singularity** — Полный probe + Operator DNA + Trust Chain + Genesis Certificate. Уникальный отпечаток оператора. → `singularity`
 - **sysinfo** — Показывает красивую сводку: ОС, процессор, память, диск (через fastfetch). → `sysinfo`
 - **sysreport** — Создаёт подробный текстовый отчёт и сохраняет его в C:\Logs\Workstation. → `sysreport`
+- **trustchain** — Каждый trustcheck/singularity добавляет блок с hash предыдущего. → `trustchain`
 - **trustcheck** — Live-проверка: самопроверки команд, сломанные backend, синхронизация профиля. → `trustcheck`
+- **windowsstatus** — Privacy, performance, firewall, UAC, backups, pending updates. → `windowsstatus`
 - **workstationstatus** — Открывает HOME BASE (домашнюю панель) в выбранном режиме. → `workstationstatus`
+
+## Безопасность
+
+- **pgp-decrypt** — Расшифровка .gpg локально (нужен приватный ключ + passphrase). → `pgp-decrypt -File secret.txt.gpg`
+- **pgp-encrypt** — Шифрует файл для получателя (публичный ключ или ID). → `pgp-encrypt -To A12238F6 -File secret.txt`
+- **pgp-export** — Экспорт .asc для контактов (не приватный ключ!). → `pgp-export`
+- **pgp-fingerprint** — Fingerprint для проверки личности out-of-band. → `pgp-fingerprint`
+- **pgp-help** — Основы OpenPGP для Tor-контекста. → `pgp-help`
+- **pgp-repair** — Экспорт публичного ключа и backup revocation, если ключ есть, но setup не завершился. → `pgp-repair`
+- **pgp-setup** — Guided Ed25519 ключ (псевдоним, passphrase). → `pgp-setup`
+- **pgp-status** — Список secret keys + fingerprint из метаданных. → `pgp-status`
+- **privacy** — То же, что sec — меню SHADOW OPS. → `privacy`
+- **sec** — Единое меню Tor + PGP: статус, playbook, все действия через fzf. → `sec`
+- **sec-help** — Tor + PGP + playbook + правила NEVER. → `sec-help`
+- **tor-check** — Tor Browser, PGP, kill switch, политика Defender. → `tor-check`
+- **tor-harden** — user.js hardening + правила сессии. Опция -Lock включает kill switch. → `tor-harden`
+- **tor-help** — Краткая шпаргалка Tor-команд. → `tor-help`
+- **tor-lock** — Firewall: блок outbound Chrome/Edge/Firefox/Brave. Tor Browser разрешён. → `tor-lock`
+- **tor-setup** — Официальный Tor Browser через winget. → `tor-setup`
+- **tor-status** — Tor Browser, hardening, kill switch. → `tor-status`
+- **tor-unlock** — Удаляет правила KGreen-Tor-Lock. → `tor-unlock`
 
 ## Сеть
 
@@ -41,6 +72,8 @@ Generated: 2026-06-28 21:31
 - **backupconfig** — Сохраняет профиль PowerShell и конфиги в C:\Backups\Workstation. → `backupconfig`
 - **cleanup** — Удаляет старые логи, лишние бэкапы и временные файлы. → `cleanup`
 - **logs** — Показывает последние файлы в C:\Logs\Workstation. → `logs`
+- **poriadok** — То же, что revise — «навести порядок». → `poriadok`
+- **revise** — Полный прогон: PATH, docs sync, doctor, trust, SHADOW OPS, next actions. → `revise`
 - **updateall** — Обновляет пакеты через winget и модули PowerShell. → `updateall`
 
 ## Восстановление
@@ -60,17 +93,23 @@ Generated: 2026-06-28 21:31
 - **home** — Открывает HOME BASE в режиме normal — trust + telemetry + command matrix. → `home`
 - **jarvis** — Открывает HOME BASE — центр управления рабочей станцией. → `jarvis`
 - **komandy** — Показывает все команды, сгруппированные по категориям. → `komandy`
-- **learn** — Краткие уроки по git, python, PowerShell и VS Code. → `learn -Topic git`
-- **menu** — Главное меню: cockpit, scan, trust, network, dev, palette. → `menu`
+- **learn** — Квесты 1–6 и темы: git, python, security, HOME BASE. → `learn -Quest 6`
+- **menu** — Главное меню: cockpit, SHADOW OPS (sec), scan, trust, network. → `menu`
 - **palette** — Интерактивный поиск по всем командам HOME BASE. → `palette`
 - **quickstart** — 5 шагов для нового пользователя системы. → `quickstart`
 
-## Режимы
+## Навигация
 
-- `hack` / `menu` — max cockpit / fzf menu
-- `scan` — быстрый probe
-- `palette` — fzf palette (Ctrl+Alt+H)
-- `trustcheck` — live integrity
+- **scripts** — Переход в папку со скриптами рабочей станции. → `scripts`
+- **tools** — Переход в папку с установленными утилитами. → `tools`
+
+## SHADOW OPS playbook
+
+1. `sec` или `tor-check`
+2. `tor-harden` (один раз)
+3. `tor-lock` (admin, перед сессией)
+4. только Tor Browser + `pgp-fingerprint`
+5. `tor-unlock` (admin, после)
 
 ## Env
 

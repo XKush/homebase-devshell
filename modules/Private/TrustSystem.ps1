@@ -207,6 +207,9 @@ function trustcheck {
     Invoke-WorkstationCmd 'trustcheck' -SkipSelfCheck {
         Write-Host "`n  Проверка доверия к системе (live)...`n" -ForegroundColor Cyan
         $t = Get-SystemTrustReport -Live -Save
+        if (Get-Command Add-TrustChainBlock -ErrorAction SilentlyContinue) {
+            Add-TrustChainBlock -TrustReport $t -Event 'trustcheck' | Out-Null
+        }
         Show-TrustReport -Trust $t
         if (-not $t.CanTrustDashboard) {
             Write-Host '  ⚠ HOME BASE не будет скрывать проблемы. Выполните doctor или repairterminal.' -ForegroundColor Yellow

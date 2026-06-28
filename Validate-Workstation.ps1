@@ -250,6 +250,28 @@ try {
     }
 } catch { Add-Pass 'WinDefend service absent or stopped' }
 
+# ── 13b. SHADOW OPS readiness ───────────────────────────────────────────────────
+Write-WorkstationStep 'SHADOW OPS readiness'
+$modPath = 'C:\Scripts\Workstation\modules\KGreen.Workstation.psm1'
+if (Test-Path $modPath) {
+    $secTest = pwsh -NoProfile -Command @"
+Import-Module '$modPath' -Force
+`$r = Get-SecurityReadinessReport
+Write-Output "PGP:`$(`$r.PgpReady)"
+Write-Output "TOR:`$(`$r.TorReady)"
+Write-Output "HARD:`$(`$r.Hardened)"
+Write-Output "LVL:`$(`$r.Level)"
+"@
+    if ($secTest -match 'PGP:True') { Add-Pass 'PGP key configured' } else { Add-Warn 'PGP not ready — pgp-repair' }
+    if ($secTest -match 'TOR:True') { Add-Pass 'Tor Browser present' } else { Add-Warn 'Tor Browser missing — tor-setup' }
+    if ($secTest -match 'HARD:True') { Add-Pass 'Tor profile hardened' } else { Add-Warn 'Tor not hardened — tor-harden' }
+    if ($secTest -match 'LVL:READY') { Add-Pass 'SHADOW OPS readiness: READY' }
+    elseif ($secTest -match 'LVL:PARTIAL') { Add-Warn 'SHADOW OPS readiness: PARTIAL' }
+    else { Add-Warn 'SHADOW OPS readiness: SETUP' }
+} else {
+    Add-Warn 'SHADOW OPS check skipped — module missing'
+}
+
 # ── 14. Onboarding helpers & command center ──────────────────────────────────
 Write-WorkstationStep 'Command center'
 $centerScript = 'C:\Scripts\Workstation\lib\WorkstationCommandCenter.ps1'
@@ -258,7 +280,7 @@ $requiredCmds = @(
     'healthcheck','workstationstatus','securitycheck','devstart','workspace',
     'cheatsheet','helpme','fixprofile','reloadprofile','sysreport','logs','networkstatus','learn',
     'nettools','toolbox','toolcheck','sysaudit',
-    'jarvis','dashboard','home'
+    'jarvis','dashboard','home','menu','scan','trustcheck','sec','revise','komandy','palette'
 )
 $helperTest = pwsh -NoProfile -Command @"
 `$env:WORKSTATION_DASHBOARD='0'; `$env:WORKSTATION_DASHBOARD_SHOWN='1'; `$env:WORKSTATION_WELCOMED='1'; `$env:CI='1'

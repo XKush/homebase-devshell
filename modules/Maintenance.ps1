@@ -44,9 +44,9 @@ function cleanlogs {
 }
 
 function cleanup {
-    param([switch]$Help)
+    param([switch]$Help, [switch]$WhatIf, [int]$KeepDays = 30)
     if (Test-ShowCommandHelp -Name 'cleanup' -Help:$Help) { return }
-    Invoke-WorkstationCmd 'cleanup' { cleanlogs @args }
+    Invoke-WorkstationCmd 'cleanup' { cleanlogs -KeepDays $KeepDays -WhatIf:$WhatIf }
 }
 
 function updateall {

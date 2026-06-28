@@ -85,6 +85,10 @@ function Write-HackerBanner {
 
     $P = Get-HackerPalette
     $hostName = $env:COMPUTERNAME
+    $callsign = '—'
+    if (Test-Path 'C:\Logs\Workstation\genesis-state.json') {
+        try { $callsign = (Get-Content 'C:\Logs\Workstation\genesis-state.json' -Raw | ConvertFrom-Json).Callsign } catch { }
+    }
 
     Write-Host ''
     Write-Host '  ╔══════════════════════════════════════════════════════════════╗' -ForegroundColor $P.Accent
@@ -99,6 +103,10 @@ function Write-HackerBanner {
     Write-Host '  ║' -NoNewline -ForegroundColor $P.Accent
     Write-Host '  mode: hacker/max · trust:live · selfcheck:on · lang:ru' -NoNewline -ForegroundColor $P.Muted
     Write-Host '   ║' -ForegroundColor $P.Accent
+    Write-Host '  ║' -NoNewline -ForegroundColor $P.Accent
+    Write-Host "  callsign: $callsign · trust:$TrustLevel" -NoNewline -ForegroundColor $P.Magenta
+    Write-Host (' ' * [math]::Max(1, 28 - $callsign.Length)) -NoNewline
+    Write-Host '║' -ForegroundColor $P.Accent
     Write-Host '  ╠══════════════════════════════════════════════════════════════╣' -ForegroundColor $P.Accent
     Write-Host '  ║  ' -NoNewline -ForegroundColor $P.Accent
     Write-Host (Format-HackerBar -Percent $HealthScore -Label 'HEALTH') -NoNewline -ForegroundColor $(if ($HealthScore -ge 90) { $P.TrustOk } elseif ($HealthScore -ge 70) { $P.Warn } else { $P.Alert })
@@ -143,12 +151,13 @@ function Show-HackerCommandMatrix {
     Write-HackerSection -Tag 'CMD' -Title 'COMMAND MATRIX — быстрый доступ' -Color $P.Cyan
 
     $matrix = @(
-        @{ Tag = 'SYS'; Color = 'Green';  Cmds = 'doctor · trustcheck · scan · windowsstatus · sysinfo' }
+        @{ Tag = 'SYS'; Color = 'Green';  Cmds = 'singularity · scan · trustcheck · doctor' }
+        @{ Tag = 'SEC'; Color = 'DarkGreen'; Cmds = 'sec · tor-check · tor-lock · pgp-fingerprint' }
         @{ Tag = 'NET'; Color = 'Cyan';   Cmds = 'nettools · networkstatus · toolcheck · portscan' }
         @{ Tag = 'DEV'; Color = 'Magenta'; Cmds = 'devstart · projects · workspace · new-project' }
-        @{ Tag = 'OPS'; Color = 'Yellow'; Cmds = 'cleanup · backupconfig · logs · updateall' }
+        @{ Tag = 'OPS'; Color = 'Yellow'; Cmds = 'revise · cleanup · backupconfig · logs · updateall' }
         @{ Tag = 'REC'; Color = 'Red';    Cmds = 'repairterminal · fixprofile · restoreconfig' }
-        @{ Tag = 'DOC'; Color = 'White';  Cmds = 'menu · palette · komandy · helpme · learn · hack' }
+        @{ Tag = 'DOC'; Color = 'White';  Cmds = 'menu · palette · komandy · sec-help · hack' }
     )
 
     foreach ($row in $matrix) {
@@ -226,9 +235,9 @@ function Show-HackerFooter {
     $P = Get-HackerPalette
     Write-HackerRule -Char '═'
     $cmds = if ($Mode -eq 'full') {
-        'hack · menu · scan · trustcheck · doctor · komandy · instrumenty · nettools'
+        'sec · menu · scan · trustcheck · hack · komandy'
     } else {
-        'home · hack · scan · trustcheck · doctor · menu · komandy'
+        'sec · home · menu · scan · trustcheck'
     }
     Write-HackerLine ">> $cmds" -Color $P.Matrix
     Write-HackerLine '>> `$env:WORKSTATION_STARTUP_MODE = minimal|normal|full' -Color $P.Muted

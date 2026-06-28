@@ -21,6 +21,19 @@
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
           "foreground": "#1a1b26",
+          "background": "#bb9af7",
+          "properties": {
+            "shell": "pwsh",
+            "command": "pwsh -NoProfile -File C:/Scripts/Workstation/terminal/omp-genesis.ps1",
+            "cache_duration": "5m"
+          },
+          "template": " {{ .Output }} "
+        },
+        {
+          "type": "command",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "foreground": "#1a1b26",
           "background": "#7aa2f7",
           "properties": {
             "shell": "pwsh",

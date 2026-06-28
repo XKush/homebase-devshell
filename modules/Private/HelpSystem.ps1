@@ -58,7 +58,7 @@ function Show-CommandGroupsRu {
         Write-Host '  КОМАНДЫ ПО ГРУППАМ — HOME BASE' -ForegroundColor Cyan
     }
 
-    foreach ($groupName in @('Система','Сеть','Разработка','Обслуживание','Восстановление','Обучение','Навигация')) {
+    foreach ($groupName in @('Система','Безопасность','Сеть','Разработка','Обслуживание','Восстановление','Обучение','Навигация')) {
         $desc = $catalog.Groups[$groupName]
         Write-Host ''
         Write-Host "  [$groupName]" -ForegroundColor Yellow

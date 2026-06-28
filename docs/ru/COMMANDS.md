@@ -1,51 +1,129 @@
 # Команды HOME BASE
 
+Generated: 2026-06-28 22:19
+
+Справка: ``имя -help`` · меню: ``sec`` · ``menu``
+
 ## Система
 
-| Команда | Описание |
-|---------|----------|
-| `doctor` | Полная диагностика |
-| `trustcheck` | Live integrity |
-| `scan` | Быстрый probe |
-| `healthcheck` | Краткий health |
-| `sysreport` | Отчёт системы |
-| `instrumenty` | Панель инструментов |
-
-## Cockpit
+_
 
 | Команда | Описание |
 |---------|----------|
-| `home` | Normal cockpit |
-| `hack` | MAX mode / fzf menu |
-| `menu` | Hacker menu (fzf) |
-| `palette` | Command palette (Ctrl+Alt+H) |
-| `komandy` | Каталог по группам |
+| `dna` | SHA256 отпечаток: MachineGuid + profile + module + git + trust. |
+| `doctor` | Запускает полную автоматическую проверку рабочей станции (68+ тестов). |
+| `genesis` | Обновляет OP-DNA, append Trust Chain, экспорт C:\\Security\\exports\\genesis-certificate.txt |
+| `healthcheck` | Синоним команды doctor — полная проверка системы. |
+| `instrumenty` | Показывает все установленные программы с объяснением на русском. |
+| `scan` | Мини-скан: trust score + self-check ключевых команд за ~2 с. |
+| `securitycheck` | Показывает состояние UAC, firewall (брандмауэр), SMB1 и телеметрии. |
+| `singularity` | Полный probe + Operator DNA + Trust Chain + Genesis Certificate. Уникальный отпечаток оператора. |
+| `sysinfo` | Показывает красивую сводку: ОС, процессор, память, диск (через fastfetch). |
+| `sysreport` | Создаёт подробный текстовый отчёт и сохраняет его в C:\Logs\Workstation. |
+| `trustchain` | Каждый trustcheck/singularity добавляет блок с hash предыдущего. |
+| `trustcheck` | Live-проверка: самопроверки команд, сломанные backend, синхронизация профиля. |
+| `windowsstatus` | Privacy, performance, firewall, UAC, backups, pending updates. |
+| `workstationstatus` | Открывает HOME BASE (домашнюю панель) в выбранном режиме. |
+
+## Безопасность
+
+_
+
+| Команда | Описание |
+|---------|----------|
+| `pgp-decrypt` | Расшифровка .gpg локально (нужен приватный ключ + passphrase). |
+| `pgp-encrypt` | Шифрует файл для получателя (публичный ключ или ID). |
+| `pgp-export` | Экспорт .asc для контактов (не приватный ключ!). |
+| `pgp-fingerprint` | Fingerprint для проверки личности out-of-band. |
+| `pgp-help` | Основы OpenPGP для Tor-контекста. |
+| `pgp-repair` | Экспорт публичного ключа и backup revocation, если ключ есть, но setup не завершился. |
+| `pgp-setup` | Guided Ed25519 ключ (псевдоним, passphrase). |
+| `pgp-status` | Список secret keys + fingerprint из метаданных. |
+| `privacy` | То же, что sec — меню SHADOW OPS. |
+| `sec` | Единое меню Tor + PGP: статус, playbook, все действия через fzf. |
+| `sec-help` | Tor + PGP + playbook + правила NEVER. |
+| `tor-check` | Tor Browser, PGP, kill switch, политика Defender. |
+| `tor-harden` | user.js hardening + правила сессии. Опция -Lock включает kill switch. |
+| `tor-help` | Краткая шпаргалка Tor-команд. |
+| `tor-lock` | Firewall: блок outbound Chrome/Edge/Firefox/Brave. Tor Browser разрешён. |
+| `tor-setup` | Официальный Tor Browser через winget. |
+| `tor-status` | Tor Browser, hardening, kill switch. |
+| `tor-unlock` | Удаляет правила KGreen-Tor-Lock. |
 
 ## Сеть
 
+_
+
 | Команда | Описание |
 |---------|----------|
-| `nettools` | Сетевая панель |
-| `toolcheck` | Проверка утилит |
-| `networkstatus` | Статус сети |
-| `portscan` | Скан портов |
+| `nettools` | Справочник по сетевым инструментам и их проверка. |
+| `networkstatus` | Показывает адаптеры, IP-адреса, DNS и firewall (брандмауэр). |
+| `portscan` | Проверяет, открыты ли указанные порты на удалённом компьютере. |
+| `sysaudit` | Проверяет структуру папок и порядок на рабочей станции. |
+| `toolbox` | Показывает все группы команд и проверяет инструменты. |
+| `toolcheck` | Проверяет, какие программы установлены и какие отсутствуют. |
+
+## Разработка
+
+_
+
+| Команда | Описание |
+|---------|----------|
+| `devinfo` | Показывает версии pwsh, git, python, node и настройки git. |
+| `devstart` | Переходит в папку проектов и открывает домашнюю панель. |
+| `new-project` | Создаёт папку проекта с git init и .gitignore. |
+| `projects` | Быстрый переход в папку со всеми проектами. |
+| `workspace` | Показывает, где вы находитесь, статус git и наличие .venv. |
 
 ## Обслуживание
 
+_
+
 | Команда | Описание |
 |---------|----------|
-| `cleanup` | Очистка |
-| `backupconfig` | Бэкап конфигов |
-| `updateall` | Обновления |
-| `repairterminal` | Починка терминала |
+| `backupconfig` | Сохраняет профиль PowerShell и конфиги в C:\Backups\Workstation. |
+| `cleanup` | Удаляет старые логи, лишние бэкапы и временные файлы. |
+| `logs` | Показывает последние файлы в C:\Logs\Workstation. |
+| `poriadok` | То же, что revise — «навести порядок». |
+| `revise` | Полный прогон: PATH, docs sync, doctor, trust, SHADOW OPS, next actions. |
+| `updateall` | Обновляет пакеты через winget и модули PowerShell. |
+
+## Восстановление
+
+_
+
+| Команда | Описание |
+|---------|----------|
+| `fixprofile` | То же, что repairterminal — починка профиля и терминала. |
+| `reloadprofile` | Перечитывает $PROFILE без перезапуска терминала. |
+| `repairterminal` | Восстанавливает шрифты, Oh My Posh, Windows Terminal и fastfetch. |
+| `restoreconfig` | Откатывает настройки из папки C:\Backups\Workstation (нужен admin). |
 
 ## Обучение
 
+_
+
 | Команда | Описание |
 |---------|----------|
-| `learn -Quest 1` | Guided квесты 1–5 |
-| `explain <cmd>` | Справка HOME BASE |
-| `helpme` | Текстовая справка |
-| `cheatsheet` | Шпаргалка |
+| `cheatsheet` | Открывает файл CHEATSHEET.md с кратким справочником. |
+| `dashboard` | То же, что home и jarvis. |
+| `hack` | Полный хакерский cockpit или fzf-меню (если установлен fzf). |
+| `help` | То же, что helpme — справочник по командам оболочки. |
+| `helpme` | Интерактивная справка по группам: git, python, nav, tools. |
+| `home` | Открывает HOME BASE в режиме normal — trust + telemetry + command matrix. |
+| `jarvis` | Открывает HOME BASE — центр управления рабочей станцией. |
+| `komandy` | Показывает все команды, сгруппированные по категориям. |
+| `learn` | Квесты 1–6 и темы: git, python, security, HOME BASE. |
+| `menu` | Главное меню: cockpit, SHADOW OPS (sec), scan, trust, network. |
+| `palette` | Интерактивный поиск по всем командам HOME BASE. |
+| `quickstart` | 5 шагов для нового пользователя системы. |
 
-Справка по любой команде: `имя -help`
+## Навигация
+
+_
+
+| Команда | Описание |
+|---------|----------|
+| `scripts` | Переход в папку со скриптами рабочей станции. |
+| `tools` | Переход в папку с установленными утилитами. |
+

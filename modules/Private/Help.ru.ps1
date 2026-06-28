@@ -8,6 +8,7 @@ function Get-WorkstationHelpCatalog {
         'Обслуживание' = 'Очистка, резервные копии и обновления'
         'Восстановление' = 'Починка терминала, профиля и откат настроек'
         'Обучение' = 'Справка, шпаргалки и обучающие материалы'
+        'Безопасность' = 'Tor, PGP, анонимные сессии — SHADOW OPS'
         'Навигация' = 'Быстрый переход по папкам и оболочка'
     }
 
@@ -46,7 +47,43 @@ function Get-WorkstationHelpCatalog {
             When = 'После tune pass или раз в неделю.'
             How = 'windowsstatus'
             Examples = @('windowsstatus', 'windowsstatus -Quiet', 'windowsstatus -help')
-            Related = @('securitycheck', 'doctor', 'updateall')
+            Related = @('securitycheck', 'doctor', 'singularity')
+        }
+        singularity = @{
+            Group = 'Система'; Title = 'singularity — UNIQUE MODE (только эта машина)'
+            Description = 'Полный probe + Operator DNA + Trust Chain + Genesis Certificate. Уникальный отпечаток оператора.'
+            Does = 'Show-SingularityCockpit — криптографический seal привязан к MachineGuid, profile, git, trust.'
+            When = 'Когда нужен максимум: доказать целостность и получить Planet ID.'
+            How = 'singularity'
+            Examples = @('singularity', 'singularity -help')
+            Related = @('genesis', 'dna', 'trustchain', 'trustcheck')
+        }
+        genesis = @{
+            Group = 'Система'; Title = 'genesis — Genesis Certificate'
+            Description = 'Обновляет OP-DNA, append Trust Chain, экспорт C:\\Security\\exports\\genesis-certificate.txt'
+            Does = 'Export-GenesisCertificate — ASCII seal unique to this workstation.'
+            When = 'После изменений profile/module/git или раз в месяц.'
+            How = 'genesis'
+            Examples = @('genesis', 'genesis -help')
+            Related = @('singularity', 'dna', 'trustchain')
+        }
+        dna = @{
+            Group = 'Система'; Title = 'dna — Operator DNA / Callsign'
+            Description = 'SHA256 отпечаток: MachineGuid + profile + module + git + trust.'
+            Does = 'Get-OperatorDna — Callsign (KG-XXXXXX) и Planet ID.'
+            When = 'Узнать уникальный код оператора для этой машины.'
+            How = 'dna · dna -Refresh'
+            Examples = @('dna', 'dna -Refresh', 'dna -help')
+            Related = @('singularity', 'genesis')
+        }
+        trustchain = @{
+            Group = 'Система'; Title = 'trustchain — append-only цепочка доверия'
+            Description = 'Каждый trustcheck/singularity добавляет блок с hash предыдущего.'
+            Does = 'Test-TrustChainIntegrity + Show-TrustChain — blockchain-lite audit trail.'
+            When = 'Проверить историю live-проб и целостность chain.'
+            How = 'trustchain'
+            Examples = @('trustchain', 'trustchain -help')
+            Related = @('trustcheck', 'singularity', 'genesis')
         }
         palette = @{
             Group = 'Обучение'; Title = 'palette — fzf палитра команд'
@@ -59,12 +96,12 @@ function Get-WorkstationHelpCatalog {
         }
         menu = @{
             Group = 'Обучение'; Title = 'menu — hacker menu (fzf)'
-            Description = 'Главное меню: cockpit, scan, trust, network, dev, palette.'
+            Description = 'Главное меню: cockpit, SHADOW OPS (sec), scan, trust, network.'
             Does = 'Show-HackerMenu; без fzf → full cockpit.'
             When = 'hack или guided выбор действия.'
-            How = 'menu · hack'
-            Examples = @('menu', 'hack', 'menu -help')
-            Related = @('hack', 'palette', 'home')
+            How = 'menu · hack · sec'
+            Examples = @('menu', 'sec', 'hack', 'menu -help')
+            Related = @('sec', 'hack', 'palette', 'home')
         }
         healthcheck = @{
             Group = 'Система'; Title = 'healthcheck — то же, что doctor'
@@ -284,12 +321,12 @@ function Get-WorkstationHelpCatalog {
         }
         learn = @{
             Group = 'Обучение'; Title = 'learn — обучающие материалы'
-            Description = 'Краткие уроки по git, python, PowerShell и VS Code.'
-            Does = 'Выводит текстовые подсказки по выбранной теме.'
-            When = 'Изучаете новую технологию или забыли синтаксис.'
-            How = 'learn -Topic git|python|powershell|vscode|all'
-            Examples = @('learn -Topic git', 'learn -Topic python')
-            Related = @('helpme', 'cheatsheet', 'quickstart')
+            Description = 'Квесты 1–6 и темы: git, python, security, HOME BASE.'
+            Does = 'Guided квесты или текстовые подсказки по теме.'
+            When = 'Изучаете систему или Tor/PGP.'
+            How = 'learn -Quest 1|2|3|4|5|6 · learn -Topic security'
+            Examples = @('learn -Quest 6', 'learn -Topic security', 'learn -Topic git')
+            Related = @('sec', 'helpme', 'cheatsheet')
         }
         cheatsheet = @{
             Group = 'Обучение'; Title = 'cheatsheet — шпаргалка команд'
@@ -390,6 +427,186 @@ function Get-WorkstationHelpCatalog {
             Examples = @('komandy')
             Related = @('helpme', 'toolbox', 'home')
         }
+        'pgp-repair' = @{
+            Group = 'Безопасность'; Title = 'pgp-repair — завершить настройку PGP'
+            Description = 'Экспорт публичного ключа и backup revocation, если ключ есть, но setup не завершился.'
+            Does = 'Repair-PgpIdentity.ps1 → C:\Security\pgp\'
+            When = 'После ошибки Key creation failed при уже созданном ключе.'
+            How = 'pgp-repair'
+            Examples = @('pgp-repair')
+            Related = @('pgp-status', 'pgp-export', 'sec')
+        }
+        'pgp-setup' = @{
+            Group = 'Безопасность'; Title = 'pgp-setup — создать OpenPGP ключ'
+            Description = 'Guided Ed25519 ключ (псевдоним, passphrase).'
+            Does = 'Configure-PgpIdentity.ps1'
+            When = 'Первый ключ для шифрования переписки.'
+            How = 'pgp-setup'
+            Examples = @('pgp-setup')
+            Related = @('pgp-repair', 'pgp-fingerprint', 'sec')
+        }
+        'pgp-status' = @{
+            Group = 'Безопасность'; Title = 'pgp-status — ключи OpenPGP'
+            Description = 'Список secret keys + fingerprint из метаданных.'
+            Does = 'gpg --list-secret-keys'
+            When = 'Проверить что ключ на месте.'
+            How = 'pgp-status'
+            Examples = @('pgp-status')
+            Related = @('pgp-fingerprint', 'sec')
+        }
+        'pgp-export' = @{
+            Group = 'Безопасность'; Title = 'pgp-export — публичный ключ'
+            Description = 'Экспорт .asc для контактов (не приватный ключ!).'
+            Does = 'gpg --armor --export → C:\Security\pgp\'
+            When = 'Дать контакту ключ для шифрования.'
+            How = 'pgp-export'
+            Examples = @('pgp-export')
+            Related = @('pgp-fingerprint', 'pgp-encrypt')
+        }
+        'pgp-fingerprint' = @{
+            Group = 'Безопасность'; Title = 'pgp-fingerprint — отпечаток ключа'
+            Description = 'Fingerprint для проверки личности out-of-band.'
+            Does = 'Показывает fingerprint из pgp-identity.json или gpg.'
+            When = 'Сверка с контактом другим каналом.'
+            How = 'pgp-fingerprint'
+            Examples = @('pgp-fingerprint')
+            Related = @('pgp-export', 'sec')
+        }
+        'pgp-encrypt' = @{
+            Group = 'Безопасность'; Title = 'pgp-encrypt — зашифровать файл'
+            Description = 'Шифрует файл для получателя (публичный ключ или ID).'
+            Does = 'gpg --encrypt --armor → file.gpg'
+            When = 'Отправка файла через Tor-чат.'
+            How = 'pgp-encrypt -To KEY -File path'
+            Examples = @('pgp-encrypt -To A12238F6 -File secret.txt')
+            Related = @('pgp-decrypt', 'pgp-export')
+        }
+        'pgp-decrypt' = @{
+            Group = 'Безопасность'; Title = 'pgp-decrypt — расшифровать файл'
+            Description = 'Расшифровка .gpg локально (нужен приватный ключ + passphrase).'
+            Does = 'gpg --decrypt'
+            When = 'Получил зашифрованный файл.'
+            How = 'pgp-decrypt -File secret.txt.gpg'
+            Examples = @('pgp-decrypt -File secret.txt.gpg')
+            Related = @('pgp-encrypt', 'pgp-status')
+        }
+        'pgp-help' = @{
+            Group = 'Безопасность'; Title = 'pgp-help — шпаргалка PGP'
+            Description = 'Основы OpenPGP для Tor-контекста.'
+            Does = 'Show-PgpHelpRu'
+            When = 'Нужна справка по шифрованию.'
+            How = 'pgp-help · sec-help'
+            Examples = @('pgp-help')
+            Related = @('sec-help', 'pgp-fingerprint')
+        }
+        'tor-setup' = @{
+            Group = 'Безопасность'; Title = 'tor-setup — установить Tor Browser'
+            Description = 'Официальный Tor Browser через winget.'
+            Does = 'Install-TorBrowser.ps1'
+            When = 'Перед работой с .onion / darknet.'
+            How = 'tor-setup'
+            Examples = @('tor-setup')
+            Related = @('tor-harden', 'tor-check', 'sec')
+        }
+        'tor-status' = @{
+            Group = 'Безопасность'; Title = 'tor-status — состояние Tor'
+            Description = 'Tor Browser, hardening, kill switch.'
+            Does = 'Get-TorSecurityState + Find-TorBrowserExe'
+            When = 'Проверить готовность к сессии.'
+            How = 'tor-status'
+            Examples = @('tor-status')
+            Related = @('tor-check', 'sec')
+        }
+        'tor-harden' = @{
+            Group = 'Безопасность'; Title = 'tor-harden — максимальная защита сессии'
+            Description = 'user.js hardening + правила сессии. Опция -Lock включает kill switch.'
+            Does = 'Configure-TorSecurity.ps1'
+            When = 'Перед Tor-сессией.'
+            How = 'tor-harden · tor-harden -Lock'
+            Examples = @('tor-harden', 'tor-harden -Lock')
+            Related = @('tor-lock', 'tor-check', 'pgp-help')
+        }
+        'tor-check' = @{
+            Group = 'Безопасность'; Title = 'tor-check — чеклист перед сессией'
+            Description = 'Tor Browser, PGP, kill switch, политика Defender.'
+            Does = 'Invoke-TorPreflightCheck'
+            When = 'Перед каждым заходом в Tor.'
+            How = 'tor-check'
+            Examples = @('tor-check')
+            Related = @('tor-lock', 'tor-status')
+        }
+        'tor-lock' = @{
+            Group = 'Безопасность'; Title = 'tor-lock — kill switch (admin)'
+            Description = 'Firewall: блок outbound Chrome/Edge/Firefox/Brave. Tor Browser разрешён.'
+            Does = 'Configure-TorSecurity.ps1 -LockSwitch'
+            When = 'Начало Tor-сессии (закрой clearnet-браузеры).'
+            How = 'tor-lock (от администратора)'
+            Examples = @('tor-lock')
+            Related = @('tor-unlock', 'tor-harden')
+        }
+        'tor-unlock' = @{
+            Group = 'Безопасность'; Title = 'tor-unlock — снять kill switch (admin)'
+            Description = 'Удаляет правила KGreen-Tor-Lock.'
+            Does = 'Configure-TorSecurity.ps1 -UnlockSwitch'
+            When = 'После Tor-сессии.'
+            How = 'tor-unlock (от администратора)'
+            Examples = @('tor-unlock')
+            Related = @('tor-lock', 'tor-status')
+        }
+        'tor-help' = @{
+            Group = 'Безопасность'; Title = 'tor-help — справка Tor'
+            Description = 'Краткая шпаргалка Tor-команд.'
+            Does = 'Show-TorHelpRu'
+            When = 'Нужна справка по Tor.'
+            How = 'tor-help · sec-help'
+            Examples = @('tor-help')
+            Related = @('sec-help', 'tor-check')
+        }
+        sec = @{
+            Group = 'Безопасность'; Title = 'sec — SHADOW OPS (главное меню)'
+            Description = 'Единое меню Tor + PGP: статус, playbook, все действия через fzf.'
+            Does = 'Show-SecurityMenu — панель readiness + интерактивное меню.'
+            When = 'Перед Tor-сессией или настройка PGP.'
+            How = 'sec · sec -Guide · sec -Status'
+            Examples = @('sec', 'sec -Guide', 'sec -Status', 'privacy')
+            Related = @('tor-check', 'sec-help', 'menu')
+        }
+        'sec-help' = @{
+            Group = 'Безопасность'; Title = 'sec-help — полная шпаргалка'
+            Description = 'Tor + PGP + playbook + правила NEVER.'
+            Does = 'Show-SecurityHelpRu'
+            When = 'Нужны инструкции без fzf-меню.'
+            How = 'sec-help'
+            Examples = @('sec-help')
+            Related = @('sec', 'pgp-help', 'tor-help')
+        }
+        privacy = @{
+            Group = 'Безопасность'; Title = 'privacy — синоним sec'
+            Description = 'То же, что sec — меню SHADOW OPS.'
+            Does = 'sec'
+            When = 'Привычнее название privacy.'
+            How = 'privacy · privacy -Status'
+            Examples = @('privacy', 'privacy -Status')
+            Related = @('sec', 'sec-help')
+        }
+        revise = @{
+            Group = 'Обслуживание'; Title = 'revise — навести порядок'
+            Description = 'Полный прогон: PATH, docs sync, doctor, trust, SHADOW OPS, next actions.'
+            Does = 'Invoke-WorkstationRevision.ps1'
+            When = 'Раз в неделю или после больших изменений.'
+            How = 'revise · revise -Backup · poriadok'
+            Examples = @('revise', 'revise -Quick', 'revise -Backup', 'poriadok')
+            Related = @('doctor', 'trustcheck', 'sec', 'backupconfig')
+        }
+        poriadok = @{
+            Group = 'Обслуживание'; Title = 'poriadok — синоним revise (RU)'
+            Description = 'То же, что revise — «навести порядок».'
+            Does = 'revise'
+            When = 'Русское название команды.'
+            How = 'poriadok · poriadok -Backup'
+            Examples = @('poriadok')
+            Related = @('revise', 'doctor', 'trustcheck')
+        }
     }
 
     return @{ Groups = $groups; Commands = $commands }
@@ -407,6 +624,10 @@ function Get-WorkstationToolCatalogRu {
            Why = 'подключение к серверам и Linux-машинам'; Example = 'ssh user@host' }
         @{ Name = 'OpenSSL'; Cmd = 'openssl'; What = 'криптографические утилиты и проверка TLS'
            Why = 'проверка сертификатов и шифрования'; Example = 'openssl s_client -connect host:443' }
+        @{ Name = 'GnuPG'; Cmd = 'gpg'; What = 'OpenPGP — шифрование и подпись сообщений'
+           Why = 'PGP для Tor-переписки'; Example = 'pgp-status · pgp-fingerprint' }
+        @{ Name = 'Tor Browser'; Cmd = 'firefox'; What = 'анонимный браузер через сеть Tor'
+           Why = 'единственный браузер для .onion'; Example = 'sec · tor-check' }
         @{ Name = 'PuTTY'; Cmd = 'putty'; What = 'графический SSH/Telnet клиент'
            Why = 'удобное подключение к серверам через GUI'; Example = 'putty' }
         @{ Name = 'Process Explorer'; Cmd = 'procexp64'; What = 'продвинутый диспетчер процессов'

@@ -12,6 +12,9 @@ function Get-CommandPaletteItems {
         $items.Add("[$group] $name — $desc")
     }
 
+    $items.Add('[ACTION] sec — SHADOW OPS (Tor + PGP menu)')
+    $items.Add('[ACTION] revise — навести порядок (doctor+trust+sec)')
+    $items.Add('[ACTION] tor-check — preflight перед Tor')
     $items.Add('[ACTION] scan — быстрый integrity scan')
     $items.Add('[ACTION] palette — это меню')
     return @($items)
@@ -19,19 +22,23 @@ function Get-CommandPaletteItems {
 
 function Invoke-CommandPalette {
     if (-not (Get-Command fzf -ErrorAction SilentlyContinue)) {
-        Write-HackerLine 'fzf не установлен — используйте komandy' -Color Yellow
+        Write-HackerLine 'fzf не установлен — используйте komandy или sec -Guide' -Color Yellow
         komandy
         return
     }
 
     $env:FZF_DEFAULT_OPTS = '--height 50% --layout=reverse --border --prompt="CMD> "'
-    $pick = Get-CommandPaletteItems | fzf --header 'HOME BASE // command palette (Enter=help, Ctrl-E=run)'
+    $pick = Get-CommandPaletteItems | fzf --header 'HOME BASE // palette · Enter=help · sec=безопасность'
     if (-not $pick) { return }
 
     if ($pick -match '\] ([a-z\-]+) —') {
         $cmd = $Matches[1]
-        if ($cmd -eq 'palette') { return }
-        if ($cmd -eq 'scan') { scan; return }
+            switch ($cmd) {
+            'palette' { return }
+            'scan'    { scan; return }
+            'sec'     { sec; return }
+            'revise'  { revise; return }
+        }
         Show-WorkstationCommandHelp -Name $cmd
         Write-HackerLine "запуск: $cmd  ·  help: $cmd -help" -Color DarkGreen
     }
@@ -44,24 +51,38 @@ function Show-HackerMenu {
     }
 
     $menu = @(
-        '1 · FULL COCKPIT — hack (max mode)'
-        '2 · QUICK SCAN — scan'
-        '3 · TRUST PROBE — trustcheck'
-        '4 · HEALTH — doctor'
-        '5 · NETWORK — nettools'
-        '6 · DEV START — devstart'
-        '7 · COMMAND PALETTE — palette'
-        '8 · TOOLS — instrumenty'
-        '9 · CATALOG — komandy'
+        '── COCKPIT ──'
+        '1 · FULL COCKPIT — home / telemetry'
+        '2 · SINGULARITY — operator seal'
+        '── SECURITY ──'
+        '3 · SHADOW OPS — sec (Tor + PGP menu)'
+        '4 · TOR PREFLIGHT — tor-check'
+        '── OPS ──'
+        '5 · QUICK SCAN — scan'
+        '6 · REVISE — poriadok (sync + doctor + trust)'
+        '7 · TRUST PROBE — trustcheck'
+        '8 · HEALTH — doctor'
+        '9 · NETWORK — nettools'
+        '── NAV ──'
+        '0 · PALETTE — palette'
+        'A · DEV START — devstart'
+        'B · PALETTE — palette'
+        'C · TOOLS — instrumenty'
+        'D · CATALOG — komandy'
     )
 
-    $env:FZF_DEFAULT_OPTS = '--height 40% --layout=reverse --border --prompt="HACK> "'
-    $pick = $menu | fzf --header 'HOME BASE // hacker menu'
+    $env:FZF_DEFAULT_OPTS = '--height 55% --layout=reverse --border --prompt="HACK> "'
+    $pick = $menu | fzf --header 'HOME BASE // menu · sec=Tor+PGP · Esc=exit'
     if (-not $pick) { return }
+    if ($pick -match '^──') { Show-HackerMenu; return }
 
     switch -Regex ($pick) {
-        'FULL COCKPIT' { Show-HomeBase -Force -Mode full; break }
+        'FULL COCKPIT' { Show-HomeBase -Force -Mode normal; break }
+        'SINGULARITY'  { singularity; break }
+        'SHADOW OPS'   { sec; break }
+        'TOR PREFLIGHT'{ tor-check; break }
         'QUICK SCAN'   { scan; break }
+        'REVISE'       { revise; break }
         'TRUST'        { trustcheck; break }
         'HEALTH'       { doctor; break }
         'NETWORK'      { nettools; break }
@@ -69,7 +90,7 @@ function Show-HackerMenu {
         'PALETTE'      { Invoke-CommandPalette; break }
         'TOOLS'        { instrumenty; break }
         'CATALOG'      { komandy; break }
-        default        { Show-HomeBase -Force -Mode full }
+        default        { sec }
     }
 }
 
