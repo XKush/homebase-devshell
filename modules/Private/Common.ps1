@@ -1,6 +1,38 @@
 # Shared command center infrastructure
 if (-not $script:WSRoot) { $script:WSRoot = 'C:\Scripts\Workstation' }
-$script:WSLog  = 'C:\Logs\Workstation\commands.log'
+
+function Get-WorkstationCommandsLogPath {
+    if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+        return Join-Path (Get-HomeBasePath -Name Logs) 'commands.log'
+    }
+    return 'C:\Logs\Workstation\commands.log'
+}
+
+function Get-WorkstationLogsRoot {
+    if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+        return Get-HomeBasePath -Name Logs
+    }
+    return 'C:\Logs\Workstation'
+}
+
+function Get-WorkstationBackupsRoot {
+    if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+        return Get-HomeBasePath -Name Backups
+    }
+    return 'C:\Backups\Workstation'
+}
+
+function Ensure-WorkstationModuleLoaded {
+    if (Get-Module KGreen.Workstation) { return $true }
+    if ((Get-Command Get-WorkstationCommandHealth, Test-ShowCommandHelp -ErrorAction SilentlyContinue).Count -ge 2) {
+        return $true
+    }
+    $modPath = Join-Path $script:WSRoot 'modules\KGreen.Workstation.psm1'
+    if (-not (Test-Path $modPath)) { return $false }
+    Import-Module $modPath -DisableNameChecking -Force -Scope Global -ErrorAction SilentlyContinue
+    return [bool](Get-Module KGreen.Workstation)
+}
+$script:WSLog  = Get-WorkstationCommandsLogPath
 $script:WSOwner = 'KGreen'
 
 if (-not $env:WORKSTATION_LANG) { $env:WORKSTATION_LANG = 'ru' }
@@ -74,9 +106,11 @@ function Get-WorkstationCommandRegistry {
         @{ Name = 'dna';              Backend = 'dna';              Module = 'Genesis';     Safe = 'dna' }
         @{ Name = 'trustchain';       Backend = 'trustchain';       Module = 'Genesis';     Safe = 'trustchain' }
         @{ Name = 'sec';              Backend = 'sec';              Module = 'Privacy';      Safe = 'sec -Status' }
+        @{ Name = 'anon';             Backend = 'anon';             Module = 'Privacy';      Safe = 'anon -Audit' }
         @{ Name = 'sec-help';         Backend = 'sec-help';         Module = 'Privacy';      Safe = 'sec-help' }
         @{ Name = 'revise';           Backend = 'revise';           Module = 'Revision';    Safe = 'revise -Quick' }
         @{ Name = 'poriadok';         Backend = 'poriadok';         Module = 'Revision';    Safe = 'revise -Quick' }
+        @{ Name = 'organize';         Backend = 'organize';         Module = 'Maintenance'; Safe = 'organize -WhatIf' }
         @{ Name = 'privacy';          Backend = 'privacy';          Module = 'Privacy';      Safe = 'sec -Status' }
         @{ Name = 'pgp-setup';        Backend = 'pgp-setup';        Module = 'Pgp';          Safe = $null }
         @{ Name = 'pgp-repair';       Backend = 'pgp-repair';       Module = 'Pgp';          Safe = $null }
@@ -89,12 +123,13 @@ function Get-WorkstationCommandRegistry {
         @{ Name = 'tor-setup';        Backend = 'tor-setup';        Module = 'Tor';          Safe = $null }
         @{ Name = 'tor-harden';       Backend = 'tor-harden';       Module = 'Tor';          Safe = $null }
         @{ Name = 'tor-check';        Backend = 'tor-check';        Module = 'Tor';          Safe = 'tor-check' }
+        @{ Name = 'tor-browser';      Backend = 'tor-browser';      Module = 'Tor';          Safe = 'tor-browser' }
         @{ Name = 'tor-status';       Backend = 'tor-status';       Module = 'Tor';          Safe = 'tor-status' }
-        @{ Name = 'tor-lock';         Backend = 'tor-lock';         Module = 'Tor';          Safe = $null }
-        @{ Name = 'tor-unlock';       Backend = 'tor-unlock';       Module = 'Tor';          Safe = $null }
         @{ Name = 'tor-help';         Backend = 'tor-help';         Module = 'Tor';          Safe = 'tor-help' }
         @{ Name = 'palette';          Backend = 'palette';          Module = 'Palette';      Safe = $null }
         @{ Name = 'menu';             Backend = 'menu';             Module = 'Palette';      Safe = $null }
+        @{ Name = 'go';               Backend = 'go';               Module = 'Palette';      Safe = $null }
+        @{ Name = 'nav';              Backend = 'nav';              Module = 'Palette';      Safe = $null }
         @{ Name = 'toolcheck';        Backend = 'Invoke-ToolCheck'; Module = 'Network';      Safe = 'toolcheck' }
         @{ Name = 'nettools';         Backend = 'Show-NetTools';    Module = 'Network';      Safe = 'nettools' }
         @{ Name = 'toolbox';          Backend = 'Show-Toolbox';     Module = 'Network';      Safe = 'toolbox' }
@@ -104,6 +139,11 @@ function Get-WorkstationCommandRegistry {
         @{ Name = 'workspace';        Backend = 'workspace';        Module = 'Workspace';    Safe = 'workspace' }
         @{ Name = 'devstart';         Backend = 'devstart';         Module = 'Workspace';    Safe = 'devstart' }
         @{ Name = 'projects';         Backend = 'projects';         Module = 'Shell';        Safe = 'projects' }
+        @{ Name = 'downloads';        Backend = 'downloads';        Module = 'Shell';        Safe = 'downloads' }
+        @{ Name = 'desktop';           Backend = 'desktop';          Module = 'Shell';        Safe = 'desktop' }
+        @{ Name = 'backups';          Backend = 'backups';          Module = 'Shell';        Safe = 'backups' }
+        @{ Name = 'configs';          Backend = 'configs';          Module = 'Shell';        Safe = 'configs' }
+        @{ Name = 'networking';       Backend = 'networking';       Module = 'Shell';        Safe = 'networking' }
         @{ Name = 'cleanup';          Backend = 'cleanup';          Module = 'Maintenance';  Safe = 'cleanup -WhatIf' }
         @{ Name = 'backupconfig';     Backend = 'backupconfig';     Module = 'Maintenance';  Safe = 'backupconfig' }
         @{ Name = 'restoreconfig';    Backend = 'restoreconfig';    Module = 'Recovery';     Safe = 'restoreconfig' }

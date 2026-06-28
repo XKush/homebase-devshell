@@ -6,7 +6,7 @@ function cleanlogs {
     $tempDirs = @([System.IO.Path]::GetTempPath(), (Join-Path $env:LOCALAPPDATA 'Temp'))
     Write-Host "  Безопасная очистка (логи/бэкапы/temp старше $KeepDays дн.)..." -ForegroundColor Cyan
 
-    $valDir = 'C:\Logs\Workstation'
+    $valDir = Get-WorkstationLogsRoot
     if (Test-Path $valDir) {
         Get-ChildItem $valDir -Filter 'validation-*.json' | Sort-Object Name -Descending | Select-Object -Skip 10 | ForEach-Object {
             if ($WhatIf) { Write-Host "  Будет удалено: $($_.Name)" -ForegroundColor DarkGray }
@@ -22,11 +22,22 @@ function cleanlogs {
         }
     }
 
-    $bakRoot = 'C:\Backups\Workstation'
+    $bakRoot = Get-WorkstationBackupsRoot
     if (Test-Path $bakRoot) {
-        Get-ChildItem $bakRoot -Directory | Sort-Object Name -Descending | Select-Object -Skip 5 | ForEach-Object {
-            if ($WhatIf) { Write-Host "  Будет удалён бэкап: $($_.Name)" -ForegroundColor DarkGray }
-            else { Remove-Item $_.FullName -Recurse -Force; Write-Host "  Удалён бэкап: $($_.Name)" -ForegroundColor DarkGray }
+        $dirs = Get-ChildItem $bakRoot -Directory -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -ne '_Archive' } |
+            Sort-Object LastWriteTime -Descending
+        foreach ($d in ($dirs | Select-Object -Skip 8)) {
+            if ($WhatIf) {
+                Write-Host "  Будет архивирован бэкап: $($d.Name)" -ForegroundColor DarkGray
+                continue
+            }
+            $archive = Join-Path $bakRoot '_Archive'
+            if (-not (Test-Path $archive)) { New-Item -ItemType Directory -Path $archive -Force | Out-Null }
+            $dest = Join-Path $archive $d.Name
+            if (Test-Path $dest) { continue }
+            Move-Item $d.FullName $dest -Force
+            Write-Host "  Архивирован бэкап: $($d.Name)" -ForegroundColor DarkGray
         }
     }
 
@@ -71,6 +82,18 @@ function backupconfig {
     if (Test-ShowCommandHelp -Name 'backupconfig' -Help:$Help) { return }
     Invoke-WorkstationCmd 'backupconfig' {
         & (Join-Path $script:WSRoot 'Backup-Configuration.ps1') -Force
+        $global:LASTEXITCODE = 0
+    }
+}
+
+function organize {
+    param([switch]$Help, [switch]$WhatIf, [switch]$Force)
+    if (Test-ShowCommandHelp -Name 'organize' -Help:$Help) { return }
+    Invoke-WorkstationCmd 'organize' {
+        if (Get-Command Ensure-WorkstationFolderLayout -ErrorAction SilentlyContinue) {
+            Ensure-WorkstationFolderLayout -Quiet | Out-Null
+        }
+        & (Join-Path $script:WSRoot 'Invoke-WorkstationOrganization.ps1') -WhatIf:$WhatIf -Force:$Force
         $global:LASTEXITCODE = 0
     }
 }

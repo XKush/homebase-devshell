@@ -6,6 +6,13 @@
 $ModuleRoot = $PSScriptRoot
 $script:WSRoot = Split-Path $ModuleRoot -Parent
 
+$foldersLib = Join-Path $script:WSRoot 'lib\WorkstationFolders.ps1'
+$pathsLib = Join-Path $script:WSRoot 'lib\HomeBasePaths.ps1'
+$anonLib = Join-Path $script:WSRoot 'lib\AnonymityKit.ps1'
+if (Test-Path $pathsLib) { . $pathsLib }
+if (Test-Path $foldersLib) { . $foldersLib }
+if (Test-Path $anonLib) { . $anonLib }
+
 $loadOrder = @(
     'Private/Common.ps1'
     'Private/Errors.ru.ps1'
@@ -20,6 +27,7 @@ $loadOrder = @(
     'Private/SelfCheck.ps1'
     'Private/BootCheck.ps1'
     'Private/Scan.ps1'
+    'Private/MenuSystem.ps1'
     'Private/CommandPalette.ps1'
     'Private/WindowsStatus.ps1'
     'Private/Pgp.ps1'
@@ -50,24 +58,24 @@ foreach ($rel in $loadOrder) {
 }
 
 $public = @(
-    'projects', 'tools', 'scripts', 'Open-Project', 'sysinfo', 'admin', 'instrumenty'
+    'projects', 'tools', 'scripts', 'downloads', 'desktop', 'backups', 'configs', 'networking', 'Open-Project', 'sysinfo', 'admin', 'instrumenty'
     'gs', 'ga', 'gc', 'gp', 'gl', 'gd', 'gco', 'gb', 'glog'
     'Enter-Venv', 'New-Venv', 'which', 'touch', 'mkcd', 'whereami', 'explain'
     'doctor', 'healthcheck', 'sysreport', 'trustcheck', 'scan', 'windowsstatus'
     'singularity', 'genesis', 'dna', 'trustchain'
     'pgp-setup', 'pgp-repair', 'pgp-status', 'pgp-export', 'pgp-fingerprint', 'pgp-encrypt', 'pgp-decrypt', 'pgp-help'
-    'tor-setup', 'tor-harden', 'tor-check', 'tor-status', 'tor-lock', 'tor-unlock', 'tor-help'
-    'sec', 'privacy', 'sec-help', 'revise', 'poriadok'
+    'tor-setup', 'tor-harden', 'tor-check', 'tor-status', 'tor-browser', 'tor-help'
+    'sec', 'privacy', 'sec-help', 'anon', 'Test-AnonymityKitAudit', 'revise', 'poriadok'
     'Get-OperatorDna', 'Get-SingularityScore', 'Show-SingularityCockpit', 'Show-GenesisCertificate'
     'Get-SecurityReadinessReport', 'Show-SecurityStatusPanel'
     'Get-WindowsStatusReport', 'Show-WindowsStatus'
-    'palette', 'menu', 'Invoke-CommandPalette', 'Show-HackerMenu'
+    'palette', 'menu', 'go', 'nav', 'Invoke-CommandPalette', 'Show-HackerMenu', 'Invoke-WorkstationNavHub', 'Invoke-WorkstationGoMenu', 'Invoke-WorkstationActionMenu', 'Register-WorkstationMenuHotkeys', 'Test-WorkstationMenuIntegrity', 'Test-WorkstationGoMenuAudit'
     'Get-WorkstationCommandHealth', 'Get-WorkstationCommandRegistry'
     'Get-SystemTrustReport', 'Show-TrustReport', 'Test-CommandSelfCheck', 'Invoke-AllCommandSelfChecks'
     'Invoke-ToolCheck', 'Show-NetTools', 'Show-Toolbox', 'Invoke-SysAudit'
     'Get-WorkstationToolInventory', 'toolcheck', 'nettools', 'toolbox', 'sysaudit'
     'networkstatus', 'portscan', 'procexp', 'procmon', 'tcpview', 'cap', 'Find-SysinternalsTool'
-    'cleanup', 'cleanlogs', 'updateall', 'backupconfig'
+    'cleanup', 'cleanlogs', 'updateall', 'backupconfig', 'organize'
     'help', 'helpme', 'cheatsheet', 'quickstart', 'learn', 'komandy'
     'repairterminal', 'fixprofile', 'reloadprofile', 'restoreconfig'
     'workspace', 'devstart', 'logs', 'securitycheck', 'new-project', 'devinfo'

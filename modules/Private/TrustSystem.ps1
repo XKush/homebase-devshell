@@ -1,6 +1,6 @@
 # Режим доверия — HOME BASE не может врать
 
-$script:TrustReportPath = 'C:\Logs\Workstation\trust-report.json'
+$script:TrustReportPath = Join-Path (Get-WorkstationLogsRoot) 'trust-report.json'
 $script:TrustMaxCacheMin = 15
 
 function Get-TrustMode {
@@ -17,6 +17,7 @@ function Save-TrustReport {
 }
 
 function Get-TrustReportFromCache {
+    if (-not $script:TrustReportPath) { $script:TrustReportPath = Join-Path (Get-WorkstationLogsRoot) 'trust-report.json' }
     if (-not (Test-Path $script:TrustReportPath)) { return $null }
     try {
         $r = Get-Content $script:TrustReportPath -Raw | ConvertFrom-Json
@@ -54,12 +55,22 @@ function Get-SystemTrustReport {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     $issues = [System.Collections.Generic.List[string]]::new()
 
-    # Модуль
-    $modOk = [bool](Get-Module KGreen.Workstation)
+    # Модуль (Get-Module alone misses session state after child-script Import-Module)
+    $modOk = [bool](Get-Module KGreen.Workstation) -or
+        ((Get-Command Get-WorkstationCommandHealth, Test-ShowCommandHelp -ErrorAction SilentlyContinue).Count -ge 2)
     if (-not $modOk) { $issues.Add((Get-TrustMessage 'ModuleMissing')) }
 
     # Самопроверки всех команд
-    $selfChecks = Invoke-AllCommandSelfChecks
+    try {
+        $selfChecks = Invoke-AllCommandSelfChecks
+    } catch {
+        $selfChecks = @([PSCustomObject]@{
+            Command = 'Invoke-AllCommandSelfChecks'
+            OK      = $false
+            Detail  = $_.Exception.Message
+            Checks  = @()
+        })
+    }
     $selfFails = @($selfChecks | Where-Object { -not $_.OK })
     if ($selfFails.Count) {
         $issues.Add((Get-TrustMessage 'SelfCheckFail' -Detail ($selfFails.Command -join ', ')))
@@ -86,7 +97,7 @@ function Get-SystemTrustReport {
     if (-not $profileOk) { $issues.Add((Get-TrustMessage 'ProfileDrift')) }
 
     # command-health.json
-    $healthPath = 'C:\Logs\Workstation\command-health.json'
+    $healthPath = Join-Path (Get-WorkstationLogsRoot) 'command-health.json'
     $healthAge = $null
     $execFailures = 0
     if (Test-Path $healthPath) {
@@ -105,7 +116,7 @@ function Get-SystemTrustReport {
 
     # validation json
     $valFail = 0
-    $val = Get-ChildItem 'C:\Logs\Workstation' -Filter 'validation-*.json' -EA SilentlyContinue |
+    $val = Get-ChildItem (Get-WorkstationLogsRoot) -Filter 'validation-*.json' -EA SilentlyContinue |
         Sort-Object Name -Descending | Select-Object -First 1
     if ($val) {
         try {
@@ -170,9 +181,9 @@ function Show-TrustReport {
     if (-not $Trust) { $Trust = Get-SystemTrustReport -Live -Save }
 
     if (Test-HackerUIEnabled) {
-        Show-HackerTrustPanel -Trust $Trust
+        Show-HackerTrustPanel -Trust $Trust -Compact
         $P = Get-HackerPalette
-        Write-HackerStat 'TIMESTAMP' ([datetime]$Trust.Timestamp).ToString('dd.MM.yyyy HH:mm:ss') -Color $P.Muted
+        Write-HackerStat 'TIME' ([datetime]$Trust.Timestamp).ToString('dd.MM.yyyy HH:mm:ss') -Color $P.Muted
         Write-Host ''
         return
     }
