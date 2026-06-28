@@ -15,6 +15,9 @@ param(
 $ErrorActionPreference = 'Continue'
 . "$PSScriptRoot\lib\WorkstationCommon.ps1"
 
+$logsRoot = Get-WorkstationLogsRoot
+$backupsRoot = Get-WorkstationBackupsRoot
+
 Write-WorkstationStep 'HOME BASE revision pass'
 
 # 1. PATH + docs sync
@@ -37,7 +40,7 @@ $doctorOk = $true
 if (-not $Quick) {
     Write-WorkstationStep 'Doctor (Validate-Workstation)'
     & (Join-Path $PSScriptRoot 'Validate-Workstation.ps1')
-    $latest = Get-ChildItem 'C:\Logs\Workstation\validation-*.json' -ErrorAction SilentlyContinue |
+    $latest = Get-ChildItem $logsRoot -Filter 'validation-*.json' -ErrorAction SilentlyContinue |
         Sort-Object Name -Descending | Select-Object -First 1
     if ($latest) {
         try {
@@ -70,7 +73,7 @@ Get-SecurityReadinessReport | ConvertTo-Json -Compress
 
 # 5. Optional backup
 if ($Backup) {
-    $bakRoot = 'C:\Backups\Workstation'
+    $bakRoot = $backupsRoot
     $days = 999
     if (Test-Path $bakRoot) {
         $latestBak = Get-ChildItem $bakRoot -Directory -ErrorAction SilentlyContinue | Sort-Object Name -Descending | Select-Object -First 1
