@@ -2,7 +2,7 @@
 
 **Статус:** ACTIVE  
 **С:** 2026-06-29  
-**До:** завершения Phase 2 (Path Abstraction)  
+**До:** полного закрытия Phase 2 (волны A–E, Final Release Review, Step 2.5, Final Integration Rehearsal, tag v2.1.0)  
 **Baseline tag:** `v2.0.0` (единственная официальная product baseline)
 
 ---

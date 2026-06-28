@@ -51,20 +51,31 @@
 
 ---
 
-## Phase 2 — Path configuration
+## Phase 2 — Path configuration (in progress)
 
 | | |
 |---|---|
-| **Goal** | Portable paths |
-| **Tasks** | homebase.defaults.json, Get-HomeBasePath, junction migration |
+| **Goal** | Portable paths; runtime SSOT; documented closeout |
+| **Done (so far)** | SSOT core, command queue 7/7, Integration Rehearsal PASS |
+| **Remaining** | Waves A–E → Final Release Review → Step 2.5 → Final Integration Rehearsal |
 | **Risk** | medium — wrong path breaks runtime |
-| **Done when** | fresh install uses config only; old paths junction 12mo |
+| **Done when** | Runtime-Code = 0; junctions per Step 2.5; tag **v2.1.0** |
+
+**Authoritative closeout:** [STEP-2-5-DECISION.md](./STEP-2-5-DECISION.md) · **Progress:** [PATH-MIGRATION-PROGRESS.md](./PATH-MIGRATION-PROGRESS.md)
+
+**Freeze:** no new user commands until Phase 2 closeout ([ARCHITECTURE-FREEZE.md](./ARCHITECTURE-FREEZE.md)).
 
 ---
 
-## v2.1 — OSS release
+## v2.1 — Path migration release
 
-Patch: docs, psd1 ModuleVersion, LICENSE applied.
+MINOR: path SSOT complete, LegacyJunctions, psd1 ModuleVersion 2.1.0, release review signed off.
+
+---
+
+## v3 — Architecture vision (design only)
+
+Post–v2.1.0 direction: [V3-ARCHITECTURE-VISION.md](./V3-ARCHITECTURE-VISION.md) — presentation, locale, declarative commands, plugins, CI/CD, module publication. **Not active work** during Phase 2.
 
 ---
 

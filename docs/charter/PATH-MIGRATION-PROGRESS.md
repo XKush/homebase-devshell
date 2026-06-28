@@ -15,7 +15,25 @@ Run: `Get-Phase2LegacyPathReport.ps1 -SaveJson` · JSON: `Logs/Phase2/legacy-pat
 | **Runtime literals** | **103** | **0** | Layer `Runtime-Code` — see [PATH-MIGRATION-FINAL-REVIEW.md](PATH-MIGRATION-FINAL-REVIEW.md) |
 | **Total literals** | **167** | tests/docs/fallback only | Mid-phase baseline was 188 total / 124 runtime |
 
-*Command queue complete. Full Phase 2 exit requires profile, install, module waves + integration rehearsal.*
+*Command queue complete · Integration Rehearsal PASS ([Integration-Rehearsal.md](Integration-Rehearsal.md)). Remaining work: waves A–E → Final Release Review → Step 2.5 → Final Integration Rehearsal → v2.1.0 ([STEP-2-5-DECISION.md](STEP-2-5-DECISION.md)).*
+
+**Freeze:** no new user commands until Phase 2 closeout completes ([ARCHITECTURE-FREEZE.md](ARCHITECTURE-FREEZE.md)).
+
+---
+
+## Remaining waves (Phase 2 closeout)
+
+Each wave: **baseline → migration → gate → passport → review**. Do not track a single literal count across waves.
+
+| Wave | Layer | Status | Notes |
+|------|-------|--------|-------|
+| **A** | Profile | ⏳ | `$PROFILE`, Install-ShellProfile, profile path hints |
+| **B** | Module | ⏳ | `modules/**` runtime literals |
+| **C** | Install | ⏳ | Install/configure, first-run scripts |
+| **D** | Fallback | ⏳ | Dedicated `Get-HomeBasePath` else removal |
+| **E** | Tests | ⏳ | Gate/compare hardcoding only (not SSOT defs) |
+
+Post-waves: **Final Release Review** → **Step 2.5** → **Final Integration Rehearsal** → **v2.1.0**.
 
 ---
 
@@ -65,12 +83,16 @@ Runtime: `C:\Logs\Workstation\Phase2\Commit\{hash}/`
 
 ## Exit criteria (Phase 2 complete)
 
-Refined mid-phase — [PATH-MIGRATION-MID-REVIEW.md](PATH-MIGRATION-MID-REVIEW.md) · **Final review (queue):** [PATH-MIGRATION-FINAL-REVIEW.md](PATH-MIGRATION-FINAL-REVIEW.md)
+Refined mid-phase — [PATH-MIGRATION-MID-REVIEW.md](PATH-MIGRATION-MID-REVIEW.md) · **Final review (queue):** [PATH-MIGRATION-FINAL-REVIEW.md](PATH-MIGRATION-FINAL-REVIEW.md) · **Closeout order:** [STEP-2-5-DECISION.md](STEP-2-5-DECISION.md)
 
+- [x] Command queue (rows 1–7) SSOT + Gate Verified
+- [x] Integration Rehearsal PASS (command-queue milestone)
+- [ ] Waves A–E complete (each with passport)
 - [ ] **Runtime-Code layer = 0** legacy literals (`Get-Phase2LegacyPathReport.ps1`)
-- [ ] Allowed non-zero literals only in Tests-Gates, Documentation, SSOT-Definition, Legacy-Fallback
-- [ ] Rows 1–7 SSOT ✅ + Gate Verified — **rows 1–7 done** · rows 8–9 pending
+- [ ] Allowed non-zero literals only in Tests-Gates, Documentation, SSOT-Definition (post–Wave D)
 - [ ] Legacy equivalence vs Phase2-Step1-Stable
 - [ ] doctor 75/75 · trust VERIFIED · all commit gates PASS
-- [ ] **LegacyJunctions disabled** until Step 2.5
-- [ ] Architecture docs updated · tag candidate **v2.1.0**
+- [ ] **Final Release Review** documented
+- [ ] **Step 2.5** — LegacyJunctions enabled (explicit approval)
+- [ ] **Final Integration Rehearsal** PASS + updated `Phase2-Completion-Passport.json`
+- [ ] Tag **v2.1.0**

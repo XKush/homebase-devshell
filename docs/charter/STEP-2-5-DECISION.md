@@ -30,7 +30,9 @@ Integration Rehearsal PASS confirms platform health and architectural equivalenc
 
 ---
 
-## Revised roadmap (post–Integration Rehearsal)
+## Phase 2 closeout roadmap (authoritative)
+
+**Policy:** No new user-facing commands until this sequence completes. Feature WIP stays in stash; only path-migration waves and release artifacts ship.
 
 Previous mental model:
 
@@ -41,16 +43,21 @@ Phase 2 → Step 2.5 → Remaining literals → v2.1.0
 **Adopted order:**
 
 ```
-Phase 2 (command queue + integration)
-    ↓
-Remaining Runtime Waves
-    ↓
-Release Review
-    ↓
-Step 2.5 (LegacyJunctions)
-    ↓
-v2.1.0
+Phase 2 (command queue + Integration Rehearsal PASS)
+    │
+    ├── Wave A — Profile
+    ├── Wave B — Module
+    ├── Wave C — Install
+    ├── Wave D — Fallback
+    ├── Wave E — Tests
+    │
+    ├── Final Release Review
+    ├── Step 2.5 (LegacyJunctions)
+    ├── Final Integration Rehearsal
+    └── v2.1.0
 ```
+
+Future direction (design only, no Phase 2 impact): [V3-ARCHITECTURE-VISION.md](./V3-ARCHITECTURE-VISION.md).
 
 ---
 
@@ -76,9 +83,9 @@ All three conditions must be met:
 
 1. **SSOT everywhere in runtime** — all runtime components resolve paths through `Get-HomeBasePath` / accessors (no new hardcoded paths in active runtime).
 2. **Migration report clean for runtime** — `Get-Phase2LegacyPathReport` shows no unexpected literals in the Runtime-Code layer.
-3. **Integration Rehearsal re-run PASS** — full Stages 0–4 after the last wave, with updated `Phase2-Completion-Passport.json`.
+3. **Pre–Step 2.5 Integration Rehearsal PASS** — full Stages 0–4 after Wave E (first rehearsal already PASS at command-queue milestone).
 
-Only then: discuss enabling LegacyJunctions, then **Release Review** for **v2.1.0**.
+**After Step 2.5:** run **Final Integration Rehearsal** (same orchestrator, updated passport) immediately before **v2.1.0** tag.
 
 ---
 
@@ -88,3 +95,4 @@ Only then: discuss enabling LegacyJunctions, then **Release Review** for **v2.1.
 - `docs/charter/PATH-MIGRATION-FINAL-REVIEW.md` — command queue complete stop
 - `docs/charter/PATH-MIGRATION-PROGRESS.md` — KPI and commit table
 - `Invoke-Phase2IntegrationRehearsal.ps1` — orchestrator for repeat runs
+- `V3-ARCHITECTURE-VISION.md` — post–v2.1.0 design goals (no Phase 2 impact)
