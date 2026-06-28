@@ -11,9 +11,9 @@ Run: `Get-Phase2LegacyPathReport.ps1 -SaveJson` · JSON: `Logs/Phase2/legacy-pat
 
 | Metric | Current | Target | Notes |
 |--------|--------:|-------:|-------|
-| **Functional progress** | **57%** (4 / 7) | 100% | Command scripts in Step 2 queue (rows 1–7) on SSOT |
-| **Runtime literals** | **124** | **0** | Layer `Runtime-Code` from legacy path report |
-| **Total literals** | **188** | tests/docs/fallback only | All layers; see [PATH-MIGRATION-MID-REVIEW.md](PATH-MIGRATION-MID-REVIEW.md) |
+| **Functional progress** | **71%** (5 / 7) | 100% | Command scripts in Step 2 queue (rows 1–7) on SSOT |
+| **Runtime literals** | **109** | **0** | Layer `Runtime-Code` from legacy path report |
+| **Total literals** | **173** | tests/docs/fallback only | All layers; see [PATH-MIGRATION-MID-REVIEW.md](PATH-MIGRATION-MID-REVIEW.md) |
 
 *Refresh KPI after each migration commit via `Get-Phase2LegacyPathReport.ps1`.*
 
@@ -27,7 +27,7 @@ Run: `Get-Phase2LegacyPathReport.ps1 -SaveJson` · JSON: `Logs/Phase2/legacy-pat
 | 2 | `Invoke-SystemDiscovery.ps1` | ✅ | ❌ | ✅ | `1756617` |
 | 3 | `Invoke-WorkstationRevision.ps1` | ✅ | ❌ | ✅ | `dcfd189` |
 | 4 | `Invoke-Housekeeping.ps1` | ✅ | ❌ | ✅ | `befc920` |
-| 5 | `Invoke-TerminalRecovery.ps1` | ⏳ | ⏳ | — | — |
+| 5 | `Invoke-TerminalRecovery.ps1` | ✅ | ❌ | ✅ | `10e304b` |
 | 6 | `Sync-WorkstationDocs.ps1` | ⏳ | ⏳ | — | — |
 | 7 | `Invoke-WorkstationOrganization.ps1` | ⏳ | ⏳ | — | — |
 | 8 | Profile hints / `$PROFILE` refs | ⏳ | ⏳ | — | — |
@@ -47,6 +47,7 @@ Runtime: `C:\Logs\Workstation\Phase2\Commit\{hash}/`
 | `1756617` | Invoke-SystemDiscovery | `Phase2/Commit/1756617/` |
 | `dcfd189` | Invoke-WorkstationRevision | `Phase2/Commit/dcfd189/` |
 | `befc920` | Invoke-Housekeeping | `Phase2/Commit/befc920/` |
+| `10e304b` | Invoke-TerminalRecovery | `Phase2/Commit/10e304b/` |
 
 ---
 
