@@ -11,16 +11,20 @@ param(
 $ErrorActionPreference = 'Continue'
 . "$PSScriptRoot\lib\WorkstationCommon.ps1"
 
+$logsRoot = Get-WorkstationLogsRoot
+$backupsRoot = Get-WorkstationBackupsRoot
+$configsRoot = Get-HomeBasePath -Name Configs
+
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$bakRoot = "C:\Backups\Workstation\terminal-recovery-$stamp"
+$bakRoot = Join-Path $backupsRoot "terminal-recovery-$stamp"
 New-Item -ItemType Directory -Force -Path $bakRoot | Out-Null
 Write-WorkstationStep 'TERMINAL RECOVERY — backup first'
 
 # Backup
 foreach ($item in @(
     (Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json')
-    'C:\Scripts\Workstation\terminal\revios-hacker.omp.json'
-    'C:\Scripts\Workstation\terminal\workstation-production.omp.json'
+    (Join-Path $PSScriptRoot 'terminal\revios-hacker.omp.json')
+    (Join-Path $PSScriptRoot 'terminal\workstation-production.omp.json')
     (Join-Path $env:USERPROFILE 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1')
 )) {
     if (Test-Path $item) { Copy-Item $item (Join-Path $bakRoot (Split-Path $item -Leaf)) -Force }
@@ -31,8 +35,10 @@ Write-WorkstationLog "Backup: $bakRoot" 'OK'
 Write-WorkstationStep 'Phase 1 — Terminal audit'
 & "$PSScriptRoot\Invoke-TerminalAudit.ps1" | Out-Null
 $auditIssues = @()
-if (Test-Path (Get-ChildItem 'C:\Logs\Workstation\terminal-audit-*.json' | Sort-Object Name -Descending | Select-Object -First 1).FullName) {
-    $audit = Get-Content (Get-ChildItem 'C:\Logs\Workstation\terminal-audit-*.json' | Sort-Object Name -Descending | Select-Object -First 1).FullName -Raw | ConvertFrom-Json
+$latestAudit = Get-ChildItem $logsRoot -Filter 'terminal-audit-*.json' -ErrorAction SilentlyContinue |
+    Sort-Object Name -Descending | Select-Object -First 1
+if ($latestAudit -and (Test-Path $latestAudit.FullName)) {
+    $audit = Get-Content $latestAudit.FullName -Raw | ConvertFrom-Json
     $auditIssues = @($audit.Issues)
 }
 
@@ -74,7 +80,7 @@ if (Test-Path $wtPath) {
 }
 @{
     FontFace = $fontFace; RepairedAt = (Get-Date).ToString('o'); RegistryOK = $true
-} | ConvertTo-Json | Set-Content 'C:\Logs\Workstation\font-status.json' -Encoding UTF8
+} | ConvertTo-Json | Set-Content (Join-Path $logsRoot 'font-status.json') -Encoding UTF8
 
 # Phase 3 — Windows Terminal standardization
 Write-WorkstationStep 'Phase 3 — Windows Terminal standardization'
@@ -90,32 +96,20 @@ Set-ItemProperty -Path 'HKCU:\Console' -Name 'CodePage' -Value 65001 -Type DWord
 
 # Phase 4 — Oh My Posh theme recovery + benchmark
 Write-WorkstationStep 'Phase 4 — Oh My Posh recovery'
-$themes = @(
-    @{ Name = 'workstation-production'; Path = "$PSScriptRoot\terminal\workstation-production.omp.json" }
-    @{ Name = 'jandedobbeleer'; Path = (Join-Path (Split-Path (Get-Command oh-my-posh).Source) '../themes/jandedobbeleer.omp.json') }
-)
-# Resolve bundled themes path
-$ompThemes = Join-Path $env:LOCALAPPDATA 'Programs\oh-my-posh\themes'
-if (Test-Path $ompThemes) {
-    $themes += @(
-        @{ Name = 'jandedobbeleer'; Path = Join-Path $ompThemes 'jandedobbeleer.omp.json' }
-        @{ Name = 'paradox'; Path = Join-Path $ompThemes 'paradox.omp.json' }
-        @{ Name = 'atomic'; Path = Join-Path $ompThemes 'atomic.omp.json' }
-    )
-}
 $bench = [System.Collections.Generic.List[object]]::new()
-$bestTheme = "$PSScriptRoot\terminal\homebase-hacker.omp.json"
-if (-not (Test-Path $bestTheme)) {
-    $bestTheme = "$PSScriptRoot\terminal\workstation-production.omp.json"
-}
-foreach ($t in $themes | Sort-Object Name -Unique) {
-    if (-not (Test-Path $t.Path)) { continue }
+$cleanTheme = "$PSScriptRoot\terminal\homebase-clean.omp.json"
+$bestTheme = if (Test-Path $cleanTheme) { $cleanTheme } else { "$PSScriptRoot\terminal\workstation-production.omp.json" }
+$themes = @(
+    @{ Name = 'homebase-clean'; Path = $cleanTheme }
+    @{ Name = 'workstation-production'; Path = "$PSScriptRoot\terminal\workstation-production.omp.json" }
+)
+foreach ($t in $themes | Where-Object { Test-Path $_.Path }) {
     $sw = [Diagnostics.Stopwatch]::StartNew()
-    $out = oh-my-posh print primary --config $t.Path 2>&1 | Out-String
+    $out = oh-my-posh print primary --config $t.Path --plain 2>&1 | Out-String
     $sw.Stop()
-    $ok = ($out -notmatch 'unable to create text')
+    $ok = ($out -notmatch 'unable to create text') -and ($out -notmatch 'Error')
     $bench.Add([ordered]@{ Theme = $t.Name; Ms = $sw.ElapsedMilliseconds; OK = $ok })
-    if ($ok) { $bestTheme = $t.Path }
+    if ($ok -and $t.Name -eq 'homebase-clean') { $bestTheme = $t.Path }
 }
 Copy-Item $bestTheme "$PSScriptRoot\terminal\active-theme.omp.json" -Force
 Write-WorkstationLog "Active OMP theme: $(Split-Path $bestTheme -Leaf)" 'OK'
@@ -127,14 +121,15 @@ Write-WorkstationLog $(if ($ompOk) { 'OMP renders without template errors' } els
 
 # Phase 5 — Fastfetch env + health display file
 Write-WorkstationStep 'Phase 5 — Fastfetch configuration'
-if (-not (Test-Path 'C:\Configs\Workstation')) { New-Item -ItemType Directory -Force -Path 'C:\Configs\Workstation' | Out-Null }
-if (Test-Path 'C:\Logs\Workstation\woc-last-session.json') {
+if (-not (Test-Path $configsRoot)) { New-Item -ItemType Directory -Force -Path $configsRoot | Out-Null }
+$wocSession = Join-Path $logsRoot 'woc-last-session.json'
+if (Test-Path $wocSession) {
     try {
-        $hs = (Get-Content 'C:\Logs\Workstation\woc-last-session.json' -Raw | ConvertFrom-Json).HealthScore
-        Set-Content 'C:\Logs\Workstation\woc-health-display.txt' "$hs/100" -Encoding UTF8
+        $hs = (Get-Content $wocSession -Raw | ConvertFrom-Json).HealthScore
+        Set-Content (Join-Path $logsRoot 'woc-health-display.txt') "$hs/100" -Encoding UTF8
     } catch { }
 }
-[Environment]::SetEnvironmentVariable('FASTFETCH_CONFIG', 'C:\Configs\Workstation\fastfetch-config.jsonc', 'User')
+[Environment]::SetEnvironmentVariable('FASTFETCH_CONFIG', (Join-Path $configsRoot 'fastfetch-config.jsonc'), 'User')
 
 & "$PSScriptRoot\Install-ShellProfile.ps1" -Force
 
@@ -154,18 +149,22 @@ if (-not $SkipValidation) {
     & "$PSScriptRoot\Validate-Workstation.ps1" -StartupBudgetMs 300 | Out-Null
     $reports.ValidationPassed = ($LASTEXITCODE -eq 0)
     & "$PSScriptRoot\Invoke-TerminalAudit.ps1" | Out-Null
-    $reports.AuditIssuesAfter = @((Get-Content (Get-ChildItem 'C:\Logs\Workstation\terminal-audit-*.json' | Sort-Object Name -Descending | Select-Object -First 1).FullName -Raw | ConvertFrom-Json).Issues)
+    $latestAuditAfter = Get-ChildItem $logsRoot -Filter 'terminal-audit-*.json' -ErrorAction SilentlyContinue |
+        Sort-Object Name -Descending | Select-Object -First 1
+    if ($latestAuditAfter) {
+        $reports.AuditIssuesAfter = @((Get-Content $latestAuditAfter.FullName -Raw | ConvertFrom-Json).Issues)
+    }
 }
 
 foreach ($name in @('repair','font','theme','startup','performance')) {
     $data = switch ($name) {
         'repair' { $reports }
-        'font' { @{ FontFace = $fontFace; Status = (Test-Path 'C:\Logs\Workstation\font-status.json') } }
+        'font' { @{ FontFace = $fontFace; Status = (Test-Path (Join-Path $logsRoot 'font-status.json')) } }
         'theme' { @{ Benchmark = @($bench); Active = Split-Path $bestTheme -Leaf; OMPOk = $ompOk } }
         'startup' { @{ ProfileBudgetMs = 300; Note = 'Use Windows Terminal — not legacy ConsoleHost' } }
         'performance' { @{ ThemeBenchmark = @($bench) } }
     }
-    $data | ConvertTo-Json -Depth 5 | Set-Content "C:\Logs\Workstation\terminal-$name-$stamp.json" -Encoding UTF8
+    $data | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $logsRoot "terminal-$name-$stamp.json") -Encoding UTF8
 }
 
 Write-Host ''
