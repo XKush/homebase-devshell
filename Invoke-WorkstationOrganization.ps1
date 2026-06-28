@@ -11,9 +11,13 @@ param(
 $ErrorActionPreference = 'Continue'
 . "$PSScriptRoot\lib\WorkstationCommon.ps1"
 
+$logsRoot = Get-WorkstationLogsRoot
+$backupsRoot = Get-WorkstationBackupsRoot
+$repoRoot = Get-HomeBasePath -Name RepositoryRoot
+
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$logDir = 'C:\Logs\Workstation'
-$bakDir = "C:\Backups\Workstation\organization-$stamp"
+$logDir = $logsRoot
+$bakDir = Join-Path $backupsRoot "organization-$stamp"
 $actions = [System.Collections.Generic.List[object]]::new()
 
 function Log-Action([string]$Action, [string]$Detail, [string]$Result = 'OK') {
@@ -59,11 +63,11 @@ foreach ($root in $structure.Keys) {
 # ── README stubs (navigation) ─────────────────────────────────────────────────
 $readmes = @{
     'C:\Tools\README.txt'       = 'Portable tools and utilities. Installed apps live in Program Files.'
-    'C:\Scripts\README.txt'     = 'Automation scripts. Workstation: C:\Scripts\Workstation'
+    'C:\Scripts\README.txt'     = "Automation scripts. Workstation: $repoRoot"
     'C:\Projects\README.txt'    = 'All development projects. Use: new-project Name'
     'C:\Security\README.txt'    = 'Security audit outputs and policy notes.'
     'C:\Networking\README.txt'  = 'Network captures, docs, scripts. Commands: nettools, networkstatus'
-    'C:\Logs\README.txt'        = 'System logs. Workstation logs: C:\Logs\Workstation'
+    'C:\Logs\README.txt'        = "System logs. Workstation logs: $logsRoot"
     'C:\Backups\README.txt'     = 'Configuration backups. Use: backupconfig'
     'C:\Configs\README.txt'     = 'Exported configs (terminal, git, network).'
     'C:\Temp\README.txt'        = 'Safe scratch space. Cleaned by Invoke-Housekeeping.ps1'
@@ -143,7 +147,7 @@ if (-not $WhatIf) {
 # ── Environment variables ──────────────────────────────────────────────────────
 $envVars = @{
     PROJECTS_HOME   = 'C:\Projects'
-    WORKSTATION_ROOT = 'C:\Scripts\Workstation'
+    WORKSTATION_ROOT = $repoRoot
     NETWORKING_HOME = 'C:\Networking'
     CONFIGS_HOME    = 'C:\Configs'
     TOOLS_HOME      = 'C:\Tools'
