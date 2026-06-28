@@ -1,0 +1,17 @@
+{
+  "SchemaVersion": 1,
+  "RepositoryRoot": "C:\\Scripts\\Workstation",
+  "RuntimeRoot": "C:\\",
+  "Paths": {
+    "Logs": "C:\\Logs\\Workstation",
+    "Backups": "C:\\Backups\\Workstation",
+    "Configs": "C:\\Configs\\Workstation",
+    "Projects": "C:\\Projects",
+    "Tools": "C:\\Tools",
+    "Scripts": "C:\\Scripts",
+    "Security": "C:\\Security",
+    "Networking": "C:\\Networking",
+    "Temp": "C:\\Temp\\Scratch"
+  },
+  "LegacyJunctions": []
+}
