@@ -2,18 +2,20 @@
 <#
 .SYNOPSIS
     Mandatory Phase 2 commit gate pipeline (run before every Step 2 commit).
-.DESCRIPTION
-    Commit is forbidden if this script returns non-zero.
-    With -SaveArtifacts, writes quality passport under Logs/Phase2/Commit/.
-.PARAMETER SaveArtifacts
-    Save doctor/trust/paths/equivalence JSON under Logs/Phase2/Commit/{folder}/.
-.PARAMETER FinalizePendingArtifacts
-    After git commit, rename latest *-pending artifact folder to current HEAD short hash.
+.PARAMETER Component
+    Component name for manifest (e.g. Invoke-WorkstationRevision).
+.PARAMETER Step
+    Migration step number for manifest (default: 2).
+.PARAMETER Phase
+    Phase number for manifest (default: 2).
 #>
 [CmdletBinding()]
 param(
     [switch]$SaveArtifacts,
-    [switch]$FinalizePendingArtifacts
+    [switch]$FinalizePendingArtifacts,
+    [string]$Component = 'unknown',
+    [string]$Step = '2',
+    [string]$Phase = '2'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -28,21 +30,44 @@ function Get-GitShortHead {
     return (git -C $wsRoot rev-parse --short HEAD 2>$null)
 }
 
+function Get-RuntimeProductVersion {
+    $psd1 = Join-Path $wsRoot 'modules\KGreen.Workstation.psd1'
+    if (-not (Test-Path $psd1)) { return '2.0.0' }
+    return [string](Import-PowerShellDataFile $psd1).ModuleVersion
+}
+
 function Save-Phase2GateArtifacts {
-    param([string]$FolderName)
+    param(
+        [string]$FolderName,
+        [string]$Component,
+        [string]$Step,
+        [string]$Phase
+    )
 
     $dir = Join-Path $artifactRoot $FolderName
     New-Item -ItemType Directory -Force -Path $dir | Out-Null
 
+    $doctorLabel = 'unknown'
     $latestVal = Get-ChildItem $logsRoot -Filter 'validation-*.json' -ErrorAction SilentlyContinue |
         Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if ($latestVal) {
         Copy-Item $latestVal.FullName (Join-Path $dir 'doctor.json') -Force
+        try {
+            $v = Get-Content $latestVal.FullName -Raw | ConvertFrom-Json
+            if ($v.Metrics) {
+                $doctorLabel = '{0}/{1}' -f $v.Metrics.PassCount, ($v.Metrics.PassCount + $v.Metrics.FailCount)
+            }
+        } catch { }
     }
 
+    $trustLabel = 'unknown'
     $trustPath = Join-Path $logsRoot 'trust-report.json'
     if (Test-Path $trustPath) {
         Copy-Item $trustPath (Join-Path $dir 'trust.json') -Force
+        try {
+            $t = Get-Content $trustPath -Raw | ConvertFrom-Json
+            $trustLabel = if ($t.Score -eq 100) { $t.Level } else { "$($t.Level) $($t.Score)" }
+        } catch { }
     }
 
     $pathNames = @('Logs', 'Backups', 'Configs', 'Projects', 'Tools', 'Scripts', 'RepositoryRoot', 'RuntimeRoot')
@@ -53,22 +78,33 @@ function Save-Phase2GateArtifacts {
     $pathsObj | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'paths.json') -Encoding UTF8
 
     $equiv = [ordered]@{
-        Timestamp   = (Get-Date).ToString('o')
-        ParentHead  = Get-GitShortHead
-        Folder      = $FolderName
-        LegacyJunctions = @((Get-HomeBaseConfig).LegacyJunctions).Count
-        Baseline    = 'docs/baselines/phase2-step1-stable.json'
-        GateScript  = 'Test-LegacyEquivalence.ps1'
-        Result      = 'PASS'
+        Timestamp         = (Get-Date).ToString('o')
+        ParentHead        = Get-GitShortHead
+        Folder            = $FolderName
+        Baseline          = 'Phase2-Step1-Stable'
+        LegacyJunctions   = @((Get-HomeBaseConfig).LegacyJunctions).Count
+        GateScript        = 'Test-LegacyEquivalence.ps1'
+        legacy_equivalence = 'PASS'
+        Result            = 'PASS'
     }
     $equiv | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'equivalence.json') -Encoding UTF8
 
-    [ordered]@{
-        Timestamp  = (Get-Date).ToString('o')
-        ParentHead = Get-GitShortHead
-        Folder     = $FolderName
-        Files      = @('doctor.json', 'trust.json', 'paths.json', 'equivalence.json')
-    } | ConvertTo-Json | Set-Content (Join-Path $dir 'manifest.json') -Encoding UTF8
+    $manifest = [ordered]@{
+        commit              = Get-GitShortHead
+        baseline            = 'Phase2-Step1-Stable'
+        phase               = $Phase
+        step                = $Step
+        component           = $Component
+        legacy_equivalence  = 'PASS'
+        doctor              = $doctorLabel
+        trust               = $trustLabel
+        timestamp           = (Get-Date).ToString('o')
+        runtime_version     = Get-RuntimeProductVersion
+        parent_head         = Get-GitShortHead
+        folder              = $FolderName
+        files               = @('doctor.json', 'trust.json', 'paths.json', 'equivalence.json', 'manifest.json')
+    }
+    $manifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'manifest.json') -Encoding UTF8
 
     Write-Host "Artifacts saved: $dir" -ForegroundColor DarkGray
     return $dir
@@ -94,8 +130,9 @@ if ($FinalizePendingArtifacts) {
     if (Test-Path $manifestPath) {
         $m = Get-Content $manifestPath -Raw | ConvertFrom-Json
         $m | Add-Member -NotePropertyName CommitHash -NotePropertyValue $newHash -Force
+        $m | Add-Member -NotePropertyName commit -NotePropertyValue $newHash -Force
         $m | Add-Member -NotePropertyName Finalized -NotePropertyValue ((Get-Date).ToString('o')) -Force
-        $m | ConvertTo-Json | Set-Content $manifestPath -Encoding UTF8
+        $m | ConvertTo-Json -Depth 4 | Set-Content $manifestPath -Encoding UTF8
     }
     Write-Host "Artifacts finalized: $dest" -ForegroundColor Green
     exit 0
@@ -132,7 +169,7 @@ if ($SaveArtifacts) {
         New-Item -ItemType Directory -Force -Path $artifactRoot | Out-Null
     }
     $folder = "$(Get-GitShortHead)-pending"
-    Save-Phase2GateArtifacts -FolderName $folder | Out-Null
+    Save-Phase2GateArtifacts -FolderName $folder -Component $Component -Step $Step -Phase $Phase | Out-Null
 }
 
 Write-Host ''
