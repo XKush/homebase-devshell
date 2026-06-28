@@ -5,14 +5,17 @@
 
 ---
 
-## KPI (interim — after Commit 4)
+## KPI (mid-phase — automated)
+
+Run: `Get-Phase2LegacyPathReport.ps1 -SaveJson` · JSON: `Logs/Phase2/legacy-path-report.json`
 
 | Metric | Current | Target | Notes |
 |--------|--------:|-------:|-------|
 | **Functional progress** | **57%** (4 / 7) | 100% | Command scripts in Step 2 queue (rows 1–7) on SSOT |
-| **Technical progress** | **~47 files · ~106 literals** | 0 in runtime code | Grep: `C:\Logs\Workstation` \| `C:\Backups\Workstation` \| `C:\Configs\Workstation` in `*.ps1`; count drops as rows migrate |
+| **Runtime literals** | **124** | **0** | Layer `Runtime-Code` from legacy path report |
+| **Total literals** | **188** | tests/docs/fallback only | All layers; see [PATH-MIGRATION-MID-REVIEW.md](PATH-MIGRATION-MID-REVIEW.md) |
 
-*Functional* = share of queued command scripts migrated. *Technical* = remaining hardcoded runtime path literals (tests, baselines, SSOT fallbacks counted until removed in later passes).
+*Refresh KPI after each migration commit via `Get-Phase2LegacyPathReport.ps1`.*
 
 ---
 
@@ -59,10 +62,12 @@ Runtime: `C:\Logs\Workstation\Phase2\Commit\{hash}/`
 
 ## Exit criteria (Phase 2 complete)
 
-- [ ] 100% runtime path access via SSOT
-- [ ] No new hardcoded `C:\Logs\Workstation` / `C:\Backups\Workstation` in working code
-- [ ] All rows Gate Verified
-- [ ] Legacy equivalence vs Step1-Stable (or updated stable)
-- [ ] doctor 75/75 · trust VERIFIED
-- [ ] Architecture docs updated
-- [ ] Tag candidate **v2.1.0**
+Refined mid-phase — full rationale in [PATH-MIGRATION-MID-REVIEW.md](PATH-MIGRATION-MID-REVIEW.md).
+
+- [ ] **Runtime-Code layer = 0** legacy literals (`Get-Phase2LegacyPathReport.ps1`)
+- [ ] Allowed non-zero literals only in Tests-Gates, Documentation, SSOT-Definition, Legacy-Fallback
+- [ ] Rows 1–7 SSOT ✅ + Gate Verified
+- [ ] Legacy equivalence vs Phase2-Step1-Stable
+- [ ] doctor 75/75 · trust VERIFIED · all commit gates PASS
+- [ ] **LegacyJunctions disabled** until Step 2.5
+- [ ] Architecture docs updated · tag candidate **v2.1.0**
