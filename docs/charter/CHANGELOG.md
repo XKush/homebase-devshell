@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validate-Workstation — `return` instead of `exit` when invoked from revise
 
 ### Changed
-- `Show-HackerQuickNav` — unified nav text with anon hotkey
+- Phase 2 Step 2 commit 1: `Validate-Workstation.ps1` — paths via `Get-HomeBasePath` / `Get-WorkstationLogsRoot`
 - `Get-WocBackupBlock` — exclude `_Archive`, sort by LastWriteTime
 - Hotkey module import — `-Scope Global` in MenuSystem
 
