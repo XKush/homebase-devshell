@@ -9,8 +9,8 @@
 
 | Metric | Current | Target | Notes |
 |--------|--------:|-------:|-------|
-| **Functional progress** | **43%** (3 / 7) | 100% | Command scripts in Step 2 queue (rows 1–7) on SSOT |
-| **Technical progress** | **~48 files · ~110 literals** | 0 in runtime code | Grep: `C:\Logs\Workstation` \| `C:\Backups\Workstation` \| `C:\Configs\Workstation` in `*.ps1`; count drops as rows migrate |
+| **Functional progress** | **57%** (4 / 7) | 100% | Command scripts in Step 2 queue (rows 1–7) on SSOT |
+| **Technical progress** | **~47 files · ~106 literals** | 0 in runtime code | Grep: `C:\Logs\Workstation` \| `C:\Backups\Workstation` \| `C:\Configs\Workstation` in `*.ps1`; count drops as rows migrate |
 
 *Functional* = share of queued command scripts migrated. *Technical* = remaining hardcoded runtime path literals (tests, baselines, SSOT fallbacks counted until removed in later passes).
 
@@ -23,7 +23,7 @@
 | 1 | `Validate-Workstation.ps1` | ✅ | ❌ | ✅ | `55d0f8c` |
 | 2 | `Invoke-SystemDiscovery.ps1` | ✅ | ❌ | ✅ | `1756617` |
 | 3 | `Invoke-WorkstationRevision.ps1` | ✅ | ❌ | ✅ | `dcfd189` |
-| 4 | `Invoke-Housekeeping.ps1` | ⏳ | ⏳ | — | — |
+| 4 | `Invoke-Housekeeping.ps1` | ✅ | ❌ | ✅ | `befc920` |
 | 5 | `Invoke-TerminalRecovery.ps1` | ⏳ | ⏳ | — | — |
 | 6 | `Sync-WorkstationDocs.ps1` | ⏳ | ⏳ | — | — |
 | 7 | `Invoke-WorkstationOrganization.ps1` | ⏳ | ⏳ | — | — |
@@ -43,6 +43,7 @@ Runtime: `C:\Logs\Workstation\Phase2\Commit\{hash}/`
 | `55d0f8c` | Validate-Workstation | *(pre-passport)* |
 | `1756617` | Invoke-SystemDiscovery | `Phase2/Commit/1756617/` |
 | `dcfd189` | Invoke-WorkstationRevision | `Phase2/Commit/dcfd189/` |
+| `befc920` | Invoke-Housekeeping | `Phase2/Commit/befc920/` |
 
 ---
 
