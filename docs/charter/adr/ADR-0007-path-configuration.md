@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Proposed (Phase 2) |
+| **Status** | Accepted (Phase 2 Step 1) |
 | **Date** | 2026-06-29 |
 
 ## Context

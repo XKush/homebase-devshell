@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Phase 1.5 release governance (commit only, **no product tag**): Test-ReleaseVersion, RELEASE-CHECKLIST, RELEASE-REQUIREMENTS, SUPPORT-POLICY, COMPATIBILITY, ENVIRONMENT-MATRIX
+- Phase 2 Step 1: `Config/homebase.defaults.json`, `Get-HomeBasePath`, wired lib/module high-traffic paths
+- Phase 2 gate scripts: `Test-HomeBasePaths`, `Test-RestoreRehearsal`, `Save-Phase2Baseline`
 - MIGRATION.md — migration contract before Phase 2
 - ARCHITECTURE-FREEZE.md — v2.0.0 freeze until Phase 2 complete
 - Full Charter Pack (`docs/charter/*`) — architecture constitution
