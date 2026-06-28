@@ -1,0 +1,19 @@
+# Logs and runtime artifacts
+*.log
+Thumbs.db
+Desktop.ini
+
+# Local overrides (never commit secrets)
+.env
+.env.*
+*.local.ps1
+secrets/
+credentials.json
+
+# Windows / editor
+.vscode/
+*.swp
+*~
+
+# Generated reports (keep structure, ignore volatile copies in repo if synced elsewhere)
+# C:\Logs lives outside repo — no action needed
