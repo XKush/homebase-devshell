@@ -5,17 +5,17 @@
 
 ---
 
-## KPI (mid-phase — automated)
+## KPI (command queue complete — automated)
 
 Run: `Get-Phase2LegacyPathReport.ps1 -SaveJson` · JSON: `Logs/Phase2/legacy-path-report.json`
 
 | Metric | Current | Target | Notes |
 |--------|--------:|-------:|-------|
-| **Functional progress** | **86%** (6 / 7) | 100% | Command scripts in Step 2 queue (rows 1–7) on SSOT |
-| **Runtime literals** | **109** | **0** | Layer `Runtime-Code` from legacy path report |
-| **Total literals** | **173** | tests/docs/fallback only | All layers; see [PATH-MIGRATION-MID-REVIEW.md](PATH-MIGRATION-MID-REVIEW.md) |
+| **Functional progress** | **100%** (7 / 7) | 100% | Command scripts in Step 2 queue (rows 1–7) ✅ |
+| **Runtime literals** | **103** | **0** | Layer `Runtime-Code` — see [PATH-MIGRATION-FINAL-REVIEW.md](PATH-MIGRATION-FINAL-REVIEW.md) |
+| **Total literals** | **167** | tests/docs/fallback only | Mid-phase baseline was 188 total / 124 runtime |
 
-*Refresh KPI after each migration commit via `Get-Phase2LegacyPathReport.ps1`.*
+*Command queue complete. Full Phase 2 exit requires profile, install, module waves + integration rehearsal.*
 
 ---
 
@@ -29,7 +29,7 @@ Run: `Get-Phase2LegacyPathReport.ps1 -SaveJson` · JSON: `Logs/Phase2/legacy-pat
 | 4 | `Invoke-Housekeeping.ps1` | ✅ | ❌ | ✅ | `befc920` |
 | 5 | `Invoke-TerminalRecovery.ps1` | ✅ | ❌ | ✅ | `10e304b` |
 | 6 | `Sync-WorkstationDocs.ps1` | ✅ | ❌ | ✅ | `378abac` |
-| 7 | `Invoke-WorkstationOrganization.ps1` | ⏳ | ⏳ | — | — |
+| 7 | `Invoke-WorkstationOrganization.ps1` | ✅ | ❌ | ✅ | `b0529f3` |
 | 8 | Profile hints / `$PROFILE` refs | ⏳ | ⏳ | — | — |
 | 9 | Install/configure scripts | ⏳ | ⏳ | — | — |
 
@@ -49,6 +49,7 @@ Runtime: `C:\Logs\Workstation\Phase2\Commit\{hash}/`
 | `befc920` | Invoke-Housekeeping | `Phase2/Commit/befc920/` |
 | `10e304b` | Invoke-TerminalRecovery | `Phase2/Commit/10e304b/` |
 | `378abac` | Sync-WorkstationDocs | `Phase2/Commit/378abac/` |
+| `b0529f3` | Invoke-WorkstationOrganization | `Phase2/Commit/b0529f3/` |
 
 ---
 
@@ -64,11 +65,11 @@ Runtime: `C:\Logs\Workstation\Phase2\Commit\{hash}/`
 
 ## Exit criteria (Phase 2 complete)
 
-Refined mid-phase — full rationale in [PATH-MIGRATION-MID-REVIEW.md](PATH-MIGRATION-MID-REVIEW.md).
+Refined mid-phase — [PATH-MIGRATION-MID-REVIEW.md](PATH-MIGRATION-MID-REVIEW.md) · **Final review (queue):** [PATH-MIGRATION-FINAL-REVIEW.md](PATH-MIGRATION-FINAL-REVIEW.md)
 
 - [ ] **Runtime-Code layer = 0** legacy literals (`Get-Phase2LegacyPathReport.ps1`)
 - [ ] Allowed non-zero literals only in Tests-Gates, Documentation, SSOT-Definition, Legacy-Fallback
-- [ ] Rows 1–7 SSOT ✅ + Gate Verified
+- [ ] Rows 1–7 SSOT ✅ + Gate Verified — **rows 1–7 done** · rows 8–9 pending
 - [ ] Legacy equivalence vs Phase2-Step1-Stable
 - [ ] doctor 75/75 · trust VERIFIED · all commit gates PASS
 - [ ] **LegacyJunctions disabled** until Step 2.5
