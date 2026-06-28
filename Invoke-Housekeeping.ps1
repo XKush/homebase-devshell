@@ -15,9 +15,12 @@ param(
 $ErrorActionPreference = 'Continue'
 . "$PSScriptRoot\lib\WorkstationCommon.ps1"
 
+$logsRoot = Get-WorkstationLogsRoot
+$backupsRoot = Get-WorkstationBackupsRoot
+
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$reportDir = 'C:\Logs\Workstation'
-$bakDir = "C:\Backups\Workstation\housekeeping-$stamp"
+$reportDir = $logsRoot
+$bakDir = Join-Path $backupsRoot "housekeeping-$stamp"
 $report = [ordered]@{
     Timestamp = (Get-Date).ToString('o')
     WhatIf    = [bool]$WhatIf
@@ -36,7 +39,7 @@ Write-WorkstationStep 'Housekeeping — generating pre-clean report'
 if (-not $WhatIf) { New-Item -ItemType Directory -Force -Path $bakDir | Out-Null }
 
 # ── 1. Old validation logs (keep latest 15) ───────────────────────────────────
-$valDir = 'C:\Logs\Workstation'
+$valDir = $logsRoot
 if (Test-Path $valDir) {
     $old = Get-ChildItem $valDir -Filter 'validation-*.json' | Sort-Object Name -Descending | Select-Object -Skip 15
     foreach ($f in $old) {
@@ -69,7 +72,7 @@ if ((Test-Path $log) -and ((Get-Item $log).Length -gt 3MB)) {
 }
 
 # ── 4. Backup rotation ────────────────────────────────────────────────────────
-$bakRoot = 'C:\Backups\Workstation'
+$bakRoot = $backupsRoot
 if (Test-Path $bakRoot) {
     $dirs = Get-ChildItem $bakRoot -Directory -EA SilentlyContinue |
         Where-Object { $_.Name -match '^\d{8}-' } |
