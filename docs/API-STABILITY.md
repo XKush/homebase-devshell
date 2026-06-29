@@ -21,6 +21,7 @@ Frozen **product CLI** commands — semver **major** bump required to break beha
 - `-Json` / `-JsonOnly` on `doctor`, `privacy`, `health`, `verify`
 - `-Fix` on `doctor`, `privacy`
 - `-Tier Core|Full` on `doctor`, `health`
+- `-Sections developer,privacy,browser,network` on `health` (optional subset; comma-separated)
 - `-Export html` on `health`
 
 ## JSON schemas (versioned)

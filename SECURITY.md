@@ -4,24 +4,21 @@
 
 | Version | Supported |
 |---------|-----------|
-| 2.0.x   | ✅        |
-| < 2.0   | ❌        |
+| **3.0.x** | ✅ Current |
+| 2.x | Best effort (no new features) |
+| < 2.0 | ❌ |
 
 ## Reporting a vulnerability
 
-If you discover a security issue in HOME BASE:
+If you discover a security issue in **HomeBase DevShell** / DevReady:
 
 1. **Do not** open a public issue for exploitable vulnerabilities.
-2. Report privately with:
+2. Use **[GitHub Private vulnerability reporting](https://github.com/XKush/homebase-devshell/security/advisories/new)** (preferred).
+3. Include:
    - description and impact;
    - steps to reproduce;
    - affected commands or scripts;
-   - HOME BASE version (`ModuleVersion` from `modules/KGreen.Workstation.psd1`).
-3. Allow reasonable time for a fix before public disclosure.
-
-When the repository is published, prefer **GitHub Security Advisories** (Private vulnerability reporting).
-
-Until then, contact the maintainer directly through your established private channel.
+   - version from `devshell version` or `modules/KGreen.Workstation.psd1` `ModuleVersion`.
 
 ## Response expectations
 
@@ -35,29 +32,28 @@ Until then, contact the maintainer directly through your established private cha
 
 **In scope:**
 
-- Destructive operations (`Remove-Item`, backup rotation, restore)
+- Product CLI: `install`, `health`, `doctor`, `privacy`, `repair` (`-Fix`)
+- Destructive module commands (`restoreconfig`, `cleanup`, backup rotation)
 - Profile / terminal deployment scripts
 - PGP key handling (`pgp-*`)
-- Firewall and privacy hardening scripts
-- Trust system integrity (`trustcheck`, SelfCheck)
+- Privacy repair scripts (registry/DNS)
 - Path / module load issues leading to privilege or data loss
 
 **Out of scope:**
 
-- Tor network anonymity guarantees (operational security is user responsibility)
-- Third-party tools installed via winget (not bundled in this repo)
-- Misuse of security scripts without authorization
+- Tor network anonymity guarantees
+- Third-party tools installed via winget
+- Misuse on systems you are not authorized to manage
 
 ## Safe use
 
-HOME BASE includes security-related automation intended for **authorized lab use** on systems you own or are permitted to manage.
-
-- Users are responsible for compliance with local laws.
-- Microsoft Defender AV is **intentionally not enabled** by this project design.
-- Always run `backupconfig` before mutating operations.
-- Use `-WhatIf` on `cleanup` and similar commands before execution.
+- Intended for **systems you own or may manage**.
+- Microsoft Defender AV is **never enabled** by this project.
+- Run `backupconfig` before destructive module operations.
+- Use `-WhatIf` on `cleanup` where supported.
 
 ## Related documentation
 
-- [internal-docs/charter/SECURITY-POLICY.md](internal-docs/charter/SECURITY-POLICY.md) — operational security chain
-- [internal-docs/charter/BACKUP-POLICY.md](internal-docs/charter/BACKUP-POLICY.md) — backup and rollback
+- [MANIFESTO](docs/MANIFESTO.md) — trust boundaries
+- [PROJECT-PRINCIPLES](docs/PROJECT-PRINCIPLES.md) — repair and privacy rules
+- [RELEASE-CRITERIA](docs/RELEASE-CRITERIA.md) — release gates
