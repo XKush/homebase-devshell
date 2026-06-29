@@ -11,7 +11,8 @@
 | **`README.md`** | DevReady hero | Install → `devready` → Ready to work |
 | **`README.ru.md`** | DevReady (RU) | Russian mirror |
 | **`install.ps1`** | Bootstrap | `irm … \| iex` one-liner |
-| **`devshell.ps1`** | Product CLI | `install` · `doctor` · `status` |
+| **`devshell.ps1`** | Product CLI | `init` · `install` · `doctor` · `status` |
+| **`packaging/`** | Alt install | zip, Scoop, WinGet templates |
 | **`CHANGELOG.md`** | Release log | Semver product history |
 | **`LICENSE`** | MIT | |
 | **`CONTRIBUTING.md`** | Contributors | |
@@ -25,7 +26,7 @@ PATH shims (after install): **`devready.cmd`** · **`devshell.cmd`** in `%LOCALA
 
 | Path | Purpose |
 |------|---------|
-| `workflows/ci.yml` | Release gates (4 jobs) |
+| `workflows/ci.yml` | Release gates + init-smoke + release-assets on tags |
 | `ISSUE_TEMPLATE/` | Bug, install-help |
 | `pull_request_template.md` | PR checklist |
 | `FUNDING.yml` | Sponsor link (optional) |
@@ -51,6 +52,7 @@ Not for end users — run via `doctor -Tier Full` or GitHub Actions.
 
 ```powershell
 devready                    # → devshell doctor (Core)
+devshell init               # dry-run plan (no winget)
 devshell install
 devshell doctor [-Tier Full]
 devshell status

@@ -14,12 +14,14 @@ Powered by **HomeBase DevShell** — a local health check for PowerShell 7 on Wi
 
 ![DevReady — install, run devready, see Ready to work](docs/assets/devready-demo.gif)
 
+**Inspect before run:** [`install.ps1` @ v2.2.0](https://github.com/XKush/homebase-devshell/blob/v2.2.0/install.ps1) · `devshell init` (dry-run, no changes) · [zip + SHA256](packaging/README.md)
+
 ---
 
 ## 30-second start
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.1/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
 ```
 
 Close the terminal. Open a new one. Run:
@@ -34,6 +36,7 @@ See **`Ready to work`**? Start coding. Anything else — fix what it shows, run 
 <summary>Prefer the full CLI name?</summary>
 
 ```powershell
+devshell init          # dry-run plan (no winget, no file changes)
 devshell doctor          # same check (Core tier)
 devshell doctor -Tier Full   # all tools + security audits
 devshell install

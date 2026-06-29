@@ -12,6 +12,25 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
+## [2.2.0] - 2026-06-29
+
+**Wave 2 — less install friction** — platform spec `1.0.0` LOCKED.
+
+### Added
+
+- **`devshell init`** — dry-run install plan (no winget, no file changes)
+- **Release zip + SHA256** — `Build-DevReadyRelease.ps1`; CI uploads on `v*` tags
+- **Packaging** — Scoop + WinGet manifest templates under `packaging/`
+- **Marketing drafts** — Habr + r/PowerShell in `internal-docs/marketing/articles/`
+- README «inspect before run» — pinned `install.ps1`, zip path, `devshell init`
+
+### Changed
+
+- Release zip excludes `internal-docs/`
+- CI: `init-smoke` + `release-assets` jobs
+
+---
+
 ## [2.1.1] - 2026-06-29
 
 **Studio polish & first-user proof assets** — platform spec `1.0.0` LOCKED.
@@ -188,7 +207,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.0
 [2.1.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.1.1
 [2.1.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.1.0
 [2.0.6]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.6

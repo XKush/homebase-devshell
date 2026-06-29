@@ -11,7 +11,7 @@ Runtime scripts for **HomeBase DevShell** (public name: **DevReady**).
 | Script | Command | Purpose |
 |--------|---------|---------|
 | [`install.ps1`](../install.ps1) | `irm … \| iex` | Clone, bootstrap, optional winget tools |
-| [`devshell.ps1`](../devshell.ps1) | `devshell …` | `install` · `doctor` · `status` |
+| [`devshell.ps1`](../devshell.ps1) | `devshell …` | `init` · `install` · `doctor` · `status` |
 
 PATH shims: `devready.cmd` (doctor Core) · `devshell.cmd` (full CLI)
 
@@ -25,6 +25,7 @@ PATH shims: `devready.cmd` (doctor Core) · `devshell.cmd` (full CLI)
 | `Install-ShellProfile.ps1` | Install-Workstation | Deploy profile |
 | `Install-Software.ps1` | Install-Workstation (unless `-SkipSoftware`) | winget stack |
 | `Validate-Workstation.ps1` | devshell doctor | Health gate `-Tier Core\|Full` |
+| `Show-DevShellInitPlan.ps1` | devshell init | Dry-run install plan |
 | `Backup-Configuration.ps1` | Install-Workstation | Pre-change backup |
 | `Fix-WorkstationPath.ps1` | Install-Workstation | PATH repair |
 | `Configure-GitIdentity.ps1` | Install-Workstation | Git placeholder identity |
@@ -59,7 +60,7 @@ Examples: `Harden-Security.ps1`, `Configure-Privacy.ps1`, `Repair-WorkstationFon
 
 Maintainer batch scripts — **not** part of `devshell install|doctor|status`.
 
-Examples: `Invoke-WorkstationRevision.ps1`, `Invoke-CommandCenterCI.ps1`, `Sync-WorkstationDocs.ps1`
+Examples: `Build-DevReadyRelease.ps1`, `Invoke-WorkstationRevision.ps1`, `Invoke-CommandCenterCI.ps1`
 
 ---
 

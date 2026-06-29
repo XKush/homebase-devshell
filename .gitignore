@@ -1,4 +1,5 @@
 # Logs and runtime artifacts
+dist/
 *.log
 Thumbs.db
 Desktop.ini

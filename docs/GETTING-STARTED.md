@@ -3,11 +3,19 @@
 1. **Install** (one line):
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.1/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
 ```
 
 2. **Close and reopen** your terminal  
 3. **Run** `devready` — look for `Ready to work`
+
+## Inspect before install
+
+| Method | Command |
+|--------|---------|
+| Read source | [install.ps1 @ release tag](https://github.com/XKush/homebase-devshell/releases/latest) |
+| Dry-run plan | `devshell init` (no winget, no changes) |
+| Verified zip | [packaging/README.md](../packaging/README.md) |
 
 That's the whole flow. Default install runs **Core** doctor (pwsh, git, profile, module, command-health). For the full workstation checklist:
 

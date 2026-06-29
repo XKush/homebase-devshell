@@ -1,0 +1,38 @@
+# Created with wingetcreate — submit to microsoft/winget-pkgs
+PackageIdentifier: XKush.DevReady
+PackageVersion: 2.2.0
+PackageLocale: en-US
+Publisher: XKush
+PublisherUrl: https://github.com/XKush
+PublisherSupportUrl: https://github.com/XKush/homebase-devshell/issues
+PackageName: DevReady
+PackageUrl: https://github.com/XKush/homebase-devshell
+License: MIT
+LicenseUrl: https://github.com/XKush/homebase-devshell/blob/main/LICENSE
+ShortDescription: Windows dev environment health check for PowerShell 7
+Description: |
+  DevReady (HomeBase DevShell) answers one question before you start coding:
+  is your Windows + PowerShell 7 dev box actually ready?
+  One-line install or verified zip; run devready for a local Core health check.
+Moniker: devready
+Tags:
+  - devready
+  - powershell
+  - windows
+  - developer-tools
+  - health-check
+Installers:
+  - Architecture: x64
+    InstallerType: zip
+    NestedInstallerType: portable
+    InstallerUrl: https://github.com/XKush/homebase-devshell/releases/download/v2.2.0/devready-v2.2.0.zip
+    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    NestedInstallerFiles:
+      - RelativeFilePath: install.ps1
+        PortableCommandAlias: devready-install
+      - RelativeFilePath: devshell.ps1
+        PortableCommandAlias: devshell
+    InstallationMetadata:
+      DefaultInstallLocation: '%LOCALAPPDATA%\DevReady'
+ManifestType: singleton
+ManifestVersion: 1.6.0

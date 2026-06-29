@@ -1,6 +1,6 @@
 # Growth vector — first 100 users
 
-**Product:** DevReady (HomeBase DevShell) · **Version:** 2.1.1 · **Updated:** 2026-06-29
+**Product:** DevReady (HomeBase DevShell) · **Version:** 2.2.0 · **Updated:** 2026-06-29
 
 Audience: maintainers. No runtime changes.
 
@@ -13,27 +13,24 @@ Audience: maintainers. No runtime changes.
 | Area | Status |
 |------|--------|
 | **Core promise** | Clear: install → `devready` → pass/fail |
-| **OSS surface** | README EN/RU, docs hub, CI 4/4, MIT, releases tagged |
+| **OSS surface** | README EN/RU, docs hub, CI 4/4+, MIT, releases tagged |
 | **Brand** | DevReady name + `devready` shim — memorable |
 | **Trust** | Local-only, no cloud, no Defender enablement |
-| **CI** | release-version, command-health, platform-hardening, install-smoke |
+| **CI** | release-version, command-health, platform-hardening, install-smoke, init-smoke, release-assets |
+| **Friction reducers** | `devshell init`, zip+SHA256, packaging manifests, article drafts |
 
 ### Gaps (block first users)
 
 | Gap | Impact | Priority |
 |-----|--------|----------|
-| **Zero social proof** | No stars, screenshots, testimonials | P0 |
-| **No video/GIF** | README is text-only; hard to trust on mobile | P0 |
-| **Install friction** | `irm \| iex` scares security-conscious devs | P1 |
-| **Niche** | Windows + pwsh 7 only — smaller funnel | Accept |
-| **No Scoop/winget package** | Discovery outside GitHub weak | P1 |
-| **social preview** | OG card still default until manual Settings upload | P2 |
-| **internal-docs in tree** | Clones full maintainer history (~noise for forks) | P2 |
+| **Low social proof** | Few stars/screenshots | P0 |
+| **social preview** | OG card default until manual Settings upload | P2 |
+| **winget-pkgs PR** | Manifest template only — not in community repo yet | P2 |
 
 ### What we removed (studio hygiene)
 
 - Playwright upload hacks — GitHub has no API; manual Settings only
-- `.github/growth/` in public tree — moved here under `internal-docs/marketing/`
+- `.github/growth/` in public tree — moved to `internal-docs/marketing/`
 - Temp scratch files — gitignored
 
 ---
@@ -65,39 +62,39 @@ Discovery → Trust → Install → Aha → Share
 
 | Stage | Goal | Tactic |
 |-------|------|--------|
-| **Discovery** | 500 repo visits/mo | GitHub topics, Reddit, X, Dev.to |
-| **Trust** | >30s on README | GIF of `devready` PASS, Issue #2 gallery |
-| **Install** | >40% complete | Pin release, troubleshooting issue #3 |
-| **Aha** | See green "Ready to work" | Core doctor ≤35 checks, fast output |
+| **Discovery** | 500 repo visits/mo | GitHub topics, Reddit, Habr, X |
+| **Trust** | >30s on README | GIF, Issue #2 gallery, zip+hash |
+| **Install** | >40% complete | `devshell init`, pinned release |
+| **Aha** | See green "Ready to work" | Core doctor ≤35 checks |
 | **Share** | 1 screenshot / 10 installs | Issue #2, Discussion #4 |
 
 ---
 
 ## 90-day roadmap (product + growth)
 
-### Wave 1 — Proof (weeks 1–2) · no architecture changes
+### Wave 1 — Proof (weeks 1–2) · done
 
-- [x] Record 15s GIF: install → `devready` → PASS (embed in README)
-- [x] Seed Issue #2 with maintainer screenshot (demo PNG)
-- [x] Pin release v2.1.1 + issues #1–#3 on GitHub (issues were pinned; release v2.1.1 published)
-- [ ] Upload `.github/social-preview.png` in Settings (manual, once — no API)
-- [x] Post launch copy to Discussion #4 (v2.1.1 comment)
+- [x] README GIF + Issue #2 seed + Discussion #4 + release v2.1.1
+- [ ] Upload `.github/social-preview.png` in Settings (manual, once)
 
-### Wave 2 — Reduce friction (weeks 3–6)
+### Wave 2 — Reduce friction (weeks 3–6) · shipped v2.2.0
 
-- [ ] `devshell init` — dry-run / print what install would do (no winget)
-- [ ] README "inspect before run" — link to tagged `install.ps1` on GitHub
-- [ ] Pester smoke tests in CI (public signal of quality)
-- [ ] Release asset: `devready-vX.Y.Z.zip` + SHA256 (no git clone required)
+- [x] `devshell init` — dry-run / print what install would do (no winget)
+- [x] README "inspect before run" — link to tagged `install.ps1`
+- [x] Release asset: `devready-vX.Y.Z.zip` + SHA256 (CI on tag)
+- [x] Scoop + winget manifest templates (`packaging/`)
+- [x] Habr + r/PowerShell article drafts (`internal-docs/marketing/articles/`)
+- [ ] Pester smoke tests in CI (optional quality signal)
+- [ ] Submit winget manifest to microsoft/winget-pkgs
 
 ### Wave 3 — Discovery (weeks 7–12)
 
-- [ ] Scoop bucket or winget manifest (community install path)
-- [ ] Dev.to / Habr RU article (install story, not architecture)
-- [ ] "Compare" doc: DevReady vs manual checklist (not vs Oh My Zsh)
-- [ ] Optional: exclude `internal-docs/` from install tree (smaller product zip)
+- [ ] Publish Habr article (copy from `articles/habr-devready.md`)
+- [ ] Post r/PowerShell (copy from `articles/reddit-powershell.md`)
+- [ ] "Compare" doc: DevReady vs manual checklist
+- [ ] Scoop bucket repo or community PR
 
-**Locked:** platform spec 1.0.0 — no new public CLI verbs without maintainer sign-off.
+**Locked:** platform spec 1.0.0 — orchestrator unchanged.
 
 ---
 
@@ -105,14 +102,11 @@ Discovery → Trust → Install → Aha → Share
 
 | Channel | Effort | Expected yield |
 |---------|--------|----------------|
-| **GitHub Search** (topics: `devready`, `powershell`, `windows-dev`) | Low | Steady long tail |
-| **Reddit** r/PowerShell, r/windows | Medium post | Spike + backlash risk on `irm\|iex` |
-| **X / Bluesky** #DevReady #PowerShell | Low | Needs GIF |
-| **Habr (RU)** | Medium article | RU README already exists |
+| **GitHub Search** | Low | Long tail |
+| **r/PowerShell** | Medium | Spike; address `irm\|iex` with init+zip |
+| **Habr (RU)** | Medium | RU README + article draft ready |
+| **X** | Low | GIF link |
 | **YouTube Short** | High | High trust |
-| **Conference / meetup** | High | Low volume, high quality |
-
-**Avoid early:** Hacker News (hostile to Windows), aggressive issue spam, paid ads.
 
 ---
 
@@ -120,49 +114,28 @@ Discovery → Trust → Install → Aha → Share
 
 | Metric | Now | 30d target | 90d target |
 |--------|-----|------------|------------|
-| GitHub stars | ~0 | 25 | 100 |
-| Release downloads | — | track via zip | 500 |
-| Issue #2 screenshots | 0 | 5 | 20 |
-| CI green | 4/4 | 4/4 | 4/4 |
-| Core doctor pass (clean VM) | yes | yes | yes |
-
-Track weekly: stars, clone traffic (GitHub Insights), Discussion #4 replies.
+| GitHub stars | low | 25 | 100 |
+| Release zip downloads | track | 50 | 500 |
+| Issue #2 screenshots | 1+ | 5 | 20 |
+| CI green | 5/5+ | green | green |
 
 ---
 
 ## Messaging cheatsheet
 
-**Share line:**
-
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.1/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
 devready
 ```
 
-**Reply to "why not just winget everything?"**
+**Reply to "irm iex is malware":**
 
-> DevReady doesn't install your stack blindly — it checks whether what's already there actually works.
-
-**Reply to "irm iex is malware"**
-
-> Fair. Read `install.ps1` on GitHub, tag v2.1.1, or wait for zip release + hash in Wave 2.
+> Run `devshell init` first, or use the release zip + SHA256 from GitHub Releases.
 
 ---
 
-## Risk register
+## Next maintainer action
 
-| Risk | Mitigation |
-|------|------------|
-| Scope creep | Issue #1 scope template; platform LOCKED |
-| CI red on release | Never ship without 4/4 green |
-| Brand split (DevReady vs homebase-devshell) | README always shows both once |
-| Maintainer burnout | Waves are sequential; no daily posting requirement |
-
----
-
-## Next maintainer action (today)
-
-1. GIF → README  
+1. Post Habr + Reddit from article drafts  
 2. Manual social preview upload (Settings)  
-3. One launch post (Discussion #4)  
-4. Do not add automation scripts that fight GitHub UI
+3. Open winget-pkgs PR after v2.2.0 release assets land

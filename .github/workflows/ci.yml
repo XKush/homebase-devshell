@@ -70,3 +70,35 @@ jobs:
           } finally {
             Pop-Location
           }
+
+  init-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: devshell init dry-run
+        shell: pwsh
+        run: |
+          $out = pwsh -NoProfile -File devshell.ps1 init 2>&1 | Out-String
+          Write-Host $out
+          if ($out -notmatch 'DRY-RUN') { throw 'init output missing DRY-RUN marker' }
+          if ($out -notmatch 'Nothing was installed') { throw 'init should not install' }
+
+  release-assets:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [release-version, command-health, platform-hardening, install-smoke, init-smoke]
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build zip + SHA256
+        shell: pwsh
+        run: |
+          $ver = $env:GITHUB_REF_NAME.TrimStart('v')
+          pwsh -NoProfile -File scripts/maintainer/invoke/Build-DevReadyRelease.ps1 -Version $ver
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/devready-*.zip
+            dist/devready-*.sha256.txt

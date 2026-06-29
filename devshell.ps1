@@ -6,11 +6,12 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('install', 'doctor', 'status', 'reload', 'trace', 'help', 'version')]
+    [ValidateSet('install', 'doctor', 'status', 'reload', 'trace', 'help', 'version', 'init')]
     [string]$Command = 'help',
     [ValidateSet('Core', 'Full')]
     [string]$Tier = 'Core',
     [switch]$SkipTools,
+    [switch]$WithTools,
     [int]$Last = 20
 )
 
@@ -32,7 +33,7 @@ function Get-DevShellProductVersion {
     param([string]$Root)
     $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
     if (Test-Path $psd1) { return [string](Import-PowerShellDataFile $psd1).ModuleVersion }
-    return '2.1.1'
+    return '2.2.0'
 }
 
 function Show-DevShellHelp {
@@ -41,6 +42,7 @@ function Show-DevShellHelp {
 DevReady — HomeBase DevShell
 
   devready           Quick health check (same as devshell doctor)
+  devshell init      Dry-run — show install plan (no winget, no changes)
   devshell install   Set up your shell
   devshell doctor    Am I ready? (-Tier Core | Full)
   devshell status    Platform load status
@@ -80,6 +82,15 @@ switch ($Command) {
     'doctor' {
         & (Join-Path $repoRoot 'scripts\maintainer\install\Validate-Workstation.ps1') -Tier $Tier -StartupBudgetMs 650
         exit $LASTEXITCODE
+    }
+    'init' {
+        $planScript = Join-Path $repoRoot 'scripts\maintainer\install\Show-DevShellInitPlan.ps1'
+        $planArgs = @{}
+        if ($WithTools) { $planArgs['WithTools'] = $true }
+        elseif ($SkipTools) { $planArgs['SkipTools'] = $true }
+        else { $planArgs['SkipTools'] = $true }
+        & $planScript @planArgs
+        exit 0
     }
     'status' {
         Invoke-WorkstationProfile -RepositoryRoot $repoRoot -Force | Out-Null
