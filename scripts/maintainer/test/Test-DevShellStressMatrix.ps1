@@ -95,6 +95,15 @@ if (`$diff.noBaseline) { @{ error = 'no_baseline'; message = 'Run: devshell base
     if ($out -notmatch 'no_baseline') { throw "bad envelope: $out" }
 }
 
+Assert-Stress 'health -Sections developer only' {
+    $env:HOMEBASE_DEVSHELL_ROOT = $Root
+    $out = pwsh -NoProfile -File (Join-Path $Root 'devshell.ps1') health -Json -Sections developer 2>&1 | Out-String
+    $doc = $out.Trim() | ConvertFrom-Json
+    if (-not $doc.sections.developer) { throw 'missing developer section' }
+    if ($doc.sections.privacyConfiguration) { throw 'privacy should be omitted' }
+    if ($doc.sectionsRequested -notcontains 'developer') { throw 'sectionsRequested missing developer' }
+}
+
 Assert-Stress 'empty logs dir — doctor json path tolerant' {
     $tempLogs = Join-Path $env:TEMP "devshell-stress-logs-$([guid]::NewGuid().ToString('N'))"
     New-Item -ItemType Directory -Force -Path $tempLogs | Out-Null

@@ -42,7 +42,7 @@
             Tags         = @('DevReady', 'HomeBase', 'DevShell', 'PowerShell', 'Windows', 'health-check', 'developer-experience', 'workstation-setup')
             LicenseUri   = 'https://opensource.org/licenses/MIT'
             ProjectUri   = 'https://github.com/XKush/homebase-devshell'
-            ReleaseNotes = 'DevReady v3.0.1 — health resilience (corrupt baseline/history), stress matrix tests.'
+            ReleaseNotes = 'DevReady v3.0.1+dev — health -Sections, Pester + PSScriptAnalyzer CI (3.1.0 prep).'
         }
     }
 }

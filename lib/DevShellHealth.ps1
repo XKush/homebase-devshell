@@ -48,29 +48,72 @@ function Invoke-DevShellDoctorJson {
     try { return Get-Content $latest.FullName -Raw | ConvertFrom-Json } catch { return $null }
 }
 
+function Resolve-DevShellHealthSectionKeys {
+    param([string[]]$Sections)
+    $all = @('developer', 'privacyConfiguration', 'browserConfiguration', 'network')
+    if (-not $Sections -or $Sections.Count -eq 0) { return $all }
+    $map = @{
+        developer            = 'developer'
+        dev                  = 'developer'
+        privacy              = 'privacyConfiguration'
+        privacyConfiguration = 'privacyConfiguration'
+        browser              = 'browserConfiguration'
+        browserConfiguration = 'browserConfiguration'
+        network              = 'network'
+        net                  = 'network'
+    }
+    $selected = [System.Collections.Generic.List[string]]::new()
+    foreach ($s in $Sections) {
+        foreach ($part in ($s -split '[,;]')) {
+            $key = $part.Trim()
+            if ([string]::IsNullOrWhiteSpace($key)) { continue }
+            $resolved = $map[$key]
+            if (-not $resolved) {
+                $lower = $key.ToLowerInvariant()
+                foreach ($entry in $map.GetEnumerator()) {
+                    if ($entry.Key -eq $lower) { $resolved = $entry.Value; break }
+                }
+            }
+            if ($resolved -and -not $selected.Contains($resolved)) { $selected.Add($resolved) }
+        }
+    }
+    if ($selected.Count -eq 0) { return $all }
+    return @($selected)
+}
+
 function Get-DevShellHealthReport {
     param(
         [Parameter(Mandatory)][string]$RepoRoot,
         [ValidateSet('Core', 'Full')]
         [string]$Tier = 'Core',
-        [string]$ProductVersion = '3.0.0'
+        [string]$ProductVersion = '3.0.0',
+        [string[]]$SectionFilter
     )
 
-    . (Join-Path $RepoRoot 'lib\PrivacyAudit.ps1')
+    $want = Resolve-DevShellHealthSectionKeys -Sections $SectionFilter
+    $runDeveloper = $want -contains 'developer'
+    $runPrivacy = $want -contains 'privacyConfiguration'
+    $runBrowser = $want -contains 'browserConfiguration'
+    $runNetwork = $want -contains 'network'
 
-    $doctor = Invoke-DevShellDoctorJson -RepoRoot $RepoRoot -Tier $Tier
-    $privacy = Get-PrivacyAuditReport -Scope System -RepoRoot $RepoRoot -ProductVersion $ProductVersion
-    $browser = Get-PrivacyAuditReport -Scope Browser -RepoRoot $RepoRoot -ProductVersion $ProductVersion
-    $network = Get-PrivacyAuditReport -Scope Vpn -RepoRoot $RepoRoot -ProductVersion $ProductVersion
+    if ($runPrivacy -or $runBrowser -or $runNetwork) {
+        . (Join-Path $RepoRoot 'lib\PrivacyAudit.ps1')
+    }
 
-    $devFail = if ($doctor) { @($doctor.Failed).Count } else { 1 }
-    $devWarn = if ($doctor) { @($doctor.Warnings).Count } else { 0 }
-    $devPass = if ($doctor) { @($doctor.Passed).Count } else { 0 }
+    $doctor = if ($runDeveloper) { Invoke-DevShellDoctorJson -RepoRoot $RepoRoot -Tier $Tier } else { $null }
+    $privacy = if ($runPrivacy) { Get-PrivacyAuditReport -Scope System -RepoRoot $RepoRoot -ProductVersion $ProductVersion } else { $null }
+    $browser = if ($runBrowser) { Get-PrivacyAuditReport -Scope Browser -RepoRoot $RepoRoot -ProductVersion $ProductVersion } else { $null }
+    $network = if ($runNetwork) { Get-PrivacyAuditReport -Scope Vpn -RepoRoot $RepoRoot -ProductVersion $ProductVersion } else { $null }
 
-    $privacyDoc = ConvertTo-PrivacyReportDocument -Report $privacy -ProductVersion $ProductVersion -Context $privacy.Context
+    $devFail = if ($runDeveloper) { if ($doctor) { @($doctor.Failed).Count } else { 1 } } else { 0 }
+    $devWarn = if ($runDeveloper -and $doctor) { @($doctor.Warnings).Count } else { 0 }
+    $devPass = if ($runDeveloper -and $doctor) { @($doctor.Passed).Count } else { 0 }
 
-    $sections = [ordered]@{
-        developer = [ordered]@{
+    $privacyDoc = if ($runPrivacy) { ConvertTo-PrivacyReportDocument -Report $privacy -ProductVersion $ProductVersion -Context $privacy.Context } else { $null }
+
+    $sections = [ordered]@{}
+    if ($runDeveloper) {
+        $sections['developer'] = [ordered]@{
             id          = 'developer'
             label       = 'Developer'
             status      = Get-DevShellSectionStatus -FailCount $devFail -WarnCount $devWarn
@@ -80,7 +123,9 @@ function Get-DevShellHealthReport {
             tier        = $Tier
             detail      = if ($devFail -eq 0) { 'Shell, tools, profile checks' } else { (@($doctor.Failed) | Select-Object -First 2) -join '; ' }
         }
-        privacyConfiguration = [ordered]@{
+    }
+    if ($runPrivacy) {
+        $sections['privacyConfiguration'] = [ordered]@{
             id          = 'privacyConfiguration'
             label       = 'Privacy Configuration'
             status      = Get-DevShellSectionStatus -FailCount $privacy.FailCount -WarnCount $privacy.WarnCount -ScoreLabel "$($privacy.Score)%"
@@ -91,7 +136,9 @@ function Get-DevShellHealthReport {
             warnings    = $privacy.WarnCount
             failed      = $privacy.FailCount
         }
-        browserConfiguration = [ordered]@{
+    }
+    if ($runBrowser) {
+        $sections['browserConfiguration'] = [ordered]@{
             id       = 'browserConfiguration'
             label    = 'Browser Configuration'
             status   = Get-DevShellSectionStatus -FailCount $browser.FailCount -WarnCount $browser.WarnCount -ScoreLabel "$($browser.Score)%"
@@ -99,7 +146,9 @@ function Get-DevShellHealthReport {
             warnings = $browser.WarnCount
             detail   = 'Policy and prefs audit — not a full browser security review.'
         }
-        network = [ordered]@{
+    }
+    if ($runNetwork) {
+        $sections['network'] = [ordered]@{
             id       = 'network'
             label    = 'Network'
             status   = Get-DevShellSectionStatus -FailCount $network.FailCount -WarnCount $network.WarnCount
@@ -109,7 +158,9 @@ function Get-DevShellHealthReport {
         }
     }
 
-    $ready = ($devFail -eq 0) -and ($privacy.FailCount -eq 0)
+    $ready = $true
+    if ($runDeveloper -and $devFail -gt 0) { $ready = $false }
+    if ($runPrivacy -and $privacy.FailCount -gt 0) { $ready = $false }
     $message = if ($ready) { 'Ready to work.' } else { 'Not ready yet.' }
 
     [PSCustomObject]@{
@@ -118,10 +169,11 @@ function Get-DevShellHealthReport {
         timestamp           = (Get-Date).ToString('o')
         philosophy          = 'HomeBase DevShell prepares, verifies and maintains professional Windows workstations.'
         tier                = $Tier
+        sectionsRequested   = @($want)
         sections            = $sections
         privacyReport       = $privacyDoc
-        browserReport       = (ConvertTo-PrivacyReportDocument -Report $browser -ProductVersion $ProductVersion -Context $browser.Context)
-        networkReport       = (ConvertTo-PrivacyReportDocument -Report $network -ProductVersion $ProductVersion -Context $network.Context)
+        browserReport       = if ($runBrowser) { ConvertTo-PrivacyReportDocument -Report $browser -ProductVersion $ProductVersion -Context $browser.Context } else { $null }
+        networkReport       = if ($runNetwork) { ConvertTo-PrivacyReportDocument -Report $network -ProductVersion $ProductVersion -Context $network.Context } else { $null }
         doctorReport        = $doctor
         summary             = [ordered]@{
             ready   = $ready

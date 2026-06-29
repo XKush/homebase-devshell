@@ -10,6 +10,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ## [Unreleased]
 
+### Added
+
+- **`devshell health -Sections`** — optional subset (`developer`, `privacy`, `browser`, `network`)
+- **Pester** unit tests (`tests/pester/Health.Baseline.Tests.ps1`)
+- **PSScriptAnalyzer** CI gate (`.PSScriptAnalyzerSettings.psd1`)
+- **`Measure-DevShellHealthProfile.ps1`** — maintainer timing helper
+
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the stabilization contract.
 
 ---

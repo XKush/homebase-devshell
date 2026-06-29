@@ -10,6 +10,7 @@ param(
     [switch]$Json,
     [ValidateSet('html')]
     [string]$Export,
+    [string[]]$SectionFilter,
     [string]$OutFile
 )
 
@@ -21,7 +22,7 @@ $repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
 . (Join-Path $PSScriptRoot '_PrivacyInvokeCommon.ps1')
 
 $product = Get-DevShellProductVersionFromRoot -RepoRoot $repoRoot
-$report = Get-DevShellHealthReport -RepoRoot $repoRoot -Tier $Tier -ProductVersion $product
+$report = Get-DevShellHealthReport -RepoRoot $repoRoot -Tier $Tier -ProductVersion $product -SectionFilter $SectionFilter
 
 $paths = Get-DevShellHealthPaths -RepoRoot $repoRoot
 Save-DevShellHealthHistory -Report $report -HistoryPath $paths.History

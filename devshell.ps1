@@ -22,6 +22,7 @@ param(
     [switch]$Json,
     [ValidateSet('html')]
     [string]$Export,
+    [string[]]$Sections,
     [ValidateSet('Chrome', 'Edge', 'Firefox', 'All')]
     [string]$Browser = 'All',
     [int]$Last = 20
@@ -55,6 +56,7 @@ HomeBase DevShell — workstation readiness & privacy auditing
 
   devshell health      Unified dashboard (developer + privacy + browser + network)
   devshell health -Json          Machine-readable report
+  devshell health -Sections developer,privacy   Subset of sections (faster)
   devshell health -Export html   HTML report in Logs folder
   devshell history     Privacy/configuration score trend
   devshell baseline    Save configuration baseline
@@ -95,6 +97,7 @@ switch ($Command) {
         $healthArgs = @{ Tier = $Tier }
         if ($Json) { $healthArgs['Json'] = $true }
         if ($Export) { $healthArgs['Export'] = $Export }
+        if ($Sections) { $healthArgs['SectionFilter'] = $Sections }
         if ($Argument) { $healthArgs['OutFile'] = $Argument }
         & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-DevShellHealth.ps1') @healthArgs
         exit $LASTEXITCODE
