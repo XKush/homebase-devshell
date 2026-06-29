@@ -27,9 +27,11 @@ function Assert-Stress {
 
 Write-Host 'DevShell stress matrix (offline)' -ForegroundColor Cyan
 
-$product = '3.0.0'
+$product = '3.0.1'
 $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
-if (Test-Path $psd1) { $product = [string](Import-PowerShellDataFile $psd1).ModuleVersion }
+if (Test-Path -LiteralPath $psd1) {
+    $product = [string](Import-PowerShellDataFile -Path $psd1).ModuleVersion
+}
 
 $sampleReport = [PSCustomObject]@{
     timestamp     = (Get-Date).ToString('o')

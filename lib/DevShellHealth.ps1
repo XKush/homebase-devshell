@@ -131,6 +131,21 @@ function New-DevShellScoredPrivacySection {
     return $entry
 }
 
+function Get-DevShellListCount {
+    param($Value)
+    if ($null -eq $Value) { return 0 }
+    return @($Value).Count
+}
+
+function Get-DevShellPrivacyReportDocument {
+    param(
+        [Parameter(Mandatory)]$Report,
+        [Parameter(Mandatory)][string]$ProductVersion
+    )
+    if (-not $Report) { return $null }
+    return ConvertTo-PrivacyReportDocument -Report $Report -ProductVersion $ProductVersion -Context $Report.Context
+}
+
 function Get-DevShellHealthReport {
     param(
         [Parameter(Mandatory)][string]$RepoRoot,
@@ -141,15 +156,10 @@ function Get-DevShellHealthReport {
     )
 
     $requested = @(Resolve-DevShellHealthSectionKeys -Sections $SectionFilter)
-    $want = [System.Collections.Generic.HashSet[string]]::new(
-        [StringComparer]::Ordinal
-    )
-    foreach ($key in $requested) { [void]$want.Add($key) }
-
-    $runDeveloper = $want.Contains('developer')
-    $runPrivacy = $want.Contains('privacyConfiguration')
-    $runBrowser = $want.Contains('browserConfiguration')
-    $runNetwork = $want.Contains('network')
+    $runDeveloper = 'developer' -in $requested
+    $runPrivacy = 'privacyConfiguration' -in $requested
+    $runBrowser = 'browserConfiguration' -in $requested
+    $runNetwork = 'network' -in $requested
 
     if ($runPrivacy -or $runBrowser -or $runNetwork) {
         . (Join-Path $RepoRoot 'lib\PrivacyAudit.ps1')
@@ -166,12 +176,18 @@ function Get-DevShellHealthReport {
         Get-PrivacyAuditReport -Scope Vpn -RepoRoot $RepoRoot -ProductVersion $ProductVersion
     } else { $null }
 
-    $devFail = if (-not $runDeveloper) { 0 } elseif ($doctor) { @($doctor.Failed).Count } else { 1 }
-    $devWarn = if ($runDeveloper -and $doctor) { @($doctor.Warnings).Count } else { 0 }
-    $devPass = if ($runDeveloper -and $doctor) { @($doctor.Passed).Count } else { 0 }
+    $devFail = if (-not $runDeveloper) { 0 } elseif ($doctor) { Get-DevShellListCount $doctor.Failed } else { 1 }
+    $devWarn = if ($runDeveloper -and $doctor) { Get-DevShellListCount $doctor.Warnings } else { 0 }
+    $devPass = if ($runDeveloper -and $doctor) { Get-DevShellListCount $doctor.Passed } else { 0 }
 
     $privacyDoc = if ($runPrivacy) {
-        ConvertTo-PrivacyReportDocument -Report $privacy -ProductVersion $ProductVersion -Context $privacy.Context
+        Get-DevShellPrivacyReportDocument -Report $privacy -ProductVersion $ProductVersion
+    } else { $null }
+    $browserDoc = if ($runBrowser) {
+        Get-DevShellPrivacyReportDocument -Report $browser -ProductVersion $ProductVersion
+    } else { $null }
+    $networkDoc = if ($runNetwork) {
+        Get-DevShellPrivacyReportDocument -Report $network -ProductVersion $ProductVersion
     } else { $null }
 
     $sectionMap = [ordered]@{}
@@ -204,11 +220,10 @@ function Get-DevShellHealthReport {
             -Id 'browserConfiguration' `
             -Label 'Browser Configuration' `
             -Audit $browser `
-            -Document (ConvertTo-PrivacyReportDocument -Report $browser -ProductVersion $ProductVersion -Context $browser.Context) `
+            -Document $browserDoc `
             -Detail 'Policy and prefs audit — not a full browser security review.'
     }
     if ($runNetwork) {
-        $networkDoc = ConvertTo-PrivacyReportDocument -Report $network -ProductVersion $ProductVersion -Context $network.Context
         $sectionMap['network'] = [ordered]@{
             id       = 'network'
             label    = 'Network'
@@ -233,12 +248,8 @@ function Get-DevShellHealthReport {
         sectionsRequested   = $requested
         sections            = $sectionMap
         privacyReport       = $privacyDoc
-        browserReport       = if ($runBrowser) {
-            ConvertTo-PrivacyReportDocument -Report $browser -ProductVersion $ProductVersion -Context $browser.Context
-        } else { $null }
-        networkReport       = if ($runNetwork) {
-            ConvertTo-PrivacyReportDocument -Report $network -ProductVersion $ProductVersion -Context $network.Context
-        } else { $null }
+        browserReport       = $browserDoc
+        networkReport       = $networkDoc
         doctorReport        = $doctor
         summary             = [ordered]@{
             ready   = $ready
@@ -453,6 +464,49 @@ function Compare-DevShellHealthBaseline {
         -CurrentTimestamp $Current.timestamp `
         -Changes @($changes) `
         -DriftDetected ($changes.Count -gt 0)
+}
+
+function Write-DevShellVerifyOutput {
+    param(
+        [Parameter(Mandatory)]$Diff,
+        [switch]$Json
+    )
+    if ($Json) {
+        if ($Diff.noBaseline) {
+            @{ error = 'no_baseline'; message = 'Run: devshell baseline' } | ConvertTo-Json
+            return 1
+        }
+        if ($Diff.baselineInvalid) {
+            @{
+                error   = 'baseline_invalid'
+                message = 'Baseline file is unreadable or corrupt'
+                changes = @($Diff.changes)
+            } | ConvertTo-Json
+            return 1
+        }
+        $Diff | ConvertTo-Json -Depth 5
+        return $(if ($Diff.driftDetected) { 1 } else { 0 })
+    }
+
+    Write-Host ''
+    Write-Host 'Baseline verify' -ForegroundColor Cyan
+    if ($Diff.noBaseline -or $Diff.baselineInvalid) {
+        if ($Diff.baselineInvalid -and $Diff.changes) {
+            Write-Host "  $($Diff.changes[0])" -ForegroundColor Yellow
+        }
+        return 1
+    }
+    Write-Host "  Baseline: $($Diff.baselineTimestamp)" -ForegroundColor DarkGray
+    Write-Host "  Current:  $($Diff.currentTimestamp)" -ForegroundColor DarkGray
+    Write-Host ''
+    if (-not $Diff.driftDetected) {
+        Write-Host '  No drift detected.' -ForegroundColor Green
+    } else {
+        Write-Host '  Changes:' -ForegroundColor Yellow
+        $Diff.changes | ForEach-Object { Write-Host "    $_" -ForegroundColor DarkGray }
+    }
+    Write-Host ''
+    return $(if ($Diff.driftDetected) { 1 } else { 0 })
 }
 
 function Export-DevShellHealthHtml {

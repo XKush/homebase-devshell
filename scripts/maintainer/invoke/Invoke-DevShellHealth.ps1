@@ -11,7 +11,8 @@ param(
     [ValidateSet('html')]
     [string]$Export,
     [string[]]$SectionFilter,
-    [string]$OutFile
+    [string]$OutFile,
+    [switch]$SkipHistory
 )
 
 $ErrorActionPreference = 'Stop'
@@ -25,7 +26,9 @@ $product = Get-DevShellProductVersionFromRoot -RepoRoot $repoRoot
 $report = Get-DevShellHealthReport -RepoRoot $repoRoot -Tier $Tier -ProductVersion $product -SectionFilter $SectionFilter
 
 $paths = Get-DevShellHealthPaths -RepoRoot $repoRoot
-Save-DevShellHealthHistory -Report $report -HistoryPath $paths.History
+if (-not $SkipHistory) {
+    Save-DevShellHealthHistory -Report $report -HistoryPath $paths.History
+}
 
 if ($Json) {
     $report | ConvertTo-Json -Depth 12
