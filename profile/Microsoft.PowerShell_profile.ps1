@@ -23,9 +23,14 @@ function Resolve-WorkstationRepositoryRoot {
 }
 
 $script:WSRoot = Resolve-WorkstationRepositoryRoot
+
+# ── C1–C4 helpers (load only — no layer control-flow) ─────────────────────────
 . (Join-Path $script:WSRoot 'lib\HomeBasePaths.ps1')
 . (Join-Path $script:WSRoot 'lib\WorkstationCommon.ps1')
 . (Join-Path $script:WSRoot 'lib\ProfileEnvironment.ps1')
+
+# ── B-layer orchestrator (single runtime entrypoint for C1→C5) ────────────────
+. (Join-Path $script:WSRoot 'lib\WorkstationOrchestrator.ps1')
 
 $script:IsInteractive = [Environment]::UserInteractive -and -not $env:CI -and $Host.Name -ne 'ServerRemoteHost'
 $script:WorkstationSessionReady = $false
@@ -42,30 +47,14 @@ if (-not $env:WORKSTATION_HACKER_UI) { $env:WORKSTATION_HACKER_UI = '1' }
 if (-not $env:WORKSTATION_HACKER_SCAN) { $env:WORKSTATION_HACKER_SCAN = '1' }
 if (-not $env:WORKSTATION_STARTUP_MODE) { $env:WORKSTATION_STARTUP_MODE = 'minimal' }
 
-# ── Profile environment state (declarative — paths + WORKSTATION_* ) ───────────
-Initialize-WorkstationProfileEnvironment | Out-Null
-
-# ── Profile boot module order ─────────────────────────────────────────────────
-# 1. PSReadLine (interactive shell)
-# 2. KGreen.Workstation (lazy — first prompt via Initialize-WorkstationModule)
-# 3. posh-git, Terminal-Icons (deferred — Initialize-WorkstationSession)
-
+# ── Session presentation (OMP / posh-git / zoxide — deferred, not layer bootstrap) ─
 $script:ProfileBootSessionModules = @('posh-git', 'Terminal-Icons')
-$script:WorkstationModuleLoaded = $false
 
 function Import-ProfileBootModule {
     param([Parameter(Mandatory)][string]$Name)
     if (Get-Module $Name) { return }
     if (Get-Module -ListAvailable $Name) {
         Import-Module $Name -ErrorAction SilentlyContinue
-    }
-}
-
-function Initialize-WorkstationModule {
-    if ($script:WorkstationModuleLoaded) { return }
-    $script:WorkstationModuleLoaded = $true
-    if (Get-Command Import-WorkstationProfileModule -ErrorAction SilentlyContinue) {
-        Import-WorkstationProfileModule -Root $script:WSRoot | Out-Null
     }
 }
 
@@ -108,7 +97,6 @@ if ($script:IsInteractive -and (Get-Module -ListAvailable PSReadLine)) {
 if ($script:IsInteractive) {
     $script:InnerPrompt = $function:Prompt
     function global:Prompt {
-        if (-not $script:WorkstationModuleLoaded) { Initialize-WorkstationModule }
         if ($env:WORKSTATION_JARVIS -ne '0' -and $env:WORKSTATION_JARVIS_SHOWN -ne '1') {
             $env:WORKSTATION_JARVIS_SHOWN = '1'
             if (Get-Command Show-HomeBase -ErrorAction SilentlyContinue) { Show-HomeBase }
@@ -201,3 +189,7 @@ function admin {
 }
 
 # ── Menu hotkeys — Register-WorkstationMenuHotkeys (first prompt via session init) ─
+
+# ── Layer bootstrap — orchestrator owns C1→C2→C4→C5→C3 (after shell setup so module exports win) ─
+Invoke-WorkstationProfile -RepositoryRoot $script:WSRoot | Out-Null
+$script:WorkstationModuleLoaded = [bool](Get-Module KGreen.Workstation)
