@@ -6,14 +6,14 @@ $repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
 
 param([switch]$SkipOpenSSL, [switch]$SkipTasks)
 
-$root = 'C:\Scripts\Workstation'
+$root = $repoRoot
 Write-Host "`n  HOME BASE UPGRADE PASS`n" -ForegroundColor Cyan
 
 # Profile sync
-& (Join-Path $root 'Install-ShellProfile.ps1') -Force
+& (Resolve-WorkstationScript -Name 'Install-ShellProfile.ps1' -Start $PSScriptRoot) -Force
 
 # Maintenance + cache refresh
-& (Join-Path $root 'Invoke-Maintenance.ps1') -Full
+& (Resolve-WorkstationScript -Name 'Invoke-Maintenance.ps1' -Start $PSScriptRoot) -Full
 
 # OpenSSL optional
 if (-not $SkipOpenSSL -and -not (Get-Command openssl -EA SilentlyContinue)) {

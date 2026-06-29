@@ -22,8 +22,8 @@ function Get-HomeBaseRecommendationsRu {
             $rec.Add('selfcheck fail → Import-Module KGreen.Workstation -Force')
         }
     }
-    if ($Report.ValidationFails -gt 0) { $rec.Add("doctor — $($Report.ValidationFails) validation errors") }
-    if ($Trust.ValidationFails -gt 0) { $rec.Add("validation fail: $($Trust.ValidationFails) → doctor") }
+    $valFails = [math]::Max($Report.ValidationFails, $Trust.ValidationFails)
+    if ($valFails -gt 0) { $rec.Add("doctor — $valFails validation errors") }
     $broken = @($Report.Health | Where-Object { $_.Status -eq 'ERROR' })
     if ($broken.Count) { $rec.Add("fix: $($broken.Name -join ', ') → repairterminal") }
     if ($Report.Backup.DaysAgo -gt 14) { $rec.Add('backupconfig — snapshot stale') }
@@ -50,6 +50,38 @@ function Get-HomeBaseRecommendationsRu {
     return @($rec | Select-Object -Unique | Select-Object -First 6)
 }
 
+function Get-HomeBaseProductChangelogLines {
+    param([int]$MaxBullets = 3)
+
+    $path = Join-Path $script:WSRoot 'CHANGELOG.md'
+    if (-not (Test-Path $path)) { return @('CHANGELOG.md не найден') }
+
+    $bullets = [System.Collections.Generic.List[string]]::new()
+    $version = $null
+    $inRelease = $false
+
+    foreach ($line in (Get-Content -LiteralPath $path)) {
+        if ($line -match '^## \[(?!Unreleased)([^\]]+)\]') {
+            if ($version) { break }
+            $version = $Matches[1].Trim()
+            $inRelease = $true
+            continue
+        }
+        if (-not $inRelease) { continue }
+        if ($line -match '^## ') { break }
+        if ($line -match '^### ') { continue }
+        if ($line -match '^- (.+)') {
+            $bullets.Add($Matches[1].Trim())
+            if ($bullets.Count -ge $MaxBullets) { break }
+        }
+    }
+
+    if ($version -and $bullets.Count) {
+        return @("релиз $version") + @($bullets | ForEach-Object { "· $_" })
+    }
+    return @('нет записей в CHANGELOG.md')
+}
+
 function Show-HomeBase {
     param(
         [switch]$Force,
@@ -70,6 +102,11 @@ function Show-HomeBase {
     }
 
     if (-not (Get-Command Build-WocReport -ErrorAction SilentlyContinue)) {
+        $wocLib = Join-Path $script:WSRoot 'lib\WorkstationOperationsCenter.ps1'
+        if (Test-Path $wocLib) { . $wocLib }
+    }
+
+    if (-not (Get-Command Build-WocReport -ErrorAction SilentlyContinue)) {
         Write-HackerLine '[FATAL] WOC offline — repairterminal' -Color Red
         return
     }
@@ -87,6 +124,10 @@ function Show-HomeBase {
     $trust = if ($SkipTrustProbe -and $cached -and $cached.AgeMinutes -le 15) {
         [PSCustomObject]$cached.Report
     } else {
+        if (Get-Command Save-CommandHealthCache -ErrorAction SilentlyContinue) {
+            $healthPath = Join-Path (Get-WorkstationLogsRoot) 'command-health.json'
+            if (-not (Test-Path $healthPath)) { Save-CommandHealthCache }
+        }
         Get-SystemTrustReport -Live -Save
     }
 
@@ -192,11 +233,13 @@ function Show-HomeBase {
         return
     }
 
-    Write-HackerSection -Tag 'LOG' -Title 'CHANGELOG — с прошлой сессии' -Color $P.Accent
+    Write-HackerSection -Tag 'LOG' -Title 'CHANGELOG — продукт и сессия' -Color $P.Accent
+    foreach ($line in (Get-HomeBaseProductChangelogLines)) {
+        Write-HackerLine "· $line" -Color $P.Muted
+    }
     if ($report.Changes -and $report.Changes.Count) {
-        $report.Changes | Select-Object -First 4 | ForEach-Object { Write-HackerLine "· $_" -Color $P.Muted }
-    } else {
-        Write-HackerLine '· no delta detected' -Color $P.Muted
+        Write-HackerLine '— с прошлой сессии —' -Color $P.Muted
+        $report.Changes | Select-Object -First 3 | ForEach-Object { Write-HackerLine "· $_" -Color $P.Muted }
     }
     Write-Host ''
 

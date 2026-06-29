@@ -27,7 +27,7 @@ if (-not $SkipNetwork)     { $adminScripts += @{ Name = 'Network';     Script = 
 
 foreach ($s in $adminScripts) {
     Write-Host "  [..] $($s.Name) (UAC)..." -ForegroundColor Yellow
-    $path = Join-Path $root $s.Script
+    $path = Resolve-WorkstationScript -Name $s.Script -Start $PSScriptRoot
     $argList = @('-NoProfile', '-File', $path) + $s.Args
     $p = Start-Process pwsh -Verb RunAs -ArgumentList $argList -Wait -PassThru
     if ($p.ExitCode -ne 0) { Write-Host "  [warn] $($s.Name) exit $($p.ExitCode)" -ForegroundColor Yellow }
@@ -35,18 +35,18 @@ foreach ($s in $adminScripts) {
 }
 
 Write-WorkstationStep 'Organization audit'
-& (Join-Path $root 'Invoke-OrganizationAudit.ps1')
+& (Resolve-WorkstationScript -Name 'Invoke-OrganizationAudit.ps1' -Start $PSScriptRoot)
 
 if (-not $SkipOrganize) {
     Write-WorkstationStep 'Workstation organization'
-    & (Join-Path $root 'Invoke-WorkstationOrganization.ps1') -Force
+    & (Resolve-WorkstationScript -Name 'Invoke-WorkstationOrganization.ps1' -Start $PSScriptRoot) -Force
 }
 
 Write-WorkstationStep 'Housekeeping'
-& (Join-Path $root 'Invoke-Housekeeping.ps1') -IncludeTemp
+& (Resolve-WorkstationScript -Name 'Invoke-Housekeeping.ps1' -Start $PSScriptRoot) -IncludeTemp
 
 Write-WorkstationStep 'Validation'
-& (Join-Path $root 'Validate-Workstation.ps1')
+& (Resolve-WorkstationScript -Name 'Validate-Workstation.ps1' -Start $PSScriptRoot)
 $valOk = ($LASTEXITCODE -eq 0)
 
 Import-Module (Join-Path $root 'modules\KGreen.Workstation.psm1') -Force -ErrorAction SilentlyContinue

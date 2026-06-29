@@ -10,9 +10,11 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$script:WSRoot = $PSScriptRoot
-. "$PSScriptRoot\lib\HomeBasePaths.ps1"
-. "$PSScriptRoot\lib\WorkstationCommon.ps1"
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+$script:WSRoot = $repoRoot
+. (Join-Path $repoRoot 'lib\HomeBasePaths.ps1')
+. (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
 
 $profilePath = Join-Path (Get-HomeBasePath -Name RepositoryRoot) 'profile\Microsoft.PowerShell_profile.ps1'
 $livePath    = Join-Path $HOME 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'

@@ -70,7 +70,7 @@ $public = @(
     'Get-SecurityReadinessReport', 'Show-SecurityStatusPanel'
     'Get-WindowsStatusReport', 'Show-WindowsStatus'
     'palette', 'menu', 'go', 'nav', 'Invoke-CommandPalette', 'Show-HackerMenu', 'Invoke-WorkstationNavHub', 'Invoke-WorkstationGoMenu', 'Invoke-WorkstationActionMenu', 'Register-WorkstationMenuHotkeys', 'Test-WorkstationMenuIntegrity', 'Test-WorkstationGoMenuAudit'
-    'Get-WorkstationCommandHealth', 'Get-WorkstationCommandRegistry'
+    'Get-WorkstationCommandHealth', 'Get-WorkstationCommandRegistry', 'Save-CommandHealthCache'
     'Get-SystemTrustReport', 'Show-TrustReport', 'Test-CommandSelfCheck', 'Invoke-AllCommandSelfChecks'
     'Invoke-ToolCheck', 'Show-NetTools', 'Show-Toolbox', 'Invoke-SysAudit'
     'Get-WorkstationToolInventory', 'toolcheck', 'nettools', 'toolbox', 'sysaudit'

@@ -6,7 +6,10 @@
 param([switch]$Force)
 
 $ErrorActionPreference = 'Stop'
-. "$PSScriptRoot\lib\WorkstationCommon.ps1"
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+$script:WSRoot = $repoRoot
+. (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
 
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $dest = Join-Path (Get-WorkstationBackupsRoot) $stamp
@@ -17,7 +20,7 @@ Write-WorkstationStep "Backup destination: $dest"
 $profilePaths = @(
     "$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
     "$HOME\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
-    'C:\Scripts\Workstation\profile\Microsoft.PowerShell_profile.ps1'
+    (Join-Path (Get-HomeBasePath -Name RepositoryRoot) 'profile\Microsoft.PowerShell_profile.ps1')
 )
 foreach ($p in $profilePaths) {
     if (Test-Path $p) {

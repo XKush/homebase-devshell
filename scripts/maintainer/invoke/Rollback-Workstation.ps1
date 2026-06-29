@@ -12,7 +12,10 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-. "$PSScriptRoot\lib\WorkstationCommon.ps1"
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+$script:WSRoot = $repoRoot
+. (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
 Assert-WorkstationAdmin
 Assert-DefenderUntouched
 

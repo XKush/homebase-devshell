@@ -27,6 +27,25 @@ function Get-WocRepositoryRoot {
     return 'C:\Scripts\Workstation'
 }
 
+function Resolve-WocMaintainerScript {
+    param([Parameter(Mandatory)][string]$Name)
+    $root = Get-WocRepositoryRoot
+    $resolveLib = Join-Path $root 'scripts\maintainer\_Resolve-RepoRoot.ps1'
+    if (Test-Path $resolveLib) {
+        if (-not (Get-Command Resolve-WorkstationScript -ErrorAction SilentlyContinue)) {
+            . $resolveLib
+        }
+        try {
+            return Resolve-WorkstationScript -Name $Name -Start $root
+        } catch { }
+    }
+    foreach ($sub in @('install', 'invoke', 'configure', 'test', 'phase2')) {
+        $candidate = Join-Path $root "scripts\maintainer\$sub\$Name"
+        if (Test-Path $candidate) { return $candidate }
+    }
+    return Join-Path $root $Name
+}
+
 function Get-WocOmpThemePath {
     if ($script:ProfileOmpTheme -and (Test-Path $script:ProfileOmpTheme)) {
         return $script:ProfileOmpTheme
@@ -152,7 +171,7 @@ function Test-WocHealthChecks {
 
     # Core scripts
     foreach ($scr in @('Validate-Workstation.ps1', 'Repair-WorkstationFonts.ps1', 'Invoke-Maintenance.ps1')) {
-        $p = Join-Path (Get-WocRepositoryRoot) $scr
+        $p = Resolve-WocMaintainerScript -Name $scr
         $checks.Add((New-WocCheck "Script $scr" $(if (Test-Path $p) { 'OK' } else { 'ERROR' }) ''))
     }
 
@@ -627,11 +646,3 @@ function Show-Woc {
     }
     Write-Host ""
 }
-
-# Compatibility aliases
-function Show-StartupCommandCenter { Show-Woc @args }
-function Show-Jarvis { Show-Woc @args }
-function Show-WorkstationDashboard { Show-Woc @args }
-function jarvis    { Show-Woc -Force -Mode full }
-function dashboard { jarvis }
-function home      { jarvis }

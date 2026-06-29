@@ -3,7 +3,7 @@
 .SYNOPSIS
     HomeBase DevShell one-line bootstrap installer.
 .EXAMPLE
-    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.1/install.ps1 | iex
+    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.2/install.ps1 | iex
 .EXAMPLE
     pwsh -File install.ps1
 #>
@@ -80,6 +80,15 @@ if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
     Write-Host ''
     Write-Host 'FAIL: Bootstrap reported errors. See output above and C:\Logs\Workstation\' -ForegroundColor Red
     exit $LASTEXITCODE
+}
+
+Write-Host ''
+Write-Host '==> Command health cache' -ForegroundColor Cyan
+$cmdTest = Join-Path $repoRoot 'scripts\maintainer\test\Test-WorkstationCommands.ps1'
+if (Test-Path $cmdTest) {
+    & $cmdTest -Quick
+} else {
+    Write-Host 'WARN: Test-WorkstationCommands.ps1 missing — run scan after first login' -ForegroundColor Yellow
 }
 
 Write-Host ''

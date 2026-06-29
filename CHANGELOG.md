@@ -12,6 +12,23 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
+## [2.0.2] - 2026-06-29
+
+**Post-OSS path regression patch** — platform spec `1.0.0` LOCKED.
+
+### Fixed
+
+- Maintainer scripts resolve `lib/` via `Resolve-WorkstationRepoRoot` (fresh `install.ps1` no longer fails on `Backup-Configuration.ps1`)
+- WOC/home cockpit resolves maintainer scripts after `scripts/maintainer/` layout move
+- Removed WOC `home`/`jarvis`/`dashboard` shims that overwrote module commands and broke trust (UNTRUSTED / missing `-Help`)
+- Home recommendations no longer break `go` menu audit (`validation` false positive)
+- Menu audit tests use `-DisableNameChecking` (clean validate output)
+- `install.ps1` runs `Test-WorkstationCommands -Quick` so `command-health.json` exists after bootstrap
+- Home cockpit CHANGELOG panel reads product `CHANGELOG.md` plus session delta
+- Home recommendation resolver maps `deploy: devstart` / `intel: sec` labels to real commands (menu audit on healthy system)
+
+---
+
 ## [2.0.1] - 2026-06-29
 
 **OSS packaging & cleanup patch** — same platform spec `1.0.0` LOCKED, no architecture changes.
@@ -67,6 +84,7 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.2
 [2.0.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.1
 [2.0.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.0

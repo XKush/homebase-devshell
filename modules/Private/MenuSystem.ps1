@@ -158,11 +158,29 @@ function Resolve-WorkstationRecommendationId {
     param([string]$Text)
 
     if ([string]::IsNullOrWhiteSpace($Text)) { return $null }
-    if ($Text -match '^(?<id>[a-z][a-z0-9\-]*)') { return $Matches.id }
     if ($Text -match '→\s*(?<id>[a-z][a-z0-9\-]*)') { return $Matches.id }
-    foreach ($id in @('repairterminal', 'doctor', 'trustcheck', 'backupconfig', 'cleanup', 'organize', 'revise', 'sysaudit', 'anon', 'sec', 'go', 'tor-check', 'tor-browser', 'tor-harden', 'pgp-repair', 'pgp-setup', 'devstart', 'windowsstatus')) {
+    if ($Text -match ':\s*(?<rest>[^·—]+)') {
+        $head = ($Matches.rest.Trim() -split '\s+')[0]
+        if ($head -match '^(?<id>[a-z][a-z0-9\-]*)$') { return $Matches.id }
+    }
+    $known = @(
+        'repairterminal', 'trustcheck', 'backupconfig', 'devstart', 'doctor', 'windowsstatus'
+        'pgp-repair', 'pgp-setup', 'tor-browser', 'tor-harden', 'tor-check', 'toolcheck'
+        'nettools', 'cleanup', 'organize', 'revise', 'sysaudit', 'anon', 'sec', 'go'
+        'menu', 'komandy', 'projects', 'hack', 'home', 'scan'
+    )
+    if (Get-Command Get-WorkstationActionRegistry -ErrorAction SilentlyContinue) {
+        $known = @(
+            (Get-WorkstationActionRegistry | ForEach-Object { $_.Id })
+            $known
+        ) | Select-Object -Unique | Sort-Object { $_.Length } -Descending
+    } else {
+        $known = $known | Sort-Object { $_.Length } -Descending
+    }
+    foreach ($id in $known) {
         if ($Text -match [regex]::Escape($id)) { return $id }
     }
+    if ($Text -match '^(?<id>[a-z][a-z0-9\-]*)') { return $Matches.id }
     return $null
 }
 

@@ -4,7 +4,10 @@
     Deduplicate user PATH, repair split "Program Files" segments, ensure workstation dirs.
 #>
 $ErrorActionPreference = 'Stop'
-. "$PSScriptRoot\lib\WorkstationCommon.ps1"
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+$script:WSRoot = $repoRoot
+. (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
 
 $pathsToEnsure = @(
     'C:\Program Files\7-Zip'
@@ -138,7 +141,7 @@ function Install-HomeBaseLegacyJunction {
 
 function Install-HomeBaseLegacyJunctions {
     param([switch]$WhatIf)
-    . "$PSScriptRoot\lib\HomeBasePaths.ps1"
+    . (Join-Path $repoRoot 'lib\HomeBasePaths.ps1')
     foreach ($j in Get-HomeBaseLegacyJunctions) {
         $target = Expand-HomeBasePathTemplate -Value $j.Target -Tokens @{
             RuntimeRoot = (Get-HomeBasePath -Name RuntimeRoot)
