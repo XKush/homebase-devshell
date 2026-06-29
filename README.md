@@ -1,88 +1,53 @@
 # HomeBase DevShell
 
-**Fast, self-checking PowerShell 7 dev environment for Windows — without the framework bloat.**
+**Stop guessing if your dev environment is broken. Run one command — know instantly.**
 
-Ships a production profile, a full command center (`doctor`, `home`, `go`), and a 5-command product CLI. Platform execution model is [locked at spec v1.0.0](docs/platform-spec-summary.md) for stability.
+A clean PowerShell environment for Windows that tells you in seconds if your machine is ready to work.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
----
-
-## Why this exists
-
-Windows + PowerShell setups drift: slow profiles, broken paths, silent misconfigurations, and “works on my machine” dotfiles nobody can trust.
-
-HomeBase DevShell gives you:
-
-- **Sub-600ms profile load** with a real command center, not a junk drawer of aliases  
-- **`devshell doctor`** — one health gate before you trust the environment  
-- **Stable core** — product updates without rewriting your dispatch architecture  
-
----
-
-## 60-second install
-
-**Recommended (pinned release):**
 
 ```powershell
 irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
 ```
 
-**From a clone:**
-
-```powershell
-git clone https://github.com/XKush/homebase-devshell.git $HOME\.homebase\devshell
-cd $HOME\.homebase\devshell
-pwsh -File install.ps1
-```
-
-Restart your terminal, then:
-
-```powershell
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 status
-```
-
-Add a alias for daily use:
-
-```powershell
-function devshell { pwsh -NoProfile -File "$HOME\.homebase\devshell\devshell.ps1" @args }
-```
+Restart your terminal, then run **`devshell doctor`**. When you see **Ready to work**, you're good.
 
 ---
 
-## Core commands (start here)
+## Why this matters
 
-| Command | Purpose |
-|---------|---------|
-| **`devshell install`** | Bootstrap folders, deploy profile, baseline setup |
-| **`devshell doctor`** | Full health validation — pass/fail gate |
-| **`devshell status`** | Product version, platform lock, runtime state |
+Your shell can be broken — and you won't know until something fails mid-task.
 
-```powershell
-pwsh -File devshell.ps1 install
-pwsh -File devshell.ps1 doctor
-pwsh -File devshell.ps1 status
-```
+Broken paths, missing tools, a profile that loads too slow, config that drifted since last week. It all looks fine until it isn't.
 
-### Optional (power users)
-
-| Command | Purpose |
-|---------|---------|
-| `devshell reload` | Refresh profile stack |
-| `devshell trace` | Last N execution trace rows (read-only, current session) |
+**`devshell doctor`** catches that drift *before* it breaks your day: one pass/fail check so you trust the environment before you write code.
 
 ---
 
-## Example: `devshell doctor`
+## The proof moment
+
+```powershell
+devshell doctor
+```
+
+When everything is healthy:
 
 ```
-HomeBase DevShell v2.0.0 — install
-Repository: C:\Users\you\.homebase\devshell
+✔ Profile OK
+✔ Tools OK
+✔ Environment OK
+✔ Ready to work
 
-==> Bootstrap (folders + profile, user scope)
-...
-==> Health check (devshell doctor)
+Profile load: 489ms
+Passed: 71 · Failed: 0
+```
 
+No guesswork. No "probably fine." You know.
+
+<details>
+<summary>Full report (when you need details)</summary>
+
+```
 ═══════════════════ VALIDATION REPORT ═══════════════════
 Passed:   71
 Failed:   0
@@ -90,77 +55,120 @@ Warnings: 0
 Profile load: 489ms <= 600ms
 Report: C:\Logs\Workstation\validation-20260629-030000.json
 ═══════════════════════════════════════════════════════
-
-SUCCESS: HomeBase DevShell is ready.
 ```
 
-If `Failed` > 0, open the JSON report under `C:\Logs\Workstation\` and re-run after fixes.
+If **`Failed` > 0**, open the JSON report, fix what's listed, run `devshell doctor` again.
+
+</details>
 
 ---
 
-## Example: `devshell status`
+## Quick start (60 seconds)
 
-```
-HomeBase DevShell
-  Product:  2.0.0
-  Platform: 1.0.0 (LOCKED)
-  Signed:   2026-06-29
+**1. Install**
 
-Runtime
-  Bootstrap:   OK
-  Environment: OK
-  Diagnostics: OK
-  Hints:       Loaded
+```powershell
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
 ```
 
-After install, the full in-session command center loads from your profile: `doctor`, `home`, `go`, `trustcheck`, and more.
+**2. Restart** Windows Terminal (or open a new PowerShell 7 window).
+
+**3. Verify**
+
+```powershell
+pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
+```
+
+**4. Check status**
+
+```powershell
+pwsh -File $HOME\.homebase\devshell\devshell.ps1 status
+```
+
+**Optional — add a short alias for daily use:**
+
+```powershell
+function devshell { pwsh -NoProfile -File "$HOME\.homebase\devshell\devshell.ps1" @args }
+```
+
+Then: `devshell install` · `devshell doctor` · `devshell status` — that's the whole product surface.
 
 ---
 
-## What this is **not**
+## Core commands
 
-- **Not a cloud product** — everything runs locally  
-- **Not a general-purpose CLI framework** — no plugin router you must learn  
-- **Not a log analytics platform** — execution trace is in-memory and read-only  
-- **Not an open core / closed brain** — the platform spec is public and frozen, not hidden magic  
-- **Not something you extend by patching orchestrator internals** — use extensions or module commands instead  
+Three commands. Nothing else required.
 
-If you want a meta-framework for PowerShell dispatch, look elsewhere. If you want a **working dev shell that stays honest**, you're in the right place.
+| Command | What it does |
+|---------|----------------|
+| **`devshell install`** | Sets up folders, deploys your PowerShell profile, runs baseline setup |
+| **`devshell doctor`** | Health check — catches broken shell, paths, and tools before you work |
+| **`devshell status`** | Confirms version and that the environment loaded correctly |
+
+```powershell
+devshell install
+devshell doctor
+devshell status
+```
+
+Without the alias:
+
+```powershell
+pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
+```
 
 ---
 
-## Platform stability
+## Real use cases
 
-Execution architecture is **LOCKED at spec v1.0.0**. Product releases (like `v2.0.0`) ship features and fixes without silently redesigning the core.
+**New Windows machine**  
+Install → doctor → start working. Know the shell is wired before you clone anything.
 
-Details: [docs/platform-spec-summary.md](docs/platform-spec-summary.md)
+**"Something feels off"**  
+Your environment might be broken and you don't know it yet. Doctor finds drift in one run.
+
+**Second PC or reinstall**  
+Same install URL, same pass/fail gate — less "works on my machine."
+
+**Daily driver**  
+Fast profile with `home`, `go`, and shortcuts — without hand-maintaining a 500-line `$PROFILE`.
+
+---
+
+## If something fails
+
+See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) or the quick fixes below.
+
+| Problem | What to do |
+|---------|------------|
+| Install says **PowerShell 7+ required** | Install from [aka.ms/powershell](https://aka.ms/powershell), reopen terminal |
+| **git not found** during remote install | Install [Git for Windows](https://git-scm.com/download/win), retry the install line |
+| **`devshell doctor` fails** | Read `C:\Logs\Workstation\validation-*.json`, fix listed items, re-run doctor |
+| **Commands not found after install** | Restart terminal; use full path or add the `devshell` alias above |
+| **Re-run setup safely** | `devshell install` is idempotent — run it again after fixes |
 
 ---
 
 ## Requirements
 
-- Windows 10/11  
+- Windows 10 or 11  
 - [PowerShell 7+](https://aka.ms/powershell)  
-- Git (for remote install clone)  
-- Optional: Windows Terminal, Git, Python (checked by `doctor`)
+- Git (for the one-line remote install)  
+- Optional: Windows Terminal, Python (checked by doctor)
 
 ---
 
-## Repository map
+## What this is **not**
 
-| Path | What |
-|------|------|
-| `install.ps1` · `devshell.ps1` | Product entry points |
-| `profile/` · `lib/` · `modules/` | Shipped runtime |
-| `docs/` | Guides + platform spec |
-| `Validate-Workstation.ps1` | Health gate used by `devshell doctor` |
+- Not a cloud service — everything runs locally  
+- Not a framework you must learn before doing work  
+- Not Linux/macOS (Windows + PowerShell 7 only)  
 
-Maintainer docs: [docs/product/GITHUB-RELEASE-PLAN.md](docs/product/GITHUB-RELEASE-PLAN.md)
+Minimal surface. Honest health check. If that's what you need, you're in the right place.
 
 ---
 
-## Contributing & license
+## More
 
-Issues and PRs welcome. Keep platform changes behind the [spec unlock process](docs/charter/PLATFORM-SPEC-SIGNOFF.md).
-
-**License:** [MIT](LICENSE) · Russian docs: [docs/ru/README.md](docs/ru/README.md)
+- [Getting started](docs/GETTING-STARTED.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Contributing](CONTRIBUTING.md)  
+- [CHANGELOG](CHANGELOG.md) · [License MIT](LICENSE) · [Русский](docs/ru/README.md)

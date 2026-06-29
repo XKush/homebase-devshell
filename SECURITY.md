@@ -59,5 +59,5 @@ HOME BASE includes security-related automation intended for **authorized lab use
 
 ## Related documentation
 
-- [docs/charter/SECURITY-POLICY.md](docs/charter/SECURITY-POLICY.md) — operational security chain
-- [docs/charter/BACKUP-POLICY.md](docs/charter/BACKUP-POLICY.md) — backup and rollback
+- [internal-docs/charter/SECURITY-POLICY.md](internal-docs/charter/SECURITY-POLICY.md) — operational security chain
+- [internal-docs/charter/BACKUP-POLICY.md](internal-docs/charter/BACKUP-POLICY.md) — backup and rollback

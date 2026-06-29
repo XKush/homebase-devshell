@@ -3,6 +3,12 @@
 Thumbs.db
 Desktop.ini
 
+# Validation / hardening reports (generated outside normal flow)
+validation-*.json
+platform-hardening-*.json
+**/validation-*.json
+**/platform-hardening-*.json
+
 # Local overrides (never commit secrets)
 .env
 .env.*
@@ -15,5 +21,17 @@ credentials.json
 *.swp
 *~
 
-# Generated reports (keep structure, ignore volatile copies in repo if synced elsewhere)
+# Scratch and WIP (do not ship to public users)
+*.tmp
+modules/Shell.ps1.tmp
+Test-MenuAudit.ps1
+Test-MenuDeepAudit.ps1
+Test-AnonymityKitAudit.ps1
+lib/AnonymityKit.ps1
+lib/Invoke-MenuPreview.ps1
+modules/Private/MenuSystem.ps1
+
+# Optional local theme override (machine-specific)
+terminal/active-theme.omp.json
+
 # C:\Logs lives outside repo — no action needed

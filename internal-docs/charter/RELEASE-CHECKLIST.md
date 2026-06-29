@@ -2,7 +2,23 @@
 
 Единый чек-лист выпуска релиза. Использовать **перед каждым** Git tag `vX.Y.Z`.
 
-**Rollback anchor:** `v2.0.0` (product) · **Phase 2 compare:** [phase2-step1-stable.json](../baselines/phase2-step1-stable.json)
+### Phase 2 commit workflow
+
+```powershell
+# Before commit (mandatory — FAIL = no commit)
+pwsh -File Invoke-Phase2CommitGate.ps1 -SaveArtifacts
+
+# One responsibility per commit
+git add <single-file-or-single-concern>
+git commit -m "..."
+
+# Finalize quality passport folder *-pending → {hash}
+pwsh -File Invoke-Phase2CommitGate.ps1 -FinalizePendingArtifacts
+```
+
+**Green Tree Rule:** Phase 2 migration files committed immediately — no mixed WIP.
+
+Passports: `{Logs}/Phase2/Commit/{shortHash}/` — doctor.json, trust.json, paths.json, equivalence.json
 
 ---
 

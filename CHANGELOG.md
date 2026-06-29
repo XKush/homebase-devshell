@@ -10,6 +10,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ## [Unreleased]
 
+### Changed
+
+- Repository cleanup for OSS adoption: user docs in `docs/`, maintainer material in `internal-docs/`
+- README simplified — public surface is install → doctor → status only
+- `.gitignore` expanded for WIP scripts and validation reports
+
 ---
 
 ## [2.0.0] - 2026-06-29
@@ -23,15 +29,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 - **Public README** — install flow, core commands, examples, scope boundaries
 - **KGreen.Workstation** command center — `doctor` (75 checks), `home`, `go`, trust system
 - **Fast profile** — canonical PowerShell 7 profile, sub-600ms load target
-- **Platform stack (shipped, spec LOCKED v1.0.0)** — orchestration, registry, router, events, trace, extensions boundary
 - **Operational hardening** — `Test-WorkstationPlatformHardening.ps1` (11 scenarios)
-- **Platform spec sign-off** — [PLATFORM-SPEC-SIGNOFF.md](docs/charter/PLATFORM-SPEC-SIGNOFF.md)
 
 ### Stability
 
-- Platform execution architecture **frozen at spec v1.0.0** — product updates do not silently change dispatch model
-- Unified event lifecycle contract (`command.execute.*`, `profile.init.*`, `extension.execute.*`)
-- Registry separation: core commands vs extensions vs module catalog
 - Fail-closed install: bootstrap + `devshell doctor` required for SUCCESS
 
 ### Known limitations
@@ -44,16 +45,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ### Documentation
 
-- [GitHub Release Plan](docs/product/GITHUB-RELEASE-PLAN.md)
-- [Public repo structure](docs/product/PUBLIC-REPO-STRUCTURE.md)
-- [Install UX review](docs/product/INSTALL-UX-REVIEW.md)
-- [Extension guidelines](docs/charter/EXTENSION-GUIDELINES.md)
+- Maintainer docs moved to `internal-docs/` (not linked from README)
 
 ---
 
 ## [1.x] - Historical
 
-Pre–HomeBase DevShell iterations. See `docs/` archive and git history before public OSS rename.
+Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 

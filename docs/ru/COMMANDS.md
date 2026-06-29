@@ -1,6 +1,6 @@
 # Команды HOME BASE
 
-Generated: 2026-06-28 22:19
+Generated: 2026-06-28 23:39
 
 Справка: ``имя -help`` · меню: ``sec`` · ``menu``
 
@@ -11,7 +11,7 @@ _
 | Команда | Описание |
 |---------|----------|
 | `dna` | SHA256 отпечаток: MachineGuid + profile + module + git + trust. |
-| `doctor` | Запускает полную автоматическую проверку рабочей станции (68+ тестов). |
+| `doctor` | Запускает полную автоматическую проверку рабочей станции (74+ тестов). |
 | `genesis` | Обновляет OP-DNA, append Trust Chain, экспорт C:\\Security\\exports\\genesis-certificate.txt |
 | `healthcheck` | Синоним команды doctor — полная проверка системы. |
 | `instrumenty` | Показывает все установленные программы с объяснением на русском. |
@@ -39,16 +39,14 @@ _
 | `pgp-repair` | Экспорт публичного ключа и backup revocation, если ключ есть, но setup не завершился. |
 | `pgp-setup` | Guided Ed25519 ключ (псевдоним, passphrase). |
 | `pgp-status` | Список secret keys + fingerprint из метаданных. |
-| `privacy` | То же, что sec — меню SHADOW OPS. |
-| `sec` | Единое меню Tor + PGP: статус, playbook, все действия через fzf. |
-| `sec-help` | Tor + PGP + playbook + правила NEVER. |
-| `tor-check` | Tor Browser, PGP, kill switch, политика Defender. |
-| `tor-harden` | user.js hardening + правила сессии. Опция -Lock включает kill switch. |
+| `privacy` | То же, что sec — меню Tor + PGP. |
+| `sec` | Меню: статус, порядок сессии, все действия через fzf. |
+| `sec-help` | Команды, порядок сессии, правила «никогда». |
+| `tor-check` | Tor Browser, PGP, user.js hardening, политика Defender. |
+| `tor-harden` | user.js hardening + правила сессии. |
 | `tor-help` | Краткая шпаргалка Tor-команд. |
-| `tor-lock` | Firewall: блок outbound Chrome/Edge/Firefox/Brave. Tor Browser разрешён. |
 | `tor-setup` | Официальный Tor Browser через winget. |
-| `tor-status` | Tor Browser, hardening, kill switch. |
-| `tor-unlock` | Удаляет правила KGreen-Tor-Lock. |
+| `tor-status` | Tor Browser, hardening, user.js. |
 
 ## Сеть
 
@@ -84,8 +82,9 @@ _
 | `backupconfig` | Сохраняет профиль PowerShell и конфиги в C:\Backups\Workstation. |
 | `cleanup` | Удаляет старые логи, лишние бэкапы и временные файлы. |
 | `logs` | Показывает последние файлы в C:\Logs\Workstation. |
+| `organize` | Создаёт стандартные папки, README, архивирует installers из Downloads (с бэкапом). |
 | `poriadok` | То же, что revise — «навести порядок». |
-| `revise` | Полный прогон: PATH, docs sync, doctor, trust, SHADOW OPS, next actions. |
+| `revise` | Полный прогон: PATH, docs sync, doctor, trust, sec, next actions. |
 | `updateall` | Обновляет пакеты через winget и модули PowerShell. |
 
 ## Восстановление
@@ -106,16 +105,18 @@ _
 | Команда | Описание |
 |---------|----------|
 | `cheatsheet` | Открывает файл CHEATSHEET.md с кратким справочником. |
-| `dashboard` | То же, что home и jarvis. |
-| `hack` | Полный хакерский cockpit или fzf-меню (если установлен fzf). |
+| `dashboard` | Расширенный обзор HOME BASE. |
+| `go` | [следующий] из home + категории (папки, порядок, система…) + все команды. Enter=выполнить. |
+| `hack` | То же, что menu — запуск частых действий через fzf. |
 | `help` | То же, что helpme — справочник по командам оболочки. |
 | `helpme` | Интерактивная справка по группам: git, python, nav, tools. |
-| `home` | Открывает HOME BASE в режиме normal — trust + telemetry + command matrix. |
-| `jarvis` | Открывает HOME BASE — центр управления рабочей станцией. |
+| `home` | Компактная панель: trust, telemetry, подсказки. По умолчанию minimal. |
+| `jarvis` | Расширенный обзор HOME BASE (режим full). |
 | `komandy` | Показывает все команды, сгруппированные по категориям. |
 | `learn` | Квесты 1–6 и темы: git, python, security, HOME BASE. |
-| `menu` | Главное меню: cockpit, SHADOW OPS (sec), scan, trust, network. |
-| `palette` | Интерактивный поиск по всем командам HOME BASE. |
+| `menu` | То же, что go. |
+| `nav` | nav -Start sec — только безопасность. |
+| `palette` | То же, что go. |
 | `quickstart` | 5 шагов для нового пользователя системы. |
 
 ## Навигация
@@ -124,6 +125,11 @@ _
 
 | Команда | Описание |
 |---------|----------|
+| `backups` | C:\Backups\Workstation — снимки backupconfig и organize. |
+| `configs` | C:\Configs\Workstation — экспортированные настройки. |
+| `desktop` | Переход на рабочий стол пользователя. |
+| `downloads` | Переход в Downloads; -Archive — C:\Downloads\Archive\Installers. |
+| `networking` | C:\Networking — captures, docs, scripts. |
 | `scripts` | Переход в папку со скриптами рабочей станции. |
 | `tools` | Переход в папку с установленными утилитами. |
 
