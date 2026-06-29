@@ -3,7 +3,7 @@
 .SYNOPSIS
     HomeBase DevShell one-line bootstrap installer.
 .EXAMPLE
-    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.2/install.ps1 | iex
+    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.3.0/install.ps1 | iex
 .EXAMPLE
     pwsh -File install.ps1
 .EXAMPLE
@@ -21,7 +21,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$script:DevShellReleaseTag = 'v2.2.2'
+$script:DevShellReleaseTag = 'v2.3.0'
 
 function Test-DevShellRepo {
     param([string]$Path)

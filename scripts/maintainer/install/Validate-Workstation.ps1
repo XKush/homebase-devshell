@@ -8,6 +8,7 @@
 param(
     [switch]$Fix,
     [switch]$FixPassCompleted,
+    [switch]$Privacy,
     [ValidateSet('Core', 'Full')]
     [string]$Tier = 'Full',
     [int]$StartupBudgetMs = 650
@@ -98,6 +99,27 @@ function Get-DevReadyFixHints {
         $hints.Add('Run: devshell doctor -Fix — or devshell install. See docs/TROUBLESHOOTING.md')
     }
     return $hints
+}
+
+if ($Privacy) {
+    . (Join-Path $repoRoot 'lib\PrivacyAudit.ps1')
+    $product = '0.0.0'
+    $psd1Path = Join-Path $repoRoot 'modules\KGreen.Workstation.psd1'
+    if (Test-Path $psd1Path) { $product = [string](Import-PowerShellDataFile $psd1Path).ModuleVersion }
+    Write-WorkstationStep 'Privacy doctor'
+    $privacyReport = Get-PrivacyAuditReport -Scope System -RepoRoot $repoRoot -ProductVersion $product
+    Write-PrivacyAuditReport -Report $privacyReport | Out-Null
+    $reportPath = Save-PrivacyAuditReport -Report $privacyReport
+    Write-Host 'Privacy readiness' -ForegroundColor Cyan
+    $col = if ($privacyReport.Score -ge 85) { 'Green' } elseif ($privacyReport.Score -ge 65) { 'Yellow' } else { 'Red' }
+    Write-Host "$($privacyReport.Score)/100 — $($privacyReport.RiskLevel)" -ForegroundColor $col
+    if ($privacyReport.WarnCount -gt 0) {
+        Write-Host ''
+        Write-Host 'Try: devshell privacy -Fix (safe repairs only)' -ForegroundColor DarkGray
+    }
+    $exitCode = if ($privacyReport.Score -ge 65) { 0 } else { 1 }
+    $global:LASTEXITCODE = $exitCode
+    exit $exitCode
 }
 
 Write-WorkstationStep 'Validation — baseline metrics'

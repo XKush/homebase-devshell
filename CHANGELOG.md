@@ -12,6 +12,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
+## [2.3.0] - 2026-06-29
+
+**Privacy suite** — platform spec `1.0.0` LOCKED.
+
+### Added
+
+- **`devshell privacy`** — system audit + configurable score (Low / Medium / High privacy)
+- **`devshell privacy -Fix`** — idempotent safe repairs (HKCU without admin; HKLM/DoH with elevation)
+- **`devshell browser`**, **`tor`**, **`vpn`**, **`opsec`**, **`metadata`**, **`clean-meta`**
+- **`devshell doctor -Privacy`** — privacy readiness score
+- **`lib/PrivacyAudit.ps1`** — offline audits, stable JSON schema `1.0.0`
+- **`Config/privacy.defaults.json`** — profile + scoring weights
+
+### Changed
+
+- Privacy reports: machine-readable `privacy-*.json` with `reportSchemaVersion`, `score`, `checks[]`
+- Non-admin: INFO for unreadable HKLM policies (no hard failure)
+
+---
+
 ## [2.2.2] - 2026-06-29
 
 **Doctor auto-repair** — platform spec `1.0.0` LOCKED.
@@ -235,7 +255,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.2.2...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.3.0
 [2.2.2]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.2
 [2.2.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.1
 [2.2.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.0

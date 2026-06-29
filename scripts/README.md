@@ -26,6 +26,13 @@ PATH shims: `devready.cmd` (doctor Core) · `devshell.cmd` (full CLI)
 | `Install-Software.ps1` | Install-Workstation (unless `-SkipSoftware`) | winget stack |
 | `Validate-Workstation.ps1` | devshell doctor | Health gate `-Tier Core\|Full`; `-Fix` auto-repair |
 | `Repair-DevReadyEnvironment.ps1` | doctor `-Fix` | winget + PSGallery + local scripts (safe sources) |
+| `Invoke-PrivacyAudit.ps1` | devshell privacy | Privacy score + `-Fix` |
+| `Repair-PrivacySettings.ps1` | privacy `-Fix` | Safe registry/DNS (no Defender/Firewall/WU) |
+| `Invoke-BrowserPrivacyAudit.ps1` | devshell browser | Chrome / Edge / Firefox |
+| `Invoke-TorReadinessAudit.ps1` | devshell tor | Tor install/harden check |
+| `Invoke-VpnAudit.ps1` | devshell vpn | VPN / TUN / DNS heuristic |
+| `Invoke-OpsecCheck.ps1` | devshell opsec | Combined OPSEC snapshot |
+| `Invoke-MetadataToolkit.ps1` | devshell metadata | exiftool view/strip |
 | `Show-DevShellInitPlan.ps1` | devshell init | Dry-run install plan |
 | `Backup-Configuration.ps1` | Install-Workstation | Pre-change backup |
 | `Fix-WorkstationPath.ps1` | Install-Workstation | PATH repair |

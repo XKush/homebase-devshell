@@ -6,13 +6,21 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('install', 'doctor', 'status', 'reload', 'trace', 'help', 'version', 'init')]
+    [ValidateSet('install', 'doctor', 'status', 'reload', 'trace', 'help', 'version', 'init',
+        'privacy', 'browser', 'tor', 'vpn', 'metadata', 'clean-meta', 'opsec', 'audit')]
     [string]$Command = 'help',
+    [Parameter(Position = 1)]
+    [string]$Argument,
     [ValidateSet('Core', 'Full')]
     [string]$Tier = 'Core',
     [switch]$SkipTools,
     [switch]$WithTools,
     [switch]$Fix,
+    [switch]$Privacy,
+    [switch]$Apply,
+    [switch]$Strip,
+    [ValidateSet('Chrome', 'Edge', 'Firefox', 'All')]
+    [string]$Browser = 'All',
     [int]$Last = 20
 )
 
@@ -34,7 +42,7 @@ function Get-DevShellProductVersion {
     param([string]$Root)
     $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
     if (Test-Path $psd1) { return [string](Import-PowerShellDataFile $psd1).ModuleVersion }
-    return '2.2.2'
+    return '2.3.0'
 }
 
 function Show-DevShellHelp {
@@ -45,8 +53,17 @@ DevReady — HomeBase DevShell
   devready           Quick health check (same as devshell doctor)
   devshell init      Dry-run — show install plan (no winget, no changes)
   devshell install   Set up your shell (Core; add -WithTools for winget stack)
-  devshell doctor    Am I ready? (-Tier Core | Full). Add -Fix to auto-repair.
+  devshell doctor    Am I ready? (-Tier Core | Full). -Fix repairs dev env. -Privacy privacy score.
   devshell status    Platform load status
+
+  devshell privacy   Privacy audit + score (read-only). -Fix for safe repairs. -Apply uses privacy.json
+  devshell audit privacy   Same as devshell privacy
+  devshell browser   Chrome / Edge / Firefox privacy checks
+  devshell tor       Tor Browser readiness (does not launch Tor)
+  devshell vpn       VPN / TUN / DNS leak heuristics
+  devshell metadata  View metadata (exiftool). Pass file as second arg.
+  devshell clean-meta <file> -Strip   Remove metadata → *_clean copy
+  devshell opsec     Combined OPSEC snapshot
 
   devshell help      Show this help
 
@@ -86,6 +103,7 @@ switch ($Command) {
             StartupBudgetMs  = 650
         }
         if ($Fix) { $doctorArgs['Fix'] = $true }
+        if ($Privacy) { $doctorArgs['Privacy'] = $true }
         & (Join-Path $repoRoot 'scripts\maintainer\install\Validate-Workstation.ps1') @doctorArgs
         exit $LASTEXITCODE
     }
@@ -97,6 +115,56 @@ switch ($Command) {
         else { $planArgs['SkipTools'] = $true }
         & $planScript @planArgs
         exit 0
+    }
+    'privacy' {
+        $privacyArgs = @{}
+        if ($Fix) { $privacyArgs['Fix'] = $true }
+        if ($Apply) { $privacyArgs['Apply'] = $true }
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-PrivacyAudit.ps1') @privacyArgs
+        exit $LASTEXITCODE
+    }
+    'audit' {
+        $target = if ($Argument) { $Argument } else { 'privacy' }
+        if ($target -eq 'privacy') {
+            $privacyArgs = @{}
+            if ($Fix) { $privacyArgs['Fix'] = $true }
+            if ($Apply) { $privacyArgs['Apply'] = $true }
+            & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-PrivacyAudit.ps1') @privacyArgs
+            exit $LASTEXITCODE
+        }
+        Write-Host "Unknown audit: $target (try: devshell audit privacy)" -ForegroundColor Yellow
+        exit 1
+    }
+    'browser' {
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-BrowserPrivacyAudit.ps1') -Browser $Browser
+        exit $LASTEXITCODE
+    }
+    'tor' {
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-TorReadinessAudit.ps1')
+        exit $LASTEXITCODE
+    }
+    'vpn' {
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-VpnAudit.ps1')
+        exit $LASTEXITCODE
+    }
+    'clean-meta' {
+        if (-not $Argument) {
+            Write-Host 'Usage: devshell clean-meta <file>' -ForegroundColor Yellow
+            exit 1
+        }
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-MetadataToolkit.ps1') -Path $Argument -Strip
+        exit $LASTEXITCODE
+    }
+    'metadata' {
+        $metaArgs = @{}
+        if ($Argument) { $metaArgs['Path'] = $Argument }
+        if ($Strip) { $metaArgs['Strip'] = $true }
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-MetadataToolkit.ps1') @metaArgs
+        exit $LASTEXITCODE
+    }
+    'opsec' {
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-OpsecCheck.ps1')
+        exit $LASTEXITCODE
     }
     'status' {
         Invoke-WorkstationProfile -RepositoryRoot $repoRoot -Force | Out-Null

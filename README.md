@@ -14,14 +14,14 @@ Powered by **HomeBase DevShell** — a local health check for PowerShell 7 on Wi
 
 ![DevReady — install, run devready, see Ready to work](docs/assets/devready-demo.gif)
 
-**Inspect before run:** [`install.ps1` @ v2.2.2](https://github.com/XKush/homebase-devshell/blob/v2.2.2/install.ps1) · `devshell init` (dry-run, no changes) · [zip + SHA256](packaging/README.md)
+**Inspect before run:** [`install.ps1` @ v2.3.0](https://github.com/XKush/homebase-devshell/blob/v2.3.0/install.ps1) · `devshell init` (dry-run, no changes) · [zip + SHA256](packaging/README.md)
 
 ---
 
 ## 30-second start
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.2/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.3.0/install.ps1 | iex
 ```
 
 Close the terminal. Open a new one. Run:
@@ -134,6 +134,7 @@ Full layout: [docs/product/REPOSITORY-SURFACE.md](docs/product/REPOSITORY-SURFAC
 |-----|-----|
 | [Getting started](docs/GETTING-STARTED.md) | Paths, install flow, diagram |
 | [Troubleshooting](docs/TROUBLESHOOTING.md) | When doctor fails |
+| [Privacy](docs/PRIVACY.md) | `devshell privacy`, browser, VPN, metadata |
 | [Command center (EN)](docs/en/COMMAND-CENTER.md) | `go`, `home`, tiers |
 | [Command center (RU)](docs/ru/COMMAND-CENTER.md) | Russian cockpit |
 | [Brand & naming](docs/product/BRAND.md) | DevReady vs HomeBase DevShell |
