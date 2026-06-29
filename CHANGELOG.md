@@ -12,6 +12,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
+## [2.0.3] - 2026-06-29
+
+**Hotfix — `irm | iex` bootstrap** — platform spec `1.0.0` LOCKED.
+
+### Fixed
+
+- `install.ps1` no longer calls `Join-Path` with empty `$PSScriptRoot` when run via `irm … | iex`
+- One-line install clones the pinned release tag (`v2.0.3`) instead of default branch
+- Bootstrap sets `WORKSTATION_ROOT` and patches `Config/homebase.defaults.json` for `~/.homebase/devshell`
+
+---
+
 ## [2.0.2] - 2026-06-29
 
 **Post-OSS path regression patch** — platform spec `1.0.0` LOCKED.
@@ -84,7 +96,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.2...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.3...HEAD
+[2.0.3]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.3
 [2.0.2]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.2
 [2.0.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.1
 [2.0.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.0

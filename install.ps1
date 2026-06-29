@@ -3,7 +3,7 @@
 .SYNOPSIS
     HomeBase DevShell one-line bootstrap installer.
 .EXAMPLE
-    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.2/install.ps1 | iex
+    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.3/install.ps1 | iex
 .EXAMPLE
     pwsh -File install.ps1
 #>
@@ -14,18 +14,40 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$script:DevShellReleaseTag = 'v2.0.3'
 
 function Test-DevShellRepo {
     param([string]$Path)
+    if ([string]::IsNullOrWhiteSpace($Path)) { return $false }
     return Test-Path (Join-Path $Path 'lib\HomeBasePaths.ps1')
 }
 
 function Get-BootstrapRepoRoot {
-    if (Test-DevShellRepo -Path $PSScriptRoot) { return $PSScriptRoot }
+    if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot) -and (Test-DevShellRepo -Path $PSScriptRoot)) {
+        return $PSScriptRoot
+    }
     if ($env:HOMEBASE_DEVSHELL_ROOT -and (Test-DevShellRepo -Path $env:HOMEBASE_DEVSHELL_ROOT)) {
         return $env:HOMEBASE_DEVSHELL_ROOT
     }
     return $null
+}
+
+function Initialize-DevShellInstallPaths {
+    param([Parameter(Mandatory)][string]$RepoRoot)
+
+    $configPath = Join-Path $RepoRoot 'Config\homebase.defaults.json'
+    if (Test-Path $configPath) {
+        $cfg = Get-Content $configPath -Raw | ConvertFrom-Json
+        $escaped = $RepoRoot.TrimEnd('\').Replace('\', '\\')
+        if ([string]$cfg.RepositoryRoot -ne $escaped) {
+            $cfg.RepositoryRoot = $escaped
+            $cfg | ConvertTo-Json -Depth 5 | Set-Content $configPath -Encoding UTF8
+        }
+    }
+
+    [Environment]::SetEnvironmentVariable('WORKSTATION_ROOT', $RepoRoot, 'User')
+    $env:WORKSTATION_ROOT = $RepoRoot
+    $env:HOMEBASE_DEVSHELL_ROOT = $RepoRoot
 }
 
 Write-Host ''
@@ -52,8 +74,8 @@ if (-not $repoRoot -and -not $SkipClone) {
     if (Test-DevShellRepo -Path $InstallPath) {
         Write-Host "Using existing checkout: $InstallPath" -ForegroundColor DarkGray
     } else {
-        Write-Host "Cloning repository to $InstallPath ..." -ForegroundColor DarkGray
-        git clone $RepoUrl $InstallPath
+        Write-Host "Cloning $script:DevShellReleaseTag to $InstallPath ..." -ForegroundColor DarkGray
+        git clone --branch $script:DevShellReleaseTag --depth 1 $RepoUrl $InstallPath
         if ($LASTEXITCODE -ne 0) {
             Write-Host 'FAIL: git clone failed.' -ForegroundColor Red
             Write-Host "Try: git clone $RepoUrl $InstallPath" -ForegroundColor DarkGray
@@ -71,6 +93,7 @@ if (-not $repoRoot -or -not (Test-DevShellRepo -Path $repoRoot)) {
 }
 
 $env:HOMEBASE_DEVSHELL_ROOT = $repoRoot
+Initialize-DevShellInstallPaths -RepoRoot $repoRoot
 Write-Host "Repository: $repoRoot" -ForegroundColor DarkGray
 
 Write-Host ''

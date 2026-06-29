@@ -17,7 +17,7 @@ function Get-DevShellRepoRoot {
     if ($env:HOMEBASE_DEVSHELL_ROOT -and (Test-Path (Join-Path $env:HOMEBASE_DEVSHELL_ROOT 'lib\HomeBasePaths.ps1'))) {
         return $env:HOMEBASE_DEVSHELL_ROOT
     }
-    if (Test-Path (Join-Path $PSScriptRoot 'lib\HomeBasePaths.ps1')) {
+    if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot) -and (Test-Path (Join-Path $PSScriptRoot 'lib\HomeBasePaths.ps1'))) {
         return $PSScriptRoot
     }
     $fallback = 'C:\Scripts\Workstation'
@@ -29,7 +29,7 @@ function Get-DevShellProductVersion {
     param([string]$Root)
     $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
     if (Test-Path $psd1) { return [string](Import-PowerShellDataFile $psd1).ModuleVersion }
-    return '2.0.2'
+    return '2.0.3'
 }
 
 function Show-DevShellHelp {
