@@ -57,5 +57,5 @@ Pre–HomeBase DevShell iterations. See `docs/` archive and git history before p
 
 ---
 
-[Unreleased]: https://github.com/KGreen/homebase-devshell/compare/v2.0.0...HEAD
-[2.0.0]: https://github.com/KGreen/homebase-devshell/releases/tag/v2.0.0
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.0

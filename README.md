@@ -25,13 +25,13 @@ HomeBase DevShell gives you:
 **Recommended (pinned release):**
 
 ```powershell
-irm https://raw.githubusercontent.com/KGreen/homebase-devshell/v2.0.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
 ```
 
 **From a clone:**
 
 ```powershell
-git clone https://github.com/KGreen/homebase-devshell.git $HOME\.homebase\devshell
+git clone https://github.com/XKush/homebase-devshell.git $HOME\.homebase\devshell
 cd $HOME\.homebase\devshell
 pwsh -File install.ps1
 ```

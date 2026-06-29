@@ -3,13 +3,13 @@
 .SYNOPSIS
     HomeBase DevShell one-line bootstrap installer.
 .EXAMPLE
-    irm https://raw.githubusercontent.com/KGreen/homebase-devshell/v2.0.0/install.ps1 | iex
+    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
 .EXAMPLE
     pwsh -File install.ps1
 #>
 param(
     [string]$InstallPath = (Join-Path $env:USERPROFILE '.homebase\devshell'),
-    [string]$RepoUrl = 'https://github.com/KGreen/homebase-devshell.git',
+    [string]$RepoUrl = 'https://github.com/XKush/homebase-devshell.git',
     [switch]$SkipClone
 )
 
