@@ -3,9 +3,11 @@
 .SYNOPSIS
     HomeBase DevShell one-line bootstrap installer.
 .EXAMPLE
-    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
+    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.1/install.ps1 | iex
 .EXAMPLE
     pwsh -File install.ps1
+.EXAMPLE
+    pwsh -File install.ps1 -WithTools
 .EXAMPLE
     pwsh -File install.ps1 -SkipTools
 #>
@@ -19,7 +21,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$script:DevShellReleaseTag = 'v2.2.0'
+$script:DevShellReleaseTag = 'v2.2.1'
 
 function Test-DevShellRepo {
     param([string]$Path)
@@ -88,7 +90,7 @@ $installTools = if ($PSBoundParameters.ContainsKey('WithTools')) {
 } elseif ($PSBoundParameters.ContainsKey('SkipTools')) {
     -not $SkipTools
 } else {
-    $true
+    $false
 }
 
 Write-Host ''
@@ -141,10 +143,11 @@ Write-Host "Repository: $repoRoot" -ForegroundColor DarkGray
 
 Write-Host ''
 if ($installTools) {
-    Write-Host '==> Bootstrap (folders + profile + tools, user scope)' -ForegroundColor Cyan
+    Write-Host '==> Bootstrap (folders + profile + winget tools, user scope)' -ForegroundColor Cyan
     & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipAdmin -SkipValidation
 } else {
-    Write-Host '==> Bootstrap (folders + profile, user scope)' -ForegroundColor Cyan
+    Write-Host '==> Bootstrap (Core — folders + profile, no winget)' -ForegroundColor Cyan
+    Write-Host '    Optional full tool stack: install.ps1 -WithTools' -ForegroundColor DarkGray
     & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin -SkipValidation
 }
 if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {

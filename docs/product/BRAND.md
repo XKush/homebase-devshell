@@ -25,7 +25,7 @@
 **Install (copy-paste):**
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.1/install.ps1 | iex
 ```
 
 **Daily check:**

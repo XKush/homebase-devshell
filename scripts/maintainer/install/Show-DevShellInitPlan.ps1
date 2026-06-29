@@ -108,13 +108,13 @@ Write-PlanStep 'Post-bootstrap' @(
 )
 
 Write-PlanStep 'You run' @(
-    if ($installTools) {
-        "pwsh -File `"$installScript`""
-    } else {
-        "pwsh -File `"$installScript`" -SkipTools"
-    }
-    '# or from repo:'
-    'devshell install -SkipTools'
+    'Core (default):'
+    "  pwsh -File `"$installScript`""
+    '  devshell install'
+    ''
+    'Full winget stack (optional):'
+    "  pwsh -File `"$installScript`" -WithTools"
+    '  devshell install -WithTools'
     ''
     'Then: close terminal → new window → devready'
 )

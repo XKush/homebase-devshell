@@ -12,14 +12,14 @@
 
 ![DevReady — install, devready, Ready to work](docs/assets/devready-demo.gif)
 
-**Проверьте до запуска:** [`install.ps1` @ v2.2.0](https://github.com/XKush/homebase-devshell/blob/v2.2.0/install.ps1) · `devshell init` (dry-run) · [zip + SHA256](packaging/README.md)
+**Проверьте до запуска:** [`install.ps1` @ v2.2.1](https://github.com/XKush/homebase-devshell/blob/v2.2.1/install.ps1) · `devshell init` (dry-run) · [zip + SHA256](packaging/README.md)
 
 ---
 
 ## Старт за 30 секунд
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.1/install.ps1 | iex
 ```
 
 Закройте терминал. Откройте снова:
@@ -28,13 +28,25 @@ irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1
 devready
 ```
 
-Видите **`Ready to work`**? Можно работать.
+Видите **`Ready to work`**? Можно работать. Иначе — блок **Try this** в выводе, затем снова `devready`.
 
-```powershell
-devshell doctor -Tier Full   # полная проверка (~75 пунктов)
-```
+<details>
+<summary>Три команды (на старте достаточно)</summary>
 
-Язык cockpit: `$env:WORKSTATION_LANG='ru'` (по умолчанию в OSS — `en`).
+| Команда | Когда |
+|---------|--------|
+| **`devready`** | Ежедневная проверка |
+| **`devshell install`** | Первая настройка (Core) |
+| **`devshell doctor`** | То же; `-Tier Full` для полного стека |
+
+</details>
+
+<details>
+<summary>После PASS — command center</summary>
+
+Меню и кокпит: [docs/ru/COMMAND-CENTER.md](docs/ru/COMMAND-CENTER.md) — не обязательны для Core.
+
+</details>
 
 ---
 
@@ -54,10 +66,9 @@ devshell doctor -Tier Full   # полная проверка (~75 пунктов
 
 | Команда | Действие |
 |---------|----------|
-| **`devready`** | Проверка здоровья (Core) |
-| **`devshell install`** | Первая настройка |
-| **`devshell doctor`** | Готов ли я? `-Tier Core` / `Full` |
-| **`devshell status`** | Загрузилась ли платформа? |
+| **`devready`** | Проверка → **Ready to work** или подсказки |
+| **`devshell install`** | Core (профиль, папки); `-WithTools` — winget-стек |
+| **`devshell doctor`** | Как devready; `-Tier Full` — ~75 проверок |
 
 ---
 

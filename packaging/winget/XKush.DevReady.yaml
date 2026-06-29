@@ -1,6 +1,6 @@
 # Created with wingetcreate — submit to microsoft/winget-pkgs
 PackageIdentifier: XKush.DevReady
-PackageVersion: 2.2.0
+PackageVersion: 2.2.1
 PackageLocale: en-US
 Publisher: XKush
 PublisherUrl: https://github.com/XKush
@@ -25,7 +25,7 @@ Installers:
   - Architecture: x64
     InstallerType: zip
     NestedInstallerType: portable
-    InstallerUrl: https://github.com/XKush/homebase-devshell/releases/download/v2.2.0/devready-v2.2.0.zip
+    InstallerUrl: https://github.com/XKush/homebase-devshell/releases/download/v2.2.1/devready-v2.2.1.zip
     InstallerSha256: b7eb7f065140c6b1e12c5a7916b0f25be5b9ca39c4ea873060fdc80a2ec1232a
     NestedInstallerFiles:
       - RelativeFilePath: install.ps1

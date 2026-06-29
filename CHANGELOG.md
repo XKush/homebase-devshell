@@ -12,6 +12,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
+## [2.2.1] - 2026-06-29
+
+**Product clarity P0** — platform spec `1.0.0` LOCKED.
+
+### Changed
+
+- `devready` / doctor end with **Ready to work.** or **Not ready yet.** + up to 3 fix hints
+- Default install is **Core** (no winget); full stack via `-WithTools`
+- README: three commands first; command center after PASS
+- `devshell install` defaults to Core; `-WithTools` for winget stack
+
+---
+
 ## [2.2.0] - 2026-06-29
 
 **Wave 2 — less install friction** — platform spec `1.0.0` LOCKED.
@@ -207,7 +220,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.2.1...HEAD
+[2.2.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.1
 [2.2.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.0
 [2.1.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.1.1
 [2.1.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.1.0

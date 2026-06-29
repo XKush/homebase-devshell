@@ -33,7 +33,7 @@ function Get-DevShellProductVersion {
     param([string]$Root)
     $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
     if (Test-Path $psd1) { return [string](Import-PowerShellDataFile $psd1).ModuleVersion }
-    return '2.2.0'
+    return '2.2.1'
 }
 
 function Show-DevShellHelp {
@@ -43,7 +43,7 @@ DevReady — HomeBase DevShell
 
   devready           Quick health check (same as devshell doctor)
   devshell init      Dry-run — show install plan (no winget, no changes)
-  devshell install   Set up your shell
+  devshell install   Set up your shell (Core; add -WithTools for winget stack)
   devshell doctor    Am I ready? (-Tier Core | Full)
   devshell status    Platform load status
 
@@ -72,10 +72,10 @@ if ($Command -in @('status', 'reload', 'trace', 'version')) {
 
 switch ($Command) {
     'install' {
-        if ($SkipTools) {
-            & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin -SkipValidation
-        } else {
+        if ($WithTools) {
             & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipAdmin -SkipValidation
+        } else {
+            & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin -SkipValidation
         }
         if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }

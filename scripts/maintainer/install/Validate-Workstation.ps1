@@ -54,6 +54,48 @@ function Add-Pass($msg) { $report.Passed.Add($msg); Write-WorkstationLog "PASS: 
 function Add-Fail($msg) { $report.Failed.Add($msg); Write-WorkstationLog "FAIL: $msg" 'ERROR' }
 function Add-Warn($msg) { $report.Warnings.Add($msg); Write-WorkstationLog "WARN: $msg" 'WARN' }
 
+function Get-DevReadyFixHints {
+    param([System.Collections.Generic.List[string]]$Failed)
+
+    $hints = [System.Collections.Generic.List[string]]::new()
+    $seen = @{}
+
+    foreach ($f in $Failed) {
+        $candidates = @(
+            if ($f -match 'git') {
+                'Install Git for Windows (https://git-scm.com/download/win), then run: devshell install'
+            }
+            if ($f -match 'pwsh|PowerShell') {
+                'Install PowerShell 7+ (https://aka.ms/powershell), open a new terminal, run: devshell install'
+            }
+            if ($f -match 'profile|OMP|Windows Terminal|encoding|UTF-8') {
+                'Run: devshell install — then close every terminal and open a new one before devready'
+            }
+            if ($f -match 'command-health|Command center|module missing|WOC module') {
+                'Run: devshell install — if it persists, see docs/TROUBLESHOOTING.md'
+            }
+            if ($f -match 'Tool missing') {
+                'Core needs pwsh + git only. For optional tools: devshell install -WithTools or devshell doctor -Tier Full'
+            }
+            if ($f -match 'Directory missing') {
+                'Run: devshell install — creates standard folders from Config'
+            }
+        ) | Where-Object { $_ }
+
+        foreach ($h in $candidates) {
+            if (-not $seen.ContainsKey($h) -and $hints.Count -lt 3) {
+                $seen[$h] = $true
+                $hints.Add($h)
+            }
+        }
+    }
+
+    if ($hints.Count -eq 0 -and $Failed.Count -gt 0) {
+        $hints.Add('Run: devshell install — then devready again. See docs/TROUBLESHOOTING.md')
+    }
+    return $hints
+}
+
 Write-WorkstationStep 'Validation — baseline metrics'
 
 # Refresh PATH from registry for accurate tool detection
@@ -500,6 +542,18 @@ if ($report.Failed.Count -gt 0) {
 if ($report.Warnings.Count -gt 0) {
     Write-Host "`nWarnings:" -ForegroundColor Yellow
     $report.Warnings | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
+}
+
+Write-Host ''
+if ($report.Failed.Count -eq 0) {
+    Write-Host 'Ready to work.' -ForegroundColor Green
+} else {
+    Write-Host 'Not ready yet.' -ForegroundColor Red
+    $hints = Get-DevReadyFixHints -Failed $report.Failed
+    if ($hints.Count -gt 0) {
+        Write-Host 'Try this:' -ForegroundColor Yellow
+        $hints | ForEach-Object { Write-Host "  → $_" -ForegroundColor DarkGray }
+    }
 }
 
 $exitCode = if ($report.Failed.Count -eq 0) { 0 } else { 1 }

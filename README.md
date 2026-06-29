@@ -14,14 +14,14 @@ Powered by **HomeBase DevShell** — a local health check for PowerShell 7 on Wi
 
 ![DevReady — install, run devready, see Ready to work](docs/assets/devready-demo.gif)
 
-**Inspect before run:** [`install.ps1` @ v2.2.0](https://github.com/XKush/homebase-devshell/blob/v2.2.0/install.ps1) · `devshell init` (dry-run, no changes) · [zip + SHA256](packaging/README.md)
+**Inspect before run:** [`install.ps1` @ v2.2.1](https://github.com/XKush/homebase-devshell/blob/v2.2.1/install.ps1) · `devshell init` (dry-run, no changes) · [zip + SHA256](packaging/README.md)
 
 ---
 
 ## 30-second start
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.1/install.ps1 | iex
 ```
 
 Close the terminal. Open a new one. Run:
@@ -30,18 +30,37 @@ Close the terminal. Open a new one. Run:
 devready
 ```
 
-See **`Ready to work`**? Start coding. Anything else — fix what it shows, run again.
+See **`Ready to work`**? Start coding. Anything else — fix the **Try this** hints, run again.
 
 <details>
-<summary>Prefer the full CLI name?</summary>
+<summary>Three commands (all you need at first)</summary>
+
+| Command | When |
+|---------|------|
+| **`devready`** | Daily check — am I ready? |
+| **`devshell install`** | First-time setup (Core: profile + folders) |
+| **`devshell doctor`** | Same as devready; `-Tier Full` for power users |
+
+</details>
+
+<details>
+<summary>More commands (optional)</summary>
 
 ```powershell
 devshell init          # dry-run plan (no winget, no file changes)
-devshell doctor          # same check (Core tier)
-devshell doctor -Tier Full   # all tools + security audits
-devshell install
+devshell doctor -Tier Full   # all tools + security audits (~75 checks)
+devshell install -WithTools    # winget stack (oh-my-posh, fzf, …)
 devshell status
 ```
+
+</details>
+
+<details>
+<summary>After PASS — command center (power users)</summary>
+
+Menus, cockpit, and 100+ helpers: [Command center (EN)](docs/en/COMMAND-CENTER.md) · [RU](docs/ru/COMMAND-CENTER.md)
+
+Not required for Core DevReady.
 
 </details>
 
@@ -61,14 +80,15 @@ Everything runs **on your PC only**. Nothing is uploaded.
 
 ## What you get
 
-### Public surface (what strangers need)
+**Level 0 — DevReady (start here)**
 
 | Command | What it does |
 |---------|----------------|
-| **`devready`** | Shortcut → health check (Core tier) |
-| **`devshell install`** | First-time bootstrap (profile + optional tools) |
-| **`devshell doctor`** | Am I ready? `-Tier Core` or `-Tier Full` |
-| **`devshell status`** | Did the platform load? |
+| **`devready`** | Core health check → **Ready to work** or fix hints |
+| **`devshell install`** | Core bootstrap (profile, folders) — add `-WithTools` for winget stack |
+| **`devshell doctor`** | Same check; `-Tier Full` when you installed the full stack |
+
+Command center (`home`, `go`, menus) lives in [docs](docs/en/COMMAND-CENTER.md) — **after** you pass Core.
 
 ### Doctor tiers
 
