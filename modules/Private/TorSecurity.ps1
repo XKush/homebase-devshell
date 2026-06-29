@@ -29,7 +29,7 @@ function tor-setup {
     Invoke-WorkstationCmd 'tor-setup' {
         $args = @{}
         if ($Force) { $args.Force = $true }
-        & (Join-Path $script:WSRoot 'Install-TorBrowser.ps1') @args
+        & (Join-Path $script:WSRoot 'scripts\maintainer\install\Install-TorBrowser.ps1') @args
     }
 }
 
@@ -39,7 +39,7 @@ function tor-harden {
     Invoke-WorkstationCmd 'tor-harden' {
         $args = @{}
         if ($Lock) { $args.LockSwitch = $true }
-        & (Join-Path $script:WSRoot 'Configure-TorSecurity.ps1') @args
+        & (Join-Path $script:WSRoot 'scripts\maintainer\configure\Configure-TorSecurity.ps1') @args
     }
 }
 
@@ -93,7 +93,7 @@ function tor-lock {
             )
             return
         }
-        & (Join-Path $script:WSRoot 'Configure-TorSecurity.ps1') -LockSwitch -SkipInstall
+        & (Join-Path $script:WSRoot 'scripts\maintainer\configure\Configure-TorSecurity.ps1') -LockSwitch -SkipInstall
     }
 }
 
@@ -111,7 +111,7 @@ function tor-unlock {
             )
             return
         }
-        & (Join-Path $script:WSRoot 'Configure-TorSecurity.ps1') -UnlockSwitch
+        & (Join-Path $script:WSRoot 'scripts\maintainer\configure\Configure-TorSecurity.ps1') -UnlockSwitch
     }
 }
 
@@ -122,5 +122,17 @@ function tor-help {
         Write-HackerLine 'полная шпаргалка → sec-help  ·  меню → sec' -Color DarkGray
         if (Get-Command Show-SecurityHelpRu -ErrorAction SilentlyContinue) { Show-SecurityHelpRu }
         else { Show-TorHelpRu }
+    }
+}
+
+function tor-browser {
+    param([switch]$Help)
+    if (Test-ShowCommandHelp -Name 'tor-browser' -Help:$Help) { return }
+    Invoke-WorkstationCmd 'tor-browser' {
+        if (Get-Command Start-TorBrowserSession -ErrorAction SilentlyContinue) {
+            Start-TorBrowserSession | Out-Null
+        } else {
+            throw 'Start-TorBrowserSession not available — check lib/AnonymityKit.ps1'
+        }
     }
 }

@@ -230,6 +230,12 @@ function privacy {
     sec @PSBoundParameters
 }
 
+function anon {
+    param([switch]$Help)
+    if (Test-ShowCommandHelp -Name 'anon' -Help:$Help) { return }
+    Invoke-WorkstationCmd 'anon' { Invoke-WorkstationNavHub -Start 'sec' }
+}
+
 function sec-help {
     param([switch]$Help)
     if (Test-ShowCommandHelp -Name 'sec-help' -Help:$Help) { return }

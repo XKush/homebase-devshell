@@ -28,9 +28,9 @@ modules/Shell.ps1.tmp
 Test-MenuAudit.ps1
 Test-MenuDeepAudit.ps1
 Test-AnonymityKitAudit.ps1
-lib/AnonymityKit.ps1
-lib/Invoke-MenuPreview.ps1
-modules/Private/MenuSystem.ps1
+
+# Optional local theme experiments
+terminal/homebase-clean.omp.json
 
 # Generated audit copies (if synced into repo by mistake)
 audit-*.json
