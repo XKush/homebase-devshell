@@ -1,5 +1,6 @@
 # Logs and runtime artifacts
 dist/
+testResults.xml
 *.log
 Thumbs.db
 Desktop.ini

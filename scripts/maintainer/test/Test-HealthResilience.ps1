@@ -4,16 +4,14 @@
     Resilience checks for health baseline/history (corrupt JSON, missing files).
 #>
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
-$Root = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+. (Join-Path $PSScriptRoot '_Test-Common.ps1')
+$Root = Get-TestWorkstationRoot -Start $PSScriptRoot
 . (Join-Path $Root 'lib\WorkstationCommon.ps1')
 . (Join-Path $Root 'lib\DevShellHealth.ps1')
 
 Write-Host 'Health resilience smoke' -ForegroundColor Cyan
 
-$product = '3.0.0'
-$psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
-if (Test-Path $psd1) { $product = [string](Import-PowerShellDataFile $psd1).ModuleVersion }
+$product = Get-TestProductVersion -Root $Root
 
 $report = [PSCustomObject]@{
     timestamp       = (Get-Date).ToString('o')

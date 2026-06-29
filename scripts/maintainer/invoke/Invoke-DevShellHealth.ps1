@@ -25,9 +25,9 @@ $repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
 $product = Get-DevShellProductVersionFromRoot -RepoRoot $repoRoot
 $report = Get-DevShellHealthReport -RepoRoot $repoRoot -Tier $Tier -ProductVersion $product -SectionFilter $SectionFilter
 
-$paths = Get-DevShellHealthPaths -RepoRoot $repoRoot
 if (-not $SkipHistory) {
-    Save-DevShellHealthHistory -Report $report -HistoryPath $paths.History
+    $historyPath = (Get-DevShellHealthPaths -RepoRoot $repoRoot).History
+    Save-DevShellHealthHistory -Report $report -HistoryPath $historyPath
 }
 
 if ($Json) {
@@ -37,8 +37,11 @@ if ($Json) {
 }
 
 if ($Export -eq 'html') {
-    $out = if ($OutFile) { $OutFile } else {
-        Join-Path (Get-WorkstationLogsRoot) ("health-{0}.html" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
+    $out = if ($OutFile) {
+        $OutFile
+    } else {
+        $logs = Get-DevShellHealthLogsRoot -RepoRoot $repoRoot
+        Join-Path $logs ("health-{0}.html" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
     }
     Export-DevShellHealthHtml -Report $report -OutPath $out
 }

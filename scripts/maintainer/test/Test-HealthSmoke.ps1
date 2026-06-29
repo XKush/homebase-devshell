@@ -4,19 +4,12 @@
     CI smoke for devshell health — validates JSON contract on any runner state.
 #>
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
-$Root = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+. (Join-Path $PSScriptRoot '_Test-Common.ps1')
+$Root = Get-TestWorkstationRoot -Start $PSScriptRoot
 
 Write-Host 'Health smoke' -ForegroundColor Cyan
 
-$out = pwsh -NoProfile -File (Join-Path $Root 'devshell.ps1') health -Json 2>&1 | Out-String
-if ($out -notmatch 'healthSchemaVersion') { throw 'health -Json missing healthSchemaVersion' }
-
-try {
-    $doc = $out.Trim() | ConvertFrom-Json
-} catch {
-    throw "health -Json invalid JSON: $_"
-}
+$doc = Invoke-TestHealthJson -Root $Root -SkipHistory
 
 if (-not $doc.healthSchemaVersion) { throw 'health JSON missing healthSchemaVersion field' }
 if (-not $doc.sections.developer) { throw 'health JSON missing sections.developer' }

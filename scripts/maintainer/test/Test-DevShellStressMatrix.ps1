@@ -6,8 +6,8 @@
     Safe CI matrix for missing/corrupt paths. Does not modify user profile or ~/.homebase.
 #>
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
-$Root = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+. (Join-Path $PSScriptRoot '_Test-Common.ps1')
+$Root = Get-TestWorkstationRoot -Start $PSScriptRoot
 . (Join-Path $Root 'lib\WorkstationCommon.ps1')
 . (Join-Path $Root 'lib\DevShellHealth.ps1')
 . (Join-Path $Root 'lib\PrivacyAudit.ps1')
@@ -27,11 +27,7 @@ function Assert-Stress {
 
 Write-Host 'DevShell stress matrix (offline)' -ForegroundColor Cyan
 
-$product = '3.0.1'
-$psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
-if (Test-Path -LiteralPath $psd1) {
-    $product = [string](Import-PowerShellDataFile -Path $psd1).ModuleVersion
-}
+$product = Get-TestProductVersion -Root $Root
 
 $sampleReport = [PSCustomObject]@{
     timestamp     = (Get-Date).ToString('o')
@@ -99,8 +95,7 @@ if (`$diff.noBaseline) { @{ error = 'no_baseline'; message = 'Run: devshell base
 
 Assert-Stress 'health -Sections developer only' {
     $env:HOMEBASE_DEVSHELL_ROOT = $Root
-    $out = pwsh -NoProfile -File (Join-Path $Root 'devshell.ps1') health -Json -Sections developer 2>&1 | Out-String
-    $doc = $out.Trim() | ConvertFrom-Json
+    $doc = Invoke-TestHealthJson -Root $Root -SectionFilter @('developer') -SkipHistory
     if (-not $doc.sections.developer) { throw 'missing developer section' }
     if ($doc.sections.privacyConfiguration) { throw 'privacy should be omitted' }
     if ($doc.sectionsRequested -notcontains 'developer') { throw 'sectionsRequested missing developer' }

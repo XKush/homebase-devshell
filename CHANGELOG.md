@@ -17,9 +17,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 - **PSScriptAnalyzer** CI gate (`.PSScriptAnalyzerSettings.psd1`)
 - **`Measure-DevShellHealthProfile.ps1`** — maintainer timing helper
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the stabilization contract.
+### Changed
 
----
+- **`lib/DevShellHealth.ps1`** — modular refactor: shared paths, safer history/baseline, `-Sections` filter, deduped privacy docs
+- **CI smoke** — `-SkipHistory` for faster health contract checks; shared `_Test-Common.ps1`
+
 
 ## [3.0.1] - 2026-06-28
 
