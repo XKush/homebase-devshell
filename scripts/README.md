@@ -47,12 +47,17 @@ PATH shims: `devready.cmd` (doctor Core) · `devshell.cmd` (full CLI)
 | Script | CI job | Purpose |
 |--------|--------|---------|
 | `Test-ReleaseVersion.ps1` | release-version | psd1 + install pin + CHANGELOG + tag |
+| `Test-HealthSmoke.ps1` | health-smoke | `health -Json` contract |
+| `Test-DoctorSmoke.ps1` | doctor-smoke | `doctor` Core JSON |
+| `Test-PrivacyAuditSmoke.ps1` | privacy-smoke | Privacy audits + doctor `-Privacy` |
 | `Test-WorkstationCommands.ps1` | command-health | 72 commands + command-health.json |
 | `Test-WorkstationPlatformHardening.ps1` | platform-hardening | Platform spec scenarios |
 | `Test-HomeBasePaths.ps1` | manual | Path SSOT |
 | `Test-LegacyEquivalence.ps1` | Phase 2 | Baseline diff |
 
 Root audits: `Test-MenuAudit.ps1` · `Test-MenuDeepAudit.ps1` · `Test-AnonymityKitAudit.ps1`
+
+**Before tagging:** [docs/RELEASE-CRITERIA.md](../docs/RELEASE-CRITERIA.md)
 
 ---
 

@@ -18,6 +18,8 @@ Questions like “should I use `health` or `doctor`?” belong in **Discussions*
 2. Keep changes focused — one problem per PR  
 3. Do **not** change the locked platform execution stack without maintainer sign-off (see `internal-docs/charter/PLATFORM-SPEC-SIGNOFF.md`)
 4. JSON / CLI changes: read [API-STABILITY.md](docs/API-STABILITY.md) and [JSON-SCHEMA.md](docs/JSON-SCHEMA.md)
+5. New features: check [MANIFESTO.md](docs/MANIFESTO.md) and [PROJECT-PRINCIPLES.md](docs/PROJECT-PRINCIPLES.md) first
+6. Maintainers cutting a release: [RELEASE-CRITERIA.md](docs/RELEASE-CRITERIA.md)
 
 Script layout: [`scripts/README.md`](scripts/README.md) · [Repository surface](docs/product/REPOSITORY-SURFACE.md)
 
@@ -40,4 +42,4 @@ Include: Windows version, PowerShell version (`$PSVersionTable`), `devshell heal
 
 We are **not** adding new public CLI commands in v3.0.x. Focus: bugfix, docs, tests, feedback. Feature ideas → Discussions first.
 
-Contract: [ROADMAP.md](docs/ROADMAP.md) · Principles: [PROJECT-PRINCIPLES.md](docs/PROJECT-PRINCIPLES.md) · [MANIFESTO.md](docs/MANIFESTO.md)
+Contract: [ROADMAP.md](docs/ROADMAP.md) · Principles: [PROJECT-PRINCIPLES.md](docs/PROJECT-PRINCIPLES.md) · [MANIFESTO.md](docs/MANIFESTO.md) · Releases: [RELEASE-CRITERIA.md](docs/RELEASE-CRITERIA.md)

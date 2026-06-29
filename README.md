@@ -143,6 +143,7 @@ Full layout: [docs/product/REPOSITORY-SURFACE.md](docs/product/REPOSITORY-SURFAC
 | [Roadmap](docs/ROADMAP.md) | v3.x contract — what we ship and what we defer |
 | [Project principles](docs/PROJECT-PRINCIPLES.md) | Engineering guardrails |
 | [Manifesto](docs/MANIFESTO.md) | Why we exist · what we never do |
+| [Release criteria](docs/RELEASE-CRITERIA.md) | Pre-tag checklist for maintainers |
 | [Troubleshooting](docs/TROUBLESHOOTING.md) | When doctor fails |
 | [Privacy](docs/PRIVACY.md) | Privacy configuration module |
 | [API stability](docs/API-STABILITY.md) | Frozen CLI contract (v3+) |

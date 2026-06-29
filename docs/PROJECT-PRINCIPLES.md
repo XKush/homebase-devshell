@@ -30,4 +30,13 @@ Engineering guardrails for contributors and future maintainers. When in doubt, p
 
 ---
 
-Related: [MANIFESTO.md](MANIFESTO.md) (why we exist) · [ROADMAP.md](ROADMAP.md) (what we ship when) · [adr/](adr/)
+## Using these documents
+
+| Before you… | Read |
+|-------------|------|
+| Propose a feature | [MANIFESTO](MANIFESTO.md) · [ROADMAP](ROADMAP.md) |
+| Change JSON output | [JSON-SCHEMA](JSON-SCHEMA.md) |
+| Change architecture | New [ADR](adr/) |
+| Cut a release | [RELEASE-CRITERIA](RELEASE-CRITERIA.md) |
+
+Related: [MANIFESTO.md](MANIFESTO.md) · [ROADMAP.md](ROADMAP.md) · [adr/](adr/)
