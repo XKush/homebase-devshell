@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    HomeBase DevShell — prepares, verifies and maintains professional Windows workstations.
+    HomeBase DevShell — DevReady product CLI. Prepares, verifies and maintains professional Windows workstations.
 #>
 [CmdletBinding()]
 param(
@@ -44,15 +44,15 @@ function Get-DevShellRepoRoot {
 
 function Get-DevShellProductVersion {
     param([string]$Root)
-    $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
-    if (Test-Path $psd1) { return [string](Import-PowerShellDataFile $psd1).ModuleVersion }
-    return '3.0.0'
+    . (Join-Path $Root 'lib\DevShellProduct.ps1')
+    return Get-DevShellProductVersionFromRoot -RepoRoot $Root
 }
 
 function Show-DevShellHelp {
     Write-Host @'
 
-HomeBase DevShell — workstation readiness & privacy auditing
+DevReady — HomeBase DevShell
+Workstation readiness and privacy auditing for Windows + PowerShell 7
 
   devshell health      Unified dashboard (developer + privacy + browser + network)
   devshell health -Json          Machine-readable report

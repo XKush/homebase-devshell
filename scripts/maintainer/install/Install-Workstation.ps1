@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    Master orchestrator — ReviOS professional workstation setup.
+    Master orchestrator — DevReady / HomeBase DevShell workstation setup.
 .NOTES
     Microsoft Defender AV is NEVER enabled, installed, or reactivated by this suite.
 #>

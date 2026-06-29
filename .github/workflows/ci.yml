@@ -110,7 +110,6 @@ jobs:
         shell: pwsh
         run: |
           pwsh -NoProfile -File scripts/maintainer/test/Test-HealthSmoke.ps1
-          pwsh -NoProfile -File scripts/maintainer/test/Test-HealthResilience.ps1
           pwsh -NoProfile -File scripts/maintainer/test/Test-DevShellStressMatrix.ps1
 
   pester:

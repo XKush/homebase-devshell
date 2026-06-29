@@ -12,7 +12,7 @@ Each [GitHub Release](https://github.com/XKush/homebase-devshell/releases) ships
 | `devready-vX.Y.Z.sha256.txt` | Lowercase SHA256 of the zip |
 
 ```powershell
-$tag = 'v3.0.0'
+$tag = 'v3.0.1'
 $zip = "$env:TEMP\devready-$tag.zip"
 Invoke-WebRequest "https://github.com/XKush/homebase-devshell/releases/download/$tag/devready-$tag.zip" -OutFile $zip
 $expected = (Invoke-WebRequest "https://github.com/XKush/homebase-devshell/releases/download/$tag/devready-$tag.sha256.txt" -UseBasicParsing).Content.Trim()

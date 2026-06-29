@@ -9,11 +9,8 @@ function Get-TestWorkstationRoot {
 
 function Get-TestProductVersion {
     param([Parameter(Mandatory)][string]$Root)
-    $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
-    if (Test-Path -LiteralPath $psd1) {
-        return [string](Import-PowerShellDataFile -Path $psd1).ModuleVersion
-    }
-    return '3.0.1'
+    . (Join-Path $Root 'lib\DevShellProduct.ps1')
+    return Get-DevShellProductVersionFromRoot -RepoRoot $Root
 }
 
 function Invoke-TestHealthJson {

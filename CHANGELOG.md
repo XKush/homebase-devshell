@@ -21,6 +21,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 - **`lib/DevShellHealth.ps1`** — modular refactor: shared paths, safer history/baseline, `-Sections` filter, deduped privacy docs
 - **CI smoke** — `-SkipHistory` for faster health contract checks; shared `_Test-Common.ps1`
+- **Branding & hygiene** — `VERSION` file, `lib/DevShellProduct.ps1` SSOT, packaging pins `3.0.1`, removed redundant `Test-HealthResilience.ps1`
 
 
 ## [3.0.1] - 2026-06-28
