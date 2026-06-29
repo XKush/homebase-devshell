@@ -57,4 +57,4 @@ Ideas → [Discussions](https://github.com/XKush/homebase-devshell/discussions) 
 2. **Discussions & Issues** — recurring pain, not one-off requests
 3. **Maintainer capacity** — reliability over feature count
 
-**Maturity signals (v3.x):** merged external PRs · constructive Discussions → doc/test changes · stable CI across releases · no surprise API breaks. Details: [RELEASE-CRITERIA.md](RELEASE-CRITERIA.md#maturity-goals-not-version-numbers). · Releases: [RELEASE-CRITERIA.md](RELEASE-CRITERIA.md)
+**Maturity signals (v3.x):** merged external PRs · constructive Discussions → doc/test changes · stable CI across releases · no surprise API breaks. See [RELEASE-CRITERIA.md](RELEASE-CRITERIA.md).
