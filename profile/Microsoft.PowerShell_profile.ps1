@@ -32,7 +32,10 @@ $script:WSRoot = Resolve-WorkstationRepositoryRoot
 # ── B-layer orchestrator (single runtime entrypoint for C1→C5) ────────────────
 . (Join-Path $script:WSRoot 'lib\WorkstationOrchestrator.ps1')
 
-# ── B-layer command router (static dispatch — no bootstrap / repair) ──────────
+# ── B-layer command registry (declarative definitions — no execution) ──────────
+. (Join-Path $script:WSRoot 'lib\WorkstationCommandRegistry.ps1')
+
+# ── B-layer command router (dispatch only — reads registry) ───────────────────
 . (Join-Path $script:WSRoot 'lib\WorkstationCommandRouter.ps1')
 
 $script:IsInteractive = [Environment]::UserInteractive -and -not $env:CI -and $Host.Name -ne 'ServerRemoteHost'
