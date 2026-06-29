@@ -136,15 +136,22 @@ jobs:
         run: |
           $errors = [System.Collections.Generic.List[object]]::new()
           foreach ($p in @('lib', 'scripts/maintainer/invoke', 'scripts/maintainer/test')) {
-            $errors.AddRange([object[]](Invoke-ScriptAnalyzer -Path $p -Recurse -Settings .PSScriptAnalyzerSettings.psd1 -Severity Error))
+            $found = Invoke-ScriptAnalyzer -Path $p -Recurse -Settings .PSScriptAnalyzerSettings.psd1 -Severity Error
+            if ($null -ne $found) {
+              foreach ($item in @($found)) { [void]$errors.Add($item) }
+            }
           }
           foreach ($f in @('devshell.ps1', 'install.ps1')) {
-            $errors.AddRange([object[]](Invoke-ScriptAnalyzer -Path $f -Settings .PSScriptAnalyzerSettings.psd1 -Severity Error))
+            $found = Invoke-ScriptAnalyzer -Path $f -Settings .PSScriptAnalyzerSettings.psd1 -Severity Error
+            if ($null -ne $found) {
+              foreach ($item in @($found)) { [void]$errors.Add($item) }
+            }
           }
           if ($errors.Count -gt 0) {
             $errors | Format-Table RuleName, ScriptName, Line, Message -AutoSize
             throw "PSScriptAnalyzer errors: $($errors.Count)"
           }
+          Write-Host "PSScriptAnalyzer: 0 errors" -ForegroundColor Green
 
   release-assets:
     if: startsWith(github.ref, 'refs/tags/v')

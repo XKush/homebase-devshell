@@ -52,6 +52,10 @@ If you discover a security issue in **HomeBase DevShell** / DevReady:
 - Run `backupconfig` before destructive module operations.
 - Use `-WhatIf` on `cleanup` where supported.
 
+## Static analysis
+
+GitHub **CodeQL does not support PowerShell** ([tracking issue](https://github.com/github/codeql/issues/17927)). CI uses **PSScriptAnalyzer** (`script-analysis` job) plus smoke tests instead.
+
 ## Related documentation
 
 - [MANIFESTO](docs/MANIFESTO.md) — trust boundaries
