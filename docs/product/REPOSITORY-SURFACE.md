@@ -1,71 +1,83 @@
 # Repository surface — what GitHub visitors see
 
-**HomeBase DevShell** is intentionally minimal on the repository root.
+**DevReady** is the public name. **HomeBase DevShell** is the product engine behind `install.ps1` and `devshell.ps1`.
 
 ---
 
-## Public product (this is the whole story)
+## Root — product face
 
-| Root file | Purpose |
-|-----------|---------|
-| **`README.md`** | Install → doctor → Ready to work |
-| **`install.ps1`** | One-line bootstrap |
-| **`devshell.ps1`** | Three commands: `install` · `doctor` · `status` |
-| **`CHANGELOG.md`** | Release history (single source of truth) |
-| **`LICENSE`** | MIT |
+| File | Label | Purpose |
+|------|-------|---------|
+| **`README.md`** | DevReady hero | Install → `devready` → Ready to work |
+| **`README.ru.md`** | DevReady (RU) | Russian mirror |
+| **`install.ps1`** | Bootstrap | `irm … \| iex` one-liner |
+| **`devshell.ps1`** | Product CLI | `install` · `doctor` · `status` |
+| **`CHANGELOG.md`** | Release log | Semver product history |
+| **`LICENSE`** | MIT | |
+| **`CONTRIBUTING.md`** | Contributors | |
+| **`SECURITY.md`** | Security | |
 
-Also: `README.ru.md`, `SECURITY.md`, `CONTRIBUTING.md` — support, not hero.
+PATH shims (after install): **`devready.cmd`** · **`devshell.cmd`** in `%LOCALAPPDATA%\Microsoft\WindowsApps`
 
 ---
 
-## User commands (only three)
+## Root — CI audit gates
+
+| File | Purpose |
+|------|---------|
+| `Test-MenuAudit.ps1` | `go` menu registry integrity |
+| `Test-MenuDeepAudit.ps1` | Menu + command self-checks |
+| `Test-AnonymityKitAudit.ps1` | Tor/PGP kit wiring (opt-in) |
+
+Not for end users — run via `doctor -Tier Full` or GitHub Actions.
+
+---
+
+## User commands
 
 ```powershell
+devready                    # → devshell doctor (Core)
 devshell install
-devshell doctor
+devshell doctor [-Tier Full]
 devshell status
 ```
 
-Everything else lives under **`scripts/maintainer/`** — not at the repository root.
+---
+
+## Directory tree (labeled)
+
+```
+├── docs/                 User guides + BRAND.md
+├── examples/minimal/     Fork without security pack
+├── Config/               homebase.defaults.json (paths SSOT)
+├── profile/              Canonical pwsh profile
+├── modules/              KGreen.Workstation — command center
+├── lib/                  Platform runtime (spec 1.0.0 LOCKED)
+├── terminal/             OMP themes, WT template
+│
+├── scripts/maintainer/
+│   ├── install/          Install-Workstation, Validate-Workstation, …
+│   ├── invoke/           Batch audits, revision, CI helpers
+│   ├── configure/        Privacy, PATH, fonts (admin optional)
+│   ├── test/             Release gates, command-health
+│   └── phase2/           Migration tooling (maintainers)
+│
+└── internal-docs/        Charter, ADR — not marketed
+```
 
 ---
 
-## Where maintainer scripts live
+## Audience matrix
 
-| Subfolder | Examples |
-|-----------|----------|
-| `scripts/maintainer/install/` | `Install-Workstation.ps1`, `Validate-Workstation.ps1`, install chain |
-| `scripts/maintainer/invoke/` | `Invoke-Maintenance.ps1`, audits, organization |
-| `scripts/maintainer/configure/` | `Configure-Privacy.ps1`, `Fix-WorkstationPath.ps1` |
-| `scripts/maintainer/test/` | `Test-WorkstationPlatformHardening.ps1`, release gates |
-| `scripts/maintainer/phase2/` | Phase 2 migration tooling |
-
-`install.ps1` and `devshell.ps1` call `scripts/maintainer/install/` directly. There are **no root shims** in the OSS surface.
-
----
-
-## Where things live
-
-| Path | Audience |
-|------|----------|
-| `docs/` | First-time users (getting started, troubleshooting) |
-| `scripts/maintainer/` | Maintainer scripts (invoke, configure, test, phase2) |
-| `internal-docs/` | Platform lock, baselines, release engineering |
-| `lib/`, `modules/`, `profile/` | Shipped runtime (not marketed as a framework) |
-
----
-
-## What we do **not** expect strangers to run
-
-- `Invoke-*` batch audits and maintenance passes  
-- `Configure-*` privacy/Tor/PGP (optional, module-driven)  
-- `Test-*` except indirectly via release CI / hardening gate  
-- Phase 2 migration tooling under `scripts/maintainer/phase2/`  
-
-If you only want a working dev shell: **use the README install line and `devshell doctor`.**
+| Path | Who |
+|------|-----|
+| Root README + `docs/` | First-time users |
+| `modules/` + `lib/` | Shipped runtime (don't market as framework) |
+| `scripts/maintainer/` | Maintainers & CI |
+| `internal-docs/` | Serious contributors, release engineering |
 
 ---
 
 ## Platform note
 
-Execution architecture is locked at spec **v1.0.0**. Product docs do not expose internal dispatch design. See `internal-docs/` for maintainers.
+Execution architecture locked at **spec v1.0.0**. Product polish (docs, brand, install UX, CI) is welcome without touching the orchestrator contract.

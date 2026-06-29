@@ -3,7 +3,7 @@
 .SYNOPSIS
     HomeBase DevShell one-line bootstrap installer.
 .EXAMPLE
-    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.6/install.ps1 | iex
+    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.0/install.ps1 | iex
 .EXAMPLE
     pwsh -File install.ps1
 .EXAMPLE
@@ -19,7 +19,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$script:DevShellReleaseTag = 'v2.0.6'
+$script:DevShellReleaseTag = 'v2.1.0'
 
 function Test-DevShellRepo {
     param([string]$Path)
@@ -64,12 +64,17 @@ function Install-DevShellPathShim {
     if (-not (Test-Path $shimDir)) {
         New-Item -ItemType Directory -Force -Path $shimDir | Out-Null
     }
-    $shimPath = Join-Path $shimDir 'devshell.cmd'
     $devshellPs1 = Join-Path $RepoRoot 'devshell.ps1'
+
     @"
 @echo off
 pwsh -NoLogo -File "$devshellPs1" %*
-"@ | Set-Content -Path $shimPath -Encoding ASCII
+"@ | Set-Content -Path (Join-Path $shimDir 'devshell.cmd') -Encoding ASCII
+
+    @"
+@echo off
+pwsh -NoLogo -File "$devshellPs1" doctor %*
+"@ | Set-Content -Path (Join-Path $shimDir 'devready.cmd') -Encoding ASCII
 
     $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
     if ($userPath -notlike "*$shimDir*") {
@@ -87,8 +92,9 @@ $installTools = if ($PSBoundParameters.ContainsKey('WithTools')) {
 }
 
 Write-Host ''
-Write-Host 'HomeBase DevShell — install' -ForegroundColor Cyan
-Write-Host 'Install. Check. Done.' -ForegroundColor DarkGray
+Write-Host 'DevReady' -ForegroundColor Cyan
+Write-Host 'HomeBase DevShell — install' -ForegroundColor DarkGray
+Write-Host 'Install. Run devready. Done.' -ForegroundColor DarkGray
 Write-Host ''
 
 if ($PSVersionTable.PSVersion.Major -lt 7) {
@@ -170,7 +176,7 @@ Write-Host ''
 if ($doctorExit -eq 0) {
     Write-Host 'Ready to work.' -ForegroundColor Green
     Write-Host ''
-    Write-Host 'Next: close this terminal, open a new one, and run: devshell doctor' -ForegroundColor DarkGray
+    Write-Host 'Next: close this terminal, open a new one, and run: devready' -ForegroundColor DarkGray
     Write-Host 'Full validation (all tools): devshell doctor -Tier Full' -ForegroundColor DarkGray
     exit 0
 }

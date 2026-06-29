@@ -1,116 +1,78 @@
-# Scripts index
+# Scripts catalog
 
-**HomeBase DevShell** ships most scripts at the **repository root** so install paths stay stable (`$PSScriptRoot`).
+Runtime scripts for **HomeBase DevShell** (public name: **DevReady**).
 
-This folder is a **catalog only** — not the runtime location (Phase 2 may move files here with root shims).
-
----
-
-## Product (user-facing)
-
-| Script | Purpose |
-|--------|---------|
-| [`install.ps1`](../install.ps1) | One-line bootstrap |
-| [`devshell.ps1`](../devshell.ps1) | `install` · `doctor` · `status` |
+**End users:** only [`install.ps1`](../install.ps1) and [`devshell.ps1`](../devshell.ps1) at the repository root — or `devready` / `devshell` on PATH after install.
 
 ---
 
-## Install chain (called by product install)
+## Product surface (root)
 
-| Script | Purpose |
-|--------|---------|
-| [`Install-Workstation.ps1`](../Install-Workstation.ps1) | Master setup orchestrator |
-| [`Install-ShellProfile.ps1`](../Install-ShellProfile.ps1) | Deploy PowerShell profile |
-| [`Validate-Workstation.ps1`](../Validate-Workstation.ps1) | Health gate (`devshell doctor`) |
-| [`Backup-Configuration.ps1`](../Backup-Configuration.ps1) | Pre-change backup |
-| [`Fix-WorkstationPath.ps1`](../Fix-WorkstationPath.ps1) | PATH repair |
-| [`Configure-GitIdentity.ps1`](../Configure-GitIdentity.ps1) | Git defaults |
+| Script | Command | Purpose |
+|--------|---------|---------|
+| [`install.ps1`](../install.ps1) | `irm … \| iex` | Clone, bootstrap, optional winget tools |
+| [`devshell.ps1`](../devshell.ps1) | `devshell …` | `install` · `doctor` · `status` |
+
+PATH shims: `devready.cmd` (doctor Core) · `devshell.cmd` (full CLI)
 
 ---
 
-## Admin / full install (skipped by default product install)
+## Install chain — `scripts/maintainer/install/`
 
-| Script | Purpose |
-|--------|---------|
-| `Optimize-Performance.ps1` | Performance tuning (elevated) |
-| `Configure-Privacy.ps1` | Privacy / DNS |
-| `Harden-Security.ps1` | Security hardening |
-| `Configure-Network.ps1` | Network setup |
-| `Install-Software.ps1` | Optional software stack |
+| Script | Called by | Purpose |
+|--------|-----------|---------|
+| `Install-Workstation.ps1` | install / devshell install | Master orchestrator |
+| `Install-ShellProfile.ps1` | Install-Workstation | Deploy profile |
+| `Install-Software.ps1` | Install-Workstation (unless `-SkipSoftware`) | winget stack |
+| `Validate-Workstation.ps1` | devshell doctor | Health gate `-Tier Core\|Full` |
+| `Backup-Configuration.ps1` | Install-Workstation | Pre-change backup |
+| `Fix-WorkstationPath.ps1` | Install-Workstation | PATH repair |
+| `Configure-GitIdentity.ps1` | Install-Workstation | Git placeholder identity |
 
----
-
-## Maintainer / CI (not for first-time users)
-
-| Pattern | Examples |
-|---------|----------|
-| `Invoke-*` | Audits, baselines, integration rehearsal, commit gate |
-| `Save-*` | Profile snapshots, phase baselines |
-| `Test-*` | `Test-WorkstationPlatformHardening.ps1` (release gate), legacy equivalence |
-| `Sync-*` / `Generate-*` | Doc sync, cheatsheet generation |
-| `Repair-*` / `Rollback-*` | Recovery tooling |
-
-Platform internals: see [`internal-docs/`](../internal-docs/).
-
-**Full inventory:** [SCRIPTS-INVENTORY.md](../internal-docs/product/SCRIPTS-INVENTORY.md)  
-**Public surface:** [REPOSITORY-SURFACE.md](../docs/product/REPOSITORY-SURFACE.md)
-
-Maintainer scripts live under **`scripts/maintainer/`** (`invoke/`, `configure/`, `test/`, `phase2/`). Root `.ps1` names are **compatibility shims**.
+`Install-Workstation -SkipValidation` when called from product `install.ps1` (doctor runs after command-health).
 
 ---
 
-## Test-* (6)
+## CI / release gates — `scripts/maintainer/test/`
 
-| Script | Role |
-|--------|------|
-| [`Test-WorkstationPlatformHardening.ps1`](../Test-WorkstationPlatformHardening.ps1) | **Release gate** — 11 platform scenarios |
-| `Test-WorkstationCommands.ps1` | Module command smoke (CI / maintainer) |
-| `Test-HomeBasePaths.ps1` | Path SSOT checks (Phase 2) |
-| `Test-LegacyEquivalence.ps1` | Baseline JSON diff (Phase 2) |
-| `Test-ReleaseVersion.ps1` | Release version consistency (needs path update) |
-| `Test-RestoreRehearsal.ps1` | Backup restore rehearsal |
+| Script | CI job | Purpose |
+|--------|--------|---------|
+| `Test-ReleaseVersion.ps1` | release-version | psd1 + install pin + CHANGELOG + tag |
+| `Test-WorkstationCommands.ps1` | command-health | 72 commands + command-health.json |
+| `Test-WorkstationPlatformHardening.ps1` | platform-hardening | Platform spec scenarios |
+| `Test-HomeBasePaths.ps1` | manual | Path SSOT |
+| `Test-LegacyEquivalence.ps1` | Phase 2 | Baseline diff |
 
-WIP menu/anonymity tests are **gitignored** — not shipped.
-
----
-
-## Configure-* (5)
-
-| Script | Product install? |
-|--------|------------------|
-| `Configure-GitIdentity.ps1` | ✅ Yes (always) |
-| `Configure-Privacy.ps1` | Admin only (`-SkipAdmin` default) |
-| `Configure-Network.ps1` | Admin only |
-| `Configure-PgpIdentity.ps1` | Optional (module) |
-| `Configure-TorSecurity.ps1` | Optional (module) |
+Root audits: `Test-MenuAudit.ps1` · `Test-MenuDeepAudit.ps1` · `Test-AnonymityKitAudit.ps1`
 
 ---
 
-## Invoke-* (23)
+## Configure — `scripts/maintainer/configure/`
 
-Maintainer / operator batch scripts — **not** part of `devshell install|doctor|status`.
+Admin / optional — skipped by default OSS install (`-SkipAdmin`).
 
-Groups: Phase 2 gates, audits, maintenance (`Invoke-Maintenance.ps1`), recovery (`Invoke-TerminalRecovery.ps1`). See [SCRIPTS-INVENTORY.md](../internal-docs/product/SCRIPTS-INVENTORY.md).
-
----
-
-## CHANGELOG
-
-| File | Role |
-|------|------|
-| [`CHANGELOG.md`](../CHANGELOG.md) | **Public** product history |
-| [`internal-docs/charter/CHANGELOG.md`](../internal-docs/charter/CHANGELOG.md) | Pointer to root only |
+Examples: `Harden-Security.ps1`, `Configure-Privacy.ps1`, `Repair-WorkstationFonts.ps1`
 
 ---
 
-## Phase 2 (planned)
+## Invoke — `scripts/maintainer/invoke/`
 
-Move maintainer scripts into:
+Maintainer batch scripts — **not** part of `devshell install|doctor|status`.
 
-```
-scripts/maintainer/
-scripts/admin/
-scripts/install/
-```
+Examples: `Invoke-WorkstationRevision.ps1`, `Invoke-CommandCenterCI.ps1`, `Sync-WorkstationDocs.ps1`
 
-Root keeps thin forwarding stubs — requires a dedicated path migration (not started).
+---
+
+## Phase 2 — `scripts/maintainer/phase2/`
+
+Migration and legacy path reports — maintainers only.
+
+---
+
+## More
+
+| Resource | |
+|----------|--|
+| Public repo map | [docs/product/REPOSITORY-SURFACE.md](../docs/product/REPOSITORY-SURFACE.md) |
+| Full inventory | [internal-docs/product/SCRIPTS-INVENTORY.md](../internal-docs/product/SCRIPTS-INVENTORY.md) |
+| Changelog | [CHANGELOG.md](../CHANGELOG.md) |

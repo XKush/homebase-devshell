@@ -12,6 +12,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
+## [2.1.0] - 2026-06-29
+
+**DevReady — public brand & polished OSS surface** — platform spec `1.0.0` LOCKED.
+
+### Added
+
+- **DevReady** — shareable product name; `devready` PATH shim → `devshell doctor`
+- README hero rewrite (badges, repo map, tiers table)
+- `docs/product/BRAND.md`, `docs/README.md` hub, `CODE_OF_CONDUCT.md`
+- Updated `REPOSITORY-SURFACE.md` and `scripts/README.md` (accurate paths)
+
+### Changed
+
+- Install banner: **DevReady** × HomeBase DevShell
+- GitHub-oriented taglines and discovery copy
+
+---
+
 ## [2.0.6] - 2026-06-29
 
 **CI install-smoke hotfix** — platform spec `1.0.0` LOCKED.
@@ -153,7 +171,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.6...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.1.0
 [2.0.6]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.6
 [2.0.5]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.5
 [2.0.4]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.4

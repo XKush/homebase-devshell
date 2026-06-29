@@ -4,7 +4,7 @@ Thanks for helping improve HomeBase DevShell.
 
 ## Before you open a PR
 
-1. Run **`devshell doctor`** on your machine — should pass on a clean install path  
+1. Run **`devready`** or **`devshell doctor`** — should pass on a clean install path  
 2. Keep changes focused — one problem per PR  
 3. Do **not** change the locked platform execution stack without maintainer sign-off (see `internal-docs/charter/PLATFORM-SPEC-SIGNOFF.md`)
 

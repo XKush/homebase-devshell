@@ -32,20 +32,20 @@ function Get-DevShellProductVersion {
     param([string]$Root)
     $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
     if (Test-Path $psd1) { return [string](Import-PowerShellDataFile $psd1).ModuleVersion }
-    return '2.0.6'
+    return '2.1.0'
 }
 
 function Show-DevShellHelp {
     Write-Host @'
 
-HomeBase DevShell
+DevReady — HomeBase DevShell
 
-  devshell install          Set up your shell (-SkipTools to skip winget packages)
-  devshell doctor           Check if you are ready (default: Core tier)
-  devshell doctor -Tier Full   All 75+ validation checks
-  devshell status           See if everything loaded
+  devready           Quick health check (same as devshell doctor)
+  devshell install   Set up your shell
+  devshell doctor    Am I ready? (-Tier Core | Full)
+  devshell status    Platform load status
 
-  devshell help             Show this help
+  devshell help      Show this help
 
 '@ -ForegroundColor DarkGray
 }
@@ -88,7 +88,7 @@ switch ($Command) {
         $product = Get-DevShellProductVersion -Root $repoRoot
 
         Write-Host ''
-        Write-Host 'HomeBase DevShell' -ForegroundColor Cyan
+        Write-Host 'DevReady — HomeBase DevShell' -ForegroundColor Cyan
         Write-Host "  Product:  $product"
         Write-Host "  Platform: $($contract.ContractVersion) ($($contract.Lock.Status))"
         Write-Host "  Signed:   $($contract.Lock.SignedAt)"

@@ -1,90 +1,92 @@
-# HomeBase DevShell
+# DevReady
 
-🌍 **Язык:** [English](README.md) | Русский
+**Готов ли ваш Windows к разработке? Одна команда — и вы знаете.**
 
-**Ваше окружение готово к работе?**
+На базе **HomeBase DevShell** — локальная проверка здоровья PowerShell 7 на Windows. Без облака. Без admin. Без угадываний.
 
-**Установка. Проверка. Готово.**
+🌍 [English](README.md) · **Русский**
 
+[![CI](https://github.com/XKush/homebase-devshell/actions/workflows/ci.yml/badge.svg)](https://github.com/XKush/homebase-devshell/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PowerShell 7](https://img.shields.io/badge/PowerShell-7+-5391FE?logo=powershell&logoColor=white)](https://aka.ms/powershell)
+
+---
+
+## Старт за 30 секунд
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.6/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.0/install.ps1 | iex
 ```
 
-Закройте терминал. Откройте снова. Запустите:
+Закройте терминал. Откройте снова:
 
 ```powershell
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
+devready
 ```
 
-Видите **Ready to work**? Всё — можно работать.
+Видите **`Ready to work`**? Можно работать.
+
+```powershell
+devshell doctor -Tier Full   # полная проверка (~75 пунктов)
+```
+
+Язык cockpit: `$env:WORKSTATION_LANG='ru'` (по умолчанию в OSS — `en`).
 
 ---
 
 ## Зачем
 
-- Окружение может быть сломано — и вы этого не заметите  
-- Новый ПК не должен означать час догадок  
-- Не стоит писать код, пока не знаешь, что всё работает  
+| Боль | Ответ DevReady |
+|------|----------------|
+| Сломанный PATH, профиль, git — тихо до ночи | **`devready`** за секунды |
+| Новый ПК | Одна строка install, одна проверка |
+| Перед первым коммитом | Зелёное = можно. Нет — чиним |
+
+Всё **только на вашем ПК**.
 
 ---
 
-## Что вы увидите
+## Команды
 
-```
-✔ Profile OK
-✔ Tools OK
-✔ Environment OK
-✔ Ready to work
-```
-
-Зелёные галочки — можно. Иначе — ещё не готово.
+| Команда | Действие |
+|---------|----------|
+| **`devready`** | Проверка здоровья (Core) |
+| **`devshell install`** | Первая настройка |
+| **`devshell doctor`** | Готов ли я? `-Tier Core` / `Full` |
+| **`devshell status`** | Загрузилась ли платформа? |
 
 ---
 
-## Три действия (и всё)
+## Документация
 
-| | |
-|---|---|
-| **install** | Первая настройка |
-| **doctor** | Готов ли я к работе? |
-| **status** | Всё загрузилось? (необязательно) |
+| Файл | О чём |
+|------|--------|
+| [Старт](docs/GETTING-STARTED.md) | Пути, диаграмма |
+| [Проблемы](docs/TROUBLESHOOTING.md) | Если doctor падает |
+| [Command center](docs/ru/COMMAND-CENTER.md) | `go`, `home`, меню |
+| [Бренд](docs/product/BRAND.md) | DevReady vs HomeBase |
 
-Те же команды в любой момент:
-
-```powershell
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 install
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 status
-```
-
-Без конфигов. Без мастеров. Скопировал — запустил — прочитал ответ.
-
----
-
-## Когда
-
-- **Новый Windows** — до первого коммита  
-- **Что-то сломалось** — одна проверка вместо угадывания  
-- **Начало дня** — 10 секунд спокойствия  
+Карта репозитория: [REPOSITORY-SURFACE.md](docs/product/REPOSITORY-SURFACE.md)
 
 ---
 
 ## Безопасно
 
-- Только **на вашем ПК** — ничего никуда не уходит  
-- **Без admin** в стандартной установке  
-- **install можно запустить снова** — хуже не станет  
+- Установка **без admin** по умолчанию  
+- **`install` можно повторять**  
+- Tor/PGP — **opt-in** через `sec`, не нужны для Core  
 
 ---
 
 ## Не для вас, если
 
-- Нужен большой фреймворк, который сначала учить  
-- Не Windows + PowerShell 7  
-- Нужна замена bash/zsh на Mac/Linux  
+- Нужен macOS/Linux  
+- Нужен недельный курс перед использованием  
 
 ---
 
-**Помощь:** [Troubleshooting](docs/TROUBLESHOOTING.md) · [English](README.md) · [Команды в shell](docs/ru/COMMAND-CENTER.md)
+[CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md)
+
+**Поделиться:** `irm …/install.ps1 | iex` → **`devready`**
+
+[⭐ Star](https://github.com/XKush/homebase-devshell)

@@ -24,7 +24,7 @@ $root = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
 Write-Host @'
 
  ╔══════════════════════════════════════════════════╗
- ║  HomeBase DevShell Setup                         ║
+ ║  DevReady — HomeBase DevShell Setup              ║
  ║  Privacy · Performance · Hardening (no Defender)   ║
  ╚══════════════════════════════════════════════════╝
 

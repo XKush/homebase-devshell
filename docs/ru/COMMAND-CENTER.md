@@ -1,4 +1,4 @@
-# Справочник команд (RU)
+# Справочник команд (RU) — DevReady
 
 > **Продукт:** [README.ru.md](../../README.ru.md) · **English:** [README.md](../../README.md)
 
@@ -18,7 +18,7 @@
 
 ## Быстрый старт (после install)
 
-1. `devshell doctor` — окружение готово  
+1. `devready` / `devshell doctor` — окружение готово  
 2. `home` — обзор  
 3. `go` — меню действий  
 

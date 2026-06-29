@@ -1,17 +1,13 @@
-# Getting started
+# Getting started — DevReady
 
 1. **Install** (one line):
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.6/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.0/install.ps1 | iex
 ```
 
-2. **Close and reopen** your terminal
-3. **Run doctor** — look for `Ready to work`
-
-```powershell
-devshell doctor
-```
+2. **Close and reopen** your terminal  
+3. **Run** `devready` — look for `Ready to work`
 
 That's the whole flow. Default install runs **Core** doctor (pwsh, git, profile, module, command-health). For the full workstation checklist:
 

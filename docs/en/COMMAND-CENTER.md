@@ -1,8 +1,8 @@
-# Command center (EN)
+# DevReady — command center (EN)
 
-> **Product:** [README.md](../../README.md) · **Russian:** [docs/ru/COMMAND-CENTER.md](../ru/COMMAND-CENTER.md)
+> **Product:** [README.md](../../README.md) · **Русский:** [docs/ru/COMMAND-CENTER.md](../ru/COMMAND-CENTER.md)
 
-Navigation after installing HomeBase DevShell.
+Navigation after installing **DevReady** (HomeBase DevShell).
 
 ## Navigation
 
@@ -18,7 +18,7 @@ Navigation after installing HomeBase DevShell.
 
 ## Quick start (after install)
 
-1. `devshell doctor` — environment ready (Core tier)
+1. `devready` — environment ready (Core tier)
 2. `home` — cockpit overview
 3. `go` — action menu
 

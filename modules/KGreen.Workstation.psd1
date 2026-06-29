@@ -1,11 +1,11 @@
 @{
     RootModule        = 'KGreen.Workstation.psm1'
-    ModuleVersion     = '2.0.6'
+    ModuleVersion     = '2.1.0'
     GUID              = '7f3a9c2e-4b81-4d5f-9e0a-1c8b6d4e2f90'
     Author            = 'KGreen'
     CompanyName       = 'KGreen'
     Copyright         = '(c) 2026 KGreen. All rights reserved.'
-    Description       = 'HOME BASE — personal Windows engineer command center (PowerShell 7).'
+    Description       = 'DevReady — HomeBase DevShell command center for PowerShell 7 on Windows.'
     PowerShellVersion = '7.0'
     FunctionsToExport = @(
         'projects', 'tools', 'scripts', 'downloads', 'desktop', 'backups', 'configs', 'networking', 'Open-Project', 'sysinfo', 'admin', 'instrumenty'
@@ -39,10 +39,10 @@
     VariablesToExport = @('WSRoot', 'WSLog', 'WSOwner')
     PrivateData       = @{
         PSData = @{
-            Tags         = @('HomeBase', 'DevShell', 'PowerShell', 'Windows', 'privacy', 'workstation')
+            Tags         = @('DevReady', 'HomeBase', 'DevShell', 'PowerShell', 'Windows', 'health-check', 'developer-experience', 'workstation-setup')
             LicenseUri   = 'https://opensource.org/licenses/MIT'
             ProjectUri   = 'https://github.com/XKush/homebase-devshell'
-            ReleaseNotes = 'HomeBase DevShell v2.0.5 — CI green, portable repo root resolution.'
+            ReleaseNotes = 'DevReady v2.1.0 — public brand, devready command, docs polish.'
         }
     }
 }

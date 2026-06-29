@@ -13,7 +13,7 @@ Most failures are fixable in **2–5 minutes**. Use this checklist before openin
 ### 2. Run install again (safe)
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.6/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.0/install.ps1 | iex
 ```
 
 Then **close terminal → open new terminal**.
