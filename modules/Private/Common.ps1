@@ -93,7 +93,7 @@ function Invoke-WorkstationCmd {
     }
 }
 
-function Get-WorkstationCommandRegistry {
+function Get-WorkstationModuleCatalog {
     return @(
         @{ Name = 'doctor';           Backend = 'doctor';           Module = 'Diagnostics';  Safe = '$env:CI=1; doctor' }
         @{ Name = 'healthcheck';      Backend = 'healthcheck';      Module = 'Diagnostics';  Safe = 'healthcheck' }
@@ -146,7 +146,7 @@ function Get-WorkstationCommandRegistry {
         @{ Name = 'networking';       Backend = 'networking';       Module = 'Shell';        Safe = 'networking' }
         @{ Name = 'cleanup';          Backend = 'cleanup';          Module = 'Maintenance';  Safe = 'cleanup -WhatIf' }
         @{ Name = 'backupconfig';     Backend = 'backupconfig';     Module = 'Maintenance';  Safe = 'backupconfig' }
-        @{ Name = 'restoreconfig';    Backend = 'restoreconfig';    Module = 'Recovery';     Safe = 'restoreconfig' }
+        @{ Name = 'restoreconfig';    Backend = 'restoreconfig';    Module = 'Recovery';     Safe = $null }
         @{ Name = 'repairterminal';   Backend = 'repairterminal';   Module = 'Recovery';     Safe = $null }
         @{ Name = 'securitycheck';    Backend = 'securitycheck';    Module = 'Workspace';    Safe = 'securitycheck' }
         @{ Name = 'learn';            Backend = 'learn';            Module = 'Learning';     Safe = 'learn -Topic git' }
@@ -168,4 +168,8 @@ function Get-WorkstationCommandRegistry {
         @{ Name = 'komandy';          Backend = 'komandy';          Module = 'Learning';     Safe = 'komandy' }
         @{ Name = 'instrumenty';      Backend = 'instrumenty';      Module = 'Shell';        Safe = 'instrumenty' }
     )
+}
+
+function Get-WorkstationCommandRegistry {
+    return Get-WorkstationModuleCatalog
 }

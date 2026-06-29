@@ -1,8 +1,8 @@
 # DevReady
 
-**Is your Windows dev box ready? One command to find out.**
+**HomeBase DevShell** prepares, verifies and maintains professional Windows workstations.
 
-Powered by **HomeBase DevShell** — a local health check for PowerShell 7 on Windows. No cloud. No admin. No guesswork.
+A workstation **readiness and privacy configuration auditing toolkit** for Windows developers and security professionals. PowerShell 7 · local only · no cloud.
 
 🌍 **English** · [Русский](README.ru.md)
 
@@ -12,34 +12,40 @@ Powered by **HomeBase DevShell** — a local health check for PowerShell 7 on Wi
 [![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?logo=windows&logoColor=white)](https://github.com/XKush/homebase-devshell)
 [![Release](https://img.shields.io/github/v/release/XKush/homebase-devshell?label=release)](https://github.com/XKush/homebase-devshell/releases/latest)
 
-![DevReady — install, run devready, see Ready to work](docs/assets/devready-demo.gif)
+![DevReady — install, devshell health, Ready to work](docs/assets/devready-demo.gif)
 
-**Inspect before run:** [`install.ps1` @ v2.3.0](https://github.com/XKush/homebase-devshell/blob/v2.3.0/install.ps1) · `devshell init` (dry-run, no changes) · [zip + SHA256](packaging/README.md)
+**Inspect before run:** [`install.ps1` @ v3.0.0](https://github.com/XKush/homebase-devshell/blob/v3.0.0/install.ps1) · `devshell init` (dry-run, no changes) · [zip + SHA256](packaging/README.md)
 
 ---
 
 ## 30-second start
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.3.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v3.0.0/install.ps1 | iex
 ```
 
 Close the terminal. Open a new one. Run:
 
 ```powershell
-devready
+devshell health
 ```
 
-See **`Ready to work`**? Start coding. Anything else — fix the **Try this** hints, run again.
+Unified dashboard: Developer · Privacy Configuration · Browser · Network → **Ready to work.**
+
+Or the classic developer check:
+
+```powershell
+devready
+```
 
 <details>
 <summary>Three commands (all you need at first)</summary>
 
 | Command | When |
 |---------|------|
-| **`devready`** | Daily check — am I ready? |
-| **`devshell install`** | First-time setup (Core: profile + folders) |
-| **`devshell doctor`** | Same as devready; `-Tier Full` for power users; **`-Fix`** auto-repairs (winget + PSGallery) |
+| **`devshell health`** | Unified dashboard + `-Json` for CI |
+| **`devready`** | Developer readiness only (same as `doctor`) |
+| **`devshell install`** | First-time setup (Core) |
 
 </details>
 
@@ -70,9 +76,9 @@ Not required for Core DevReady.
 
 | Problem | DevReady answer |
 |---------|-----------------|
-| Broken PATH, missing git, dead profile — silent until 2am | **`devready`** surfaces it in seconds |
-| New laptop / reinstall | One install line, one check |
-| "Works on my machine" before the first commit | Green = go. Not green = not yet. |
+| Broken PATH, missing git, dead profile — silent until 2am | **`devshell health`** surfaces it in seconds |
+| New laptop / reinstall | One install line, one **`health`** check |
+| Privacy/OS config drift before sensitive work | Dashboard + **`baseline`** / **`verify`** |
 
 Everything runs **on your PC only**. Nothing is uploaded.
 
@@ -84,9 +90,10 @@ Everything runs **on your PC only**. Nothing is uploaded.
 
 | Command | What it does |
 |---------|----------------|
-| **`devready`** | Core health check → **Ready to work** or fix hints |
+| **`devshell health`** | Unified dashboard → **Ready to work** or fix hints; `-Json` for CI |
+| **`devready`** | Developer checks only (subset of health) |
 | **`devshell install`** | Core bootstrap (profile, folders) — add `-WithTools` for winget stack |
-| **`devshell doctor`** | Same check; `-Tier Full` when you installed the full stack |
+| **`devshell baseline`** / **`verify`** | Save and compare configuration baseline |
 
 Command center (`home`, `go`, menus) lives in [docs](docs/en/COMMAND-CENTER.md) — **after** you pass Core.
 
@@ -134,7 +141,9 @@ Full layout: [docs/product/REPOSITORY-SURFACE.md](docs/product/REPOSITORY-SURFAC
 |-----|-----|
 | [Getting started](docs/GETTING-STARTED.md) | Paths, install flow, diagram |
 | [Troubleshooting](docs/TROUBLESHOOTING.md) | When doctor fails |
-| [Privacy](docs/PRIVACY.md) | `devshell privacy`, browser, VPN, metadata |
+| [Privacy](docs/PRIVACY.md) | Privacy configuration module |
+| [API stability](docs/API-STABILITY.md) | Frozen CLI contract (v3+) |
+| [ADR](docs/adr/) | Architecture decisions |
 | [Command center (EN)](docs/en/COMMAND-CENTER.md) | `go`, `home`, tiers |
 | [Command center (RU)](docs/ru/COMMAND-CENTER.md) | Russian cockpit |
 | [Brand & naming](docs/product/BRAND.md) | DevReady vs HomeBase DevShell |
@@ -166,6 +175,6 @@ Platform execution architecture is **locked at spec v1.0.0** — product/UX/docs
 
 ---
 
-**Share the one-liner:** `irm …/install.ps1 | iex` then **`devready`**
+**Share the one-liner:** `irm …/install.ps1 | iex` then **`devshell health`**
 
 [⭐ Star on GitHub](https://github.com/XKush/homebase-devshell) if it saved you an hour of debugging.

@@ -1,6 +1,6 @@
 # Growth vector — first 100 users
 
-**Product:** DevReady (HomeBase DevShell) · **Version:** 2.2.0 · **Updated:** 2026-06-29
+**Product:** DevReady (HomeBase DevShell) · **Version:** 3.0.0 · **Updated:** 2026-06-29
 
 Audience: maintainers. No runtime changes.
 
@@ -77,7 +77,7 @@ Discovery → Trust → Install → Aha → Share
 - [x] README GIF + Issue #2 seed + Discussion #4 + release v2.1.1
 - [ ] Upload `.github/social-preview.png` in Settings (manual, once)
 
-### Wave 2 — Reduce friction (weeks 3–6) · shipped v2.2.0
+### Wave 2 — Reduce friction (weeks 3–6) · shipped v3.0.0
 
 - [x] `devshell init` — dry-run / print what install would do (no winget)
 - [x] README "inspect before run" — link to tagged `install.ps1`
@@ -124,7 +124,7 @@ Discovery → Trust → Install → Aha → Share
 ## Messaging cheatsheet
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v3.0.0/install.ps1 | iex
 devready
 ```
 
@@ -138,4 +138,4 @@ devready
 
 1. Post Habr + Reddit from article drafts  
 2. Manual social preview upload (Settings)  
-3. Open winget-pkgs PR after v2.2.0 release assets land
+3. Open winget-pkgs PR after v3.0.0 release assets land

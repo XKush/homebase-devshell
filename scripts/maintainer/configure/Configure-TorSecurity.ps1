@@ -4,7 +4,9 @@
     Maximum Tor session hardening for HOME BASE.
 #>
 param(
-    [switch]$SkipInstall
+    [switch]$SkipInstall,
+    [switch]$LockSwitch,
+    [switch]$UnlockSwitch
 )
 
 . (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
@@ -14,6 +16,18 @@ $ErrorActionPreference = 'Stop'
 . "$repoRoot\lib\WorkstationCommon.ps1"
 . "$repoRoot\lib\TorCommon.ps1"
 Assert-DefenderUntouched
+
+if ($UnlockSwitch) {
+    Disable-TorKillSwitch
+    Write-WorkstationLog 'Tor kill switch disabled' 'OK'
+    exit 0
+}
+
+if ($LockSwitch) {
+    Enable-TorKillSwitch
+    Write-WorkstationLog 'Tor kill switch enabled — clearnet browsers blocked' 'OK'
+    exit 0
+}
 
 Write-WorkstationStep 'Tor maximum security profile'
 Clear-TorKillSwitchLegacy

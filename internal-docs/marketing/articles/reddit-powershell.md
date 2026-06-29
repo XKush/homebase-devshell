@@ -13,7 +13,7 @@ I ship a small MIT utility for **Windows + PowerShell 7** called **DevReady** (r
 **Answer:** Install once, run `devready`, get pass/fail locally. Nothing uploaded.
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v3.0.0/install.ps1 | iex
 # new terminal
 devready
 ```
@@ -21,12 +21,12 @@ devready
 **Don't trust `irm | iex`?** Fair.
 
 1. **Dry-run:** clone the repo and run `pwsh -File devshell.ps1 init` — prints the full install plan, no winget, no changes.
-2. **Verified zip:** download `devready-v2.2.0.zip` + `.sha256.txt` from [Releases](https://github.com/XKush/homebase-devshell/releases/tag/v2.2.0), expand, `pwsh -File install.ps1 -SkipClone -SkipTools`.
-3. **Read first:** [install.ps1 on GitHub](https://github.com/XKush/homebase-devshell/blob/v2.2.0/install.ps1) (pinned tag).
+2. **Verified zip:** download `devready-v3.0.0.zip` + `.sha256.txt` from [Releases](https://github.com/XKush/homebase-devshell/releases/tag/v3.0.0), expand, `pwsh -File install.ps1 -SkipClone -SkipTools`.
+3. **Read first:** [install.ps1 on GitHub](https://github.com/XKush/homebase-devshell/blob/v3.0.0/install.ps1) (pinned tag).
 
 Demo GIF in README:
 
-https://github.com/XKush/homebase-devshell/blob/v2.2.0/docs/assets/devready-demo.gif
+https://github.com/XKush/homebase-devshell/blob/v3.0.0/docs/assets/devready-demo.gif
 
 **What it is NOT:** a cross-platform dotfiles framework, a Kali clone, or a cloud dashboard. Three product commands: `install`, `doctor`, `status` (+ `init` for planning).
 

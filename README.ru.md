@@ -1,8 +1,8 @@
 # DevReady
 
-**Готов ли ваш Windows к разработке? Одна команда — и вы знаете.**
+**HomeBase DevShell** готовит, проверяет и поддерживает профессиональные рабочие станции Windows.
 
-На базе **HomeBase DevShell** — локальная проверка здоровья PowerShell 7 на Windows. Без облака. Без admin. Без угадываний.
+Набор для **готовности к работе и аудита конфигурации приватности** — для разработчиков и специалистов по безопасности. PowerShell 7 · только локально · без облака.
 
 🌍 [English](README.md) · **Русский**
 
@@ -10,34 +10,40 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PowerShell 7](https://img.shields.io/badge/PowerShell-7+-5391FE?logo=powershell&logoColor=white)](https://aka.ms/powershell)
 
-![DevReady — install, devready, Ready to work](docs/assets/devready-demo.gif)
+![DevReady — install, devshell health, Ready to work](docs/assets/devready-demo.gif)
 
-**Проверьте до запуска:** [`install.ps1` @ v2.3.0](https://github.com/XKush/homebase-devshell/blob/v2.3.0/install.ps1) · `devshell init` (dry-run) · [zip + SHA256](packaging/README.md)
+**Проверьте до запуска:** [`install.ps1` @ v3.0.0](https://github.com/XKush/homebase-devshell/blob/v3.0.0/install.ps1) · `devshell init` (dry-run) · [zip + SHA256](packaging/README.md)
 
 ---
 
 ## Старт за 30 секунд
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.3.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v3.0.0/install.ps1 | iex
 ```
 
 Закройте терминал. Откройте снова:
 
 ```powershell
-devready
+devshell health
 ```
 
-Видите **`Ready to work`**? Можно работать. Иначе — блок **Try this** в выводе, затем снова `devready`.
+Единый дашборд: Developer · Privacy Configuration · Browser · Network → **Ready to work.**
+
+Или классическая проверка разработчика:
+
+```powershell
+devready
+```
 
 <details>
 <summary>Три команды (на старте достаточно)</summary>
 
 | Команда | Когда |
 |---------|--------|
-| **`devready`** | Ежедневная проверка |
+| **`devshell health`** | Единый дашборд + `-Json` для CI |
+| **`devready`** | Только готовность разработчика (`doctor`) |
 | **`devshell install`** | Первая настройка (Core) |
-| **`devshell doctor`** | То же; `-Tier Full` для полного стека; **`-Fix`** — авто-ремонт (winget + PSGallery) |
 
 </details>
 
@@ -54,9 +60,9 @@ devready
 
 | Боль | Ответ DevReady |
 |------|----------------|
-| Сломанный PATH, профиль, git — тихо до ночи | **`devready`** за секунды |
-| Новый ПК | Одна строка install, одна проверка |
-| Перед первым коммитом | Зелёное = можно. Нет — чиним |
+| Сломанный PATH, профиль, git — тихо до ночи | **`devshell health`** за секунды |
+| Новый ПК | Одна строка install, одна проверка **`health`** |
+| Дрейф конфигурации | **`baseline`** / **`verify`** |
 
 Всё **только на вашем ПК**.
 
@@ -66,9 +72,10 @@ devready
 
 | Команда | Действие |
 |---------|----------|
-| **`devready`** | Проверка → **Ready to work** или подсказки |
+| **`devshell health`** | Дашборд → **Ready to work**; `-Json` для CI |
+| **`devready`** | Только проверка разработчика |
 | **`devshell install`** | Core (профиль, папки); `-WithTools` — winget-стек |
-| **`devshell doctor`** | Как devready; `-Tier Full` — ~75 проверок |
+| **`devshell baseline`** / **`verify`** | Снимок и сравнение конфигурации |
 
 ---
 
@@ -102,6 +109,6 @@ devready
 
 [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md)
 
-**Поделиться:** `irm …/install.ps1 | iex` → **`devready`**
+**Поделиться:** `irm …/install.ps1 | iex` → **`devshell health`**
 
 [⭐ Star](https://github.com/XKush/homebase-devshell)

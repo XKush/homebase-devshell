@@ -11,7 +11,7 @@
 Ничего не уходит в облако. MIT.
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v3.0.0/install.ps1 | iex
 devready
 ```
 
@@ -34,7 +34,7 @@ DevReady не «ставит всё подряд через winget». Он **п�
 
 ## Как это выглядит
 
-![DevReady demo](https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/docs/assets/devready-demo.gif)
+![DevReady demo](https://raw.githubusercontent.com/XKush/homebase-devshell/v3.0.0/docs/assets/devready-demo.gif)
 
 Core-проверка: ~31 тест за секунду — pwsh, git, profile, command-health.
 
@@ -45,15 +45,15 @@ Core-проверка: ~31 тест за секунду — pwsh, git, profile, 
 ### 1. Одна строка (быстро)
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v3.0.0/install.ps1 | iex
 ```
 
-Исходник на GitHub: [install.ps1 @ v2.2.0](https://github.com/XKush/homebase-devshell/blob/v2.2.0/install.ps1)
+Исходник на GitHub: [install.ps1 @ v3.0.0](https://github.com/XKush/homebase-devshell/blob/v3.0.0/install.ps1)
 
 ### 2. Dry-run без изменений
 
 ```powershell
-git clone --branch v2.2.0 --depth 1 https://github.com/XKush/homebase-devshell.git
+git clone --branch v3.0.0 --depth 1 https://github.com/XKush/homebase-devshell.git
 cd homebase-devshell
 pwsh -File devshell.ps1 init
 ```
@@ -62,10 +62,10 @@ pwsh -File devshell.ps1 init
 
 ### 3. Zip + SHA256
 
-С [Releases](https://github.com/XKush/homebase-devshell/releases/tag/v2.2.0):
+С [Releases](https://github.com/XKush/homebase-devshell/releases/tag/v3.0.0):
 
-- `devready-v2.2.0.zip`
-- `devready-v2.2.0.sha256.txt`
+- `devready-v3.0.0.zip`
+- `devready-v3.0.0.sha256.txt`
 
 Распаковать в `%USERPROFILE%\.homebase\devshell`, затем:
 

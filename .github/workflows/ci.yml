@@ -92,9 +92,30 @@ jobs:
         run: |
           pwsh -NoProfile -File scripts/maintainer/test/Test-PrivacyAuditSmoke.ps1
 
+  doctor-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Doctor Core smoke
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File scripts/maintainer/test/Test-DoctorSmoke.ps1
+
+  health-smoke:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Health dashboard smoke
+        shell: pwsh
+        run: |
+          $out = pwsh -NoProfile -File devshell.ps1 health -Json 2>&1 | Out-String
+          if ($out -notmatch 'healthSchemaVersion') { throw 'health -Json missing schema' }
+          if ($out -notmatch 'Ready to work|Not ready yet') { throw 'health missing summary' }
+
   release-assets:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [release-version, command-health, platform-hardening, install-smoke, init-smoke, privacy-smoke]
+    needs: [release-version, command-health, platform-hardening, install-smoke, init-smoke, privacy-smoke, doctor-smoke, health-smoke]
     runs-on: windows-latest
     permissions:
       contents: write

@@ -19,7 +19,7 @@ I built **DevReady** for Windows + PowerShell 7 — a local health check that an
 **Install (one line):**
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.1/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v3.0.0/install.ps1 | iex
 ```
 
 Close the terminal. Open a new one. Run:

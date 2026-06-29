@@ -92,13 +92,17 @@ function Write-WorkstationLog {
         'ERROR' { 'Red' }
         default { 'Gray' }
     }
-    Write-Host $line -ForegroundColor $color
+    if ($env:DEVSHELL_QUIET -ne '1') {
+        Write-Host $line -ForegroundColor $color
+    }
 }
 
 function Write-WorkstationStep {
     param([string]$Title)
-    Write-Host ''
-    Write-Host "==> $Title" -ForegroundColor Cyan
+    if ($env:DEVSHELL_QUIET -ne '1') {
+        Write-Host ''
+        Write-Host "==> $Title" -ForegroundColor Cyan
+    }
     Write-WorkstationLog $Title
 }
 

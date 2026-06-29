@@ -1,12 +1,12 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    HomeBase DevShell — product CLI (thin wrapper over locked platform v1.0.0).
+    HomeBase DevShell — prepares, verifies and maintains professional Windows workstations.
 #>
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('install', 'doctor', 'status', 'reload', 'trace', 'help', 'version', 'init',
+    [ValidateSet('health', 'history', 'baseline', 'verify', 'install', 'doctor', 'status', 'reload', 'trace', 'help', 'version', 'init',
         'privacy', 'browser', 'tor', 'vpn', 'metadata', 'clean-meta', 'opsec', 'audit')]
     [string]$Command = 'help',
     [Parameter(Position = 1)]
@@ -19,6 +19,9 @@ param(
     [switch]$Privacy,
     [switch]$Apply,
     [switch]$Strip,
+    [switch]$Json,
+    [ValidateSet('html')]
+    [string]$Export,
     [ValidateSet('Chrome', 'Edge', 'Firefox', 'All')]
     [string]$Browser = 'All',
     [int]$Last = 20
@@ -42,30 +45,29 @@ function Get-DevShellProductVersion {
     param([string]$Root)
     $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
     if (Test-Path $psd1) { return [string](Import-PowerShellDataFile $psd1).ModuleVersion }
-    return '2.3.0'
+    return '3.0.0'
 }
 
 function Show-DevShellHelp {
     Write-Host @'
 
-DevReady — HomeBase DevShell
+HomeBase DevShell — workstation readiness & privacy auditing
 
-  devready           Quick health check (same as devshell doctor)
-  devshell init      Dry-run — show install plan (no winget, no changes)
-  devshell install   Set up your shell (Core; add -WithTools for winget stack)
-  devshell doctor    Am I ready? (-Tier Core | Full). -Fix repairs dev env. -Privacy privacy score.
-  devshell status    Platform load status
+  devshell health      Unified dashboard (developer + privacy + browser + network)
+  devshell health -Json          Machine-readable report
+  devshell health -Export html   HTML report in Logs folder
+  devshell history     Privacy/configuration score trend
+  devshell baseline    Save configuration baseline
+  devshell verify      Compare current state to baseline
 
-  devshell privacy   Privacy audit + score (read-only). -Fix for safe repairs. -Apply uses privacy.json
-  devshell audit privacy   Same as devshell privacy
-  devshell browser   Chrome / Edge / Firefox privacy checks
-  devshell tor       Tor Browser readiness (does not launch Tor)
-  devshell vpn       VPN / TUN / DNS leak heuristics
-  devshell metadata  View metadata (exiftool). Pass file as second arg.
-  devshell clean-meta <file> -Strip   Remove metadata → *_clean copy
-  devshell opsec     Combined OPSEC snapshot
+  devready / devshell doctor     Developer readiness (-Tier Core|Full, -Fix, -Json)
+  devshell install     First-time setup (Core; -WithTools for winget stack)
+  devshell init        Dry-run install plan
 
-  devshell help      Show this help
+  Advanced (frozen API — see docs/API-STABILITY.md):
+  devshell privacy | browser | vpn | tor | metadata | clean-meta
+
+  devshell help
 
 '@ -ForegroundColor DarkGray
 }
@@ -89,6 +91,28 @@ if ($Command -in @('status', 'reload', 'trace', 'version')) {
 }
 
 switch ($Command) {
+    'health' {
+        $healthArgs = @{ Tier = $Tier }
+        if ($Json) { $healthArgs['Json'] = $true }
+        if ($Export) { $healthArgs['Export'] = $Export }
+        if ($Argument) { $healthArgs['OutFile'] = $Argument }
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-DevShellHealth.ps1') @healthArgs
+        exit $LASTEXITCODE
+    }
+    'history' {
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-DevShellHistory.ps1') -Last $Last
+        exit $LASTEXITCODE
+    }
+    'baseline' {
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-DevShellBaseline.ps1')
+        exit $LASTEXITCODE
+    }
+    'verify' {
+        $verifyArgs = @{}
+        if ($Json) { $verifyArgs['Json'] = $true }
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-DevShellVerify.ps1') @verifyArgs
+        exit $LASTEXITCODE
+    }
     'install' {
         if ($WithTools) {
             & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipAdmin -SkipValidation
@@ -104,6 +128,7 @@ switch ($Command) {
         }
         if ($Fix) { $doctorArgs['Fix'] = $true }
         if ($Privacy) { $doctorArgs['Privacy'] = $true }
+        if ($Json) { $doctorArgs['JsonOnly'] = $true }
         & (Join-Path $repoRoot 'scripts\maintainer\install\Validate-Workstation.ps1') @doctorArgs
         exit $LASTEXITCODE
     }
@@ -120,6 +145,7 @@ switch ($Command) {
         $privacyArgs = @{}
         if ($Fix) { $privacyArgs['Fix'] = $true }
         if ($Apply) { $privacyArgs['Apply'] = $true }
+        if ($Json) { $privacyArgs['Json'] = $true }
         & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-PrivacyAudit.ps1') @privacyArgs
         exit $LASTEXITCODE
     }
@@ -129,22 +155,29 @@ switch ($Command) {
             $privacyArgs = @{}
             if ($Fix) { $privacyArgs['Fix'] = $true }
             if ($Apply) { $privacyArgs['Apply'] = $true }
+            if ($Json) { $privacyArgs['Json'] = $true }
             & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-PrivacyAudit.ps1') @privacyArgs
             exit $LASTEXITCODE
         }
-        Write-Host "Unknown audit: $target (try: devshell audit privacy)" -ForegroundColor Yellow
+        Write-Host "Unknown audit: $target" -ForegroundColor Yellow
         exit 1
     }
     'browser' {
-        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-BrowserPrivacyAudit.ps1') -Browser $Browser
+        $bArgs = @{ Browser = $Browser }
+        if ($Json) { $bArgs['Json'] = $true }
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-BrowserPrivacyAudit.ps1') @bArgs
         exit $LASTEXITCODE
     }
     'tor' {
-        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-TorReadinessAudit.ps1')
+        $tArgs = @{}
+        if ($Json) { $tArgs['Json'] = $true }
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-TorReadinessAudit.ps1') @tArgs
         exit $LASTEXITCODE
     }
     'vpn' {
-        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-VpnAudit.ps1')
+        $vArgs = @{}
+        if ($Json) { $vArgs['Json'] = $true }
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-VpnAudit.ps1') @vArgs
         exit $LASTEXITCODE
     }
     'clean-meta' {
@@ -163,7 +196,9 @@ switch ($Command) {
         exit $LASTEXITCODE
     }
     'opsec' {
-        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-OpsecCheck.ps1')
+        $oArgs = @{}
+        if ($Json) { $oArgs['Json'] = $true }
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Invoke-OpsecCheck.ps1') @oArgs
         exit $LASTEXITCODE
     }
     'status' {
@@ -173,7 +208,7 @@ switch ($Command) {
         $product = Get-DevShellProductVersion -Root $repoRoot
 
         Write-Host ''
-        Write-Host 'DevReady — HomeBase DevShell' -ForegroundColor Cyan
+        Write-Host 'HomeBase DevShell' -ForegroundColor Cyan
         Write-Host "  Product:  $product"
         Write-Host "  Platform: $($contract.ContractVersion) ($($contract.Lock.Status))"
         Write-Host "  Signed:   $($contract.Lock.SignedAt)"

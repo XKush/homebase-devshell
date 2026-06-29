@@ -10,6 +10,43 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ## [Unreleased]
 
+### Planned for v3.1 (engineering quality — no new public commands)
+
+- Pester unit tests for core logic (`PrivacyAudit`, health aggregation)
+- PSScriptAnalyzer in CI
+- Refactor large files (`MenuSystem.ps1`, `PrivacyAudit.ps1`) without API changes
+- Stable smoke tests on clean Windows VMs
+- Plugin manifest validation (scaffold only)
+
+---
+
+## [3.0.0] - 2026-06-29
+
+**Unified health & API freeze** — platform spec `1.0.0` LOCKED.
+
+### Added
+
+- **`devshell health`** — dashboard (Developer, Privacy Configuration, Browser, Network)
+- **`devshell health -Json`**, **`-Export html`**
+- **`devshell history`**, **`baseline`**, **`verify`**
+- **`devshell doctor -Json`**
+- **`docs/API-STABILITY.md`**, **`docs/adr/`** (ADR-001–005)
+- **`plugins/README.md`** — plugin model scaffold
+- CI: **doctor-smoke**, **health-smoke**
+- **`DEVSHELL_QUIET`** — clean `-Json` / `-JsonOnly` stdout (no log noise)
+
+### Changed
+
+- Positioning: *prepares, verifies and maintains professional Windows workstations*
+- Privacy labels: **Strong/Moderate/Weak configuration** + disclaimers
+- **`Configure-Privacy.ps1`** delegates to **`Repair-PrivacySettings`** (SSOT)
+- **`Get-WorkstationModuleCatalog`** (alias `Get-WorkstationCommandRegistry` in module)
+
+### Fixed
+
+- **`tor-lock` / `tor-unlock`** wired to `Enable-TorKillSwitch` / `Disable-TorKillSwitch`
+- **`restoreconfig`** removed from automated safe command tests
+
 ---
 
 ## [2.3.0] - 2026-06-29
@@ -255,7 +292,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/XKush/homebase-devshell/releases/tag/v3.0.0
 [2.3.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.3.0
 [2.2.2]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.2
 [2.2.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.1

@@ -38,9 +38,9 @@ function Get-PrivacyRiskLevel {
         if ($null -ne $ScoringConfig.riskLevels.high) { $high = [int]$ScoringConfig.riskLevels.high }
         if ($null -ne $ScoringConfig.riskLevels.medium) { $medium = [int]$ScoringConfig.riskLevels.medium }
     }
-    if ($Score -ge $high) { return 'High privacy' }
-    if ($Score -ge $medium) { return 'Medium privacy' }
-    return 'Low privacy'
+    if ($Score -ge $high) { return 'Strong configuration' }
+    if ($Score -ge $medium) { return 'Moderate configuration' }
+    return 'Weak configuration'
 }
 
 function Get-PrivacyScoringConfig {
@@ -688,7 +688,8 @@ function Write-PrivacyAuditReport {
     Write-Host ''
     $high = if ($Report.ScoringConfig -and $Report.ScoringConfig.riskLevels) { [int]$Report.ScoringConfig.riskLevels.high } else { 85 }
     $medium = if ($Report.ScoringConfig -and $Report.ScoringConfig.riskLevels) { [int]$Report.ScoringConfig.riskLevels.medium } else { 65 }
-    Write-Host "Privacy score" -ForegroundColor DarkGray
+    Write-Host "Privacy configuration" -ForegroundColor DarkGray
+    Write-Host '  OS settings only — does not measure network anonymity.' -ForegroundColor DarkGray
     $scoreCol = if ($Report.Score -ge $high) { 'Green' } elseif ($Report.Score -ge $medium) { 'Yellow' } else { 'Red' }
     $maxScore = if ($Report.ScoringConfig -and $Report.ScoringConfig.maxScore) { $Report.ScoringConfig.maxScore } else { 100 }
     Write-Host "$($Report.Score)/$maxScore" -ForegroundColor $scoreCol

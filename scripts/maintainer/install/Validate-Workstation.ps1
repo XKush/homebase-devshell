@@ -9,6 +9,7 @@ param(
     [switch]$Fix,
     [switch]$FixPassCompleted,
     [switch]$Privacy,
+    [switch]$JsonOnly,
     [ValidateSet('Core', 'Full')]
     [string]$Tier = 'Full',
     [int]$StartupBudgetMs = 650
@@ -17,6 +18,7 @@ param(
 $isFull = ($Tier -eq 'Full')
 
 $ErrorActionPreference = 'Continue'
+if ($JsonOnly) { $env:DEVSHELL_QUIET = '1' }
 . (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
 $repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
 . (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
@@ -110,7 +112,8 @@ if ($Privacy) {
     $privacyReport = Get-PrivacyAuditReport -Scope System -RepoRoot $repoRoot -ProductVersion $product
     Write-PrivacyAuditReport -Report $privacyReport | Out-Null
     $reportPath = Save-PrivacyAuditReport -Report $privacyReport
-    Write-Host 'Privacy readiness' -ForegroundColor Cyan
+    Write-Host 'Privacy configuration' -ForegroundColor Cyan
+    Write-Host '  OS configuration only. Does not measure network anonymity.' -ForegroundColor DarkGray
     $col = if ($privacyReport.Score -ge 85) { 'Green' } elseif ($privacyReport.Score -ge 65) { 'Yellow' } else { 'Red' }
     Write-Host "$($privacyReport.Score)/100 — $($privacyReport.RiskLevel)" -ForegroundColor $col
     if ($privacyReport.WarnCount -gt 0) {
@@ -543,6 +546,14 @@ $outDir = $logsRoot
 if (-not (Test-Path $outDir)) { New-Item -ItemType Directory -Force -Path $outDir | Out-Null }
 $outFile = Join-Path $outDir ("validation-{0}.json" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
 $report | ConvertTo-Json -Depth 6 | Set-Content $outFile -Encoding UTF8
+
+if ($JsonOnly) {
+    $report | ConvertTo-Json -Depth 6
+    $exitCode = if ($report.Failed.Count -eq 0) { 0 } else { 1 }
+    Remove-Item Env:DEVSHELL_QUIET -ErrorAction SilentlyContinue
+    $global:LASTEXITCODE = $exitCode
+    exit $exitCode
+}
 
 Write-Host ''
 Write-Host '════════════════ VALIDATION REPORT ════════════════' -ForegroundColor Cyan

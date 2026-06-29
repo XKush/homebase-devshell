@@ -1,6 +1,6 @@
 @{
     RootModule        = 'KGreen.Workstation.psm1'
-    ModuleVersion     = '2.3.0'
+    ModuleVersion     = '3.0.0'
     GUID              = '7f3a9c2e-4b81-4d5f-9e0a-1c8b6d4e2f90'
     Author            = 'KGreen'
     CompanyName       = 'KGreen'
@@ -20,7 +20,7 @@
         'Get-SecurityReadinessReport', 'Show-SecurityStatusPanel'
         'Get-WindowsStatusReport', 'Show-WindowsStatus'
         'palette', 'menu', 'go', 'nav', 'Invoke-CommandPalette', 'Show-HackerMenu', 'Invoke-WorkstationNavHub', 'Invoke-WorkstationGoMenu', 'Invoke-WorkstationActionMenu', 'Register-WorkstationMenuHotkeys', 'Test-WorkstationMenuIntegrity', 'Test-WorkstationGoMenuAudit'
-        'Get-WorkstationCommandHealth', 'Get-WorkstationCommandRegistry'
+        'Get-WorkstationCommandHealth', 'Get-WorkstationCommandRegistry', 'Get-WorkstationModuleCatalog'
         'Get-SystemTrustReport', 'Show-TrustReport', 'Test-CommandSelfCheck', 'Invoke-AllCommandSelfChecks'
         'Invoke-ToolCheck', 'Show-NetTools', 'Show-Toolbox', 'Invoke-SysAudit'
         'Get-WorkstationToolInventory', 'toolcheck', 'nettools', 'toolbox', 'sysaudit'
@@ -42,7 +42,7 @@
             Tags         = @('DevReady', 'HomeBase', 'DevShell', 'PowerShell', 'Windows', 'health-check', 'developer-experience', 'workstation-setup')
             LicenseUri   = 'https://opensource.org/licenses/MIT'
             ProjectUri   = 'https://github.com/XKush/homebase-devshell'
-            ReleaseNotes = 'DevReady v2.3.0 — privacy audit suite (privacy, browser, vpn, tor, opsec, metadata).'
+            ReleaseNotes = 'DevReady v3.0.0 — unified health dashboard, API freeze, baseline/verify/history.'
         }
     }
 }

@@ -53,7 +53,8 @@ foreach ($scope in @('System', 'Browser', 'Tor', 'Vpn')) {
 }
 
 $doctorOut = pwsh -NoProfile -File (Join-Path $Root 'devshell.ps1') doctor -Privacy 2>&1 | Out-String
-if ($doctorOut -notmatch 'Privacy readiness') { throw 'doctor -Privacy missing readiness line' }
+if ($doctorOut -notmatch 'Privacy configuration') { throw 'doctor -Privacy missing configuration header' }
+if ($doctorOut -notmatch 'Does not measure network anonymity') { throw 'doctor -Privacy missing disclaimer' }
 if ($doctorOut -notmatch '\d+/100') { throw 'doctor -Privacy missing score' }
 Write-Host '  [PASS] devshell doctor -Privacy' -ForegroundColor Green
 

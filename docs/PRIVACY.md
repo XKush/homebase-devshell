@@ -60,12 +60,12 @@ Stable fields for CI and external tools:
 ```json
 {
   "reportSchemaVersion": "1.0.0",
-  "productVersion": "2.3.0",
+  "productVersion": "3.0.0",
   "scope": "System",
   "elevated": false,
   "offlineCapable": true,
   "limitations": ["HKLM policy checks may be incomplete without elevation"],
-  "score": { "value": 85, "max": 100, "riskLevel": "High privacy" },
+  "score": { "value": 85, "max": 100, "riskLevel": "Strong configuration" },
   "summary": { "pass": 6, "warn": 5, "fail": 0, "info": 7 },
   "checks": [
     { "id": "doh", "label": "DNS over HTTPS", "status": "Pass", "weight": 8, "deduction": 0 }
@@ -88,11 +88,15 @@ Edit weights in `Config/privacy.defaults.json` (or `%USERPROFILE%\.homebase\priv
 }
 ```
 
-## Planned after v2.3.0
+## Implemented in v3.0
 
-- `devshell privacy baseline` / `verify` — regression vs saved baseline
-- `devshell privacy compare old.json new.json` — score diff
-- `--Export html|markdown` — human reports
+- `devshell health` — unified dashboard (replaces scattered top-level commands for daily use)
+- `devshell baseline` / `verify` — configuration drift vs saved baseline
+- `devshell history` — privacy score trends over time
+- `devshell health -Export html` — GitHub Security–style HTML report
+- `devshell privacy -Json` / `health -Json` — machine-readable reports
+
+## Planned after v3.0 (plugins / v3.1+)
 - Richer browser audit (sync, signed-in accounts, extensions count)
 - `devshell metadata --Scan <folder>` — list files with EXIF only
 - Tor Browser signature check (when reliable offline)
