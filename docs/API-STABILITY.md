@@ -33,6 +33,8 @@ Frozen **product CLI** commands — semver **major** bump required to break beha
 
 New fields may be **added** in minor releases. Renaming or removing fields requires schema version bump.
 
+Full policy: [JSON-SCHEMA.md](JSON-SCHEMA.md)
+
 ## Not frozen (profile / maintainer)
 
 Commands inside `KGreen.Workstation` module (`sec`, `go`, `jarvis`, …) may change without major product bump. They are **not** the public DevReady API.

@@ -1,0 +1,27 @@
+title: "Idea: "
+labels: ["idea"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Product ideas and feedback. v3.x is in **stabilization** — new features go through community validation first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      placeholder: e.g. I only ever run devshell health — could X live inside it?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed direction (optional)
+  - type: checkboxes
+    id: usage
+    attributes:
+      label: What do you run most often?
+      options:
+        - label: devshell health
+        - label: devready / doctor
+        - label: privacy / browser
+        - label: install only

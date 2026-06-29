@@ -10,9 +10,10 @@
 
 ## Checklist
 
-- [ ] README still shows install → doctor → Ready to work only
-- [ ] No architecture terms added to public docs
-- [ ] `devshell doctor` passes locally (if touching install path)
+- [ ] README still leads with install → **`devshell health`**
+- [ ] No architecture terms added to public docs without reason
+- [ ] `devshell health` or `doctor` passes locally (if touching install path)
+- [ ] JSON changes documented in `docs/JSON-SCHEMA.md` if applicable
 
 ## Test plan
 

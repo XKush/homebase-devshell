@@ -1,0 +1,36 @@
+title: "Question: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for setup choices, usage questions, and “what should I use?” — not bug reports.
+        For bugs, use **Bug report** in Issues.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      placeholder: e.g. Should I use devshell health or doctor daily?
+    validations:
+      required: true
+  - type: dropdown
+    id: command
+    attributes:
+      label: Primary command (if any)
+      options:
+        - devshell health
+        - devready / doctor
+        - privacy / browser
+        - install
+        - other / not sure
+  - type: input
+    id: version
+    attributes:
+      label: DevReady version
+      placeholder: output of `devshell version` or install tag (e.g. 3.0.0)
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Windows version, pwsh version, what you already tried
+      placeholder: Windows 11, pwsh 7.5, ran devshell health -Json
