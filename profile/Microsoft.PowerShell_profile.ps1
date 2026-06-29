@@ -24,6 +24,7 @@ function Resolve-WorkstationRepositoryRoot {
 
 $script:WSRoot = Resolve-WorkstationRepositoryRoot
 . (Join-Path $script:WSRoot 'lib\HomeBasePaths.ps1')
+. (Join-Path $script:WSRoot 'lib\WorkstationCommon.ps1')
 
 $script:IsInteractive = [Environment]::UserInteractive -and -not $env:CI -and $Host.Name -ne 'ServerRemoteHost'
 $script:WorkstationSessionReady = $false
@@ -54,14 +55,27 @@ $env:CONFIGS_HOME     = 'C:\Configs'
 $env:TOOLS_HOME       = 'C:\Tools'
 $env:WS_TEMP          = 'C:\Temp\Scratch'
 
-# ── Lazy module load (faster profile startup) ─────────────────────────────────
+# ── Profile boot module order ─────────────────────────────────────────────────
+# 1. PSReadLine (interactive shell)
+# 2. KGreen.Workstation (lazy — first prompt via Initialize-WorkstationModule)
+# 3. posh-git, Terminal-Icons (deferred — Initialize-WorkstationSession)
+
+$script:ProfileBootSessionModules = @('posh-git', 'Terminal-Icons')
 $script:WorkstationModuleLoaded = $false
+
+function Import-ProfileBootModule {
+    param([Parameter(Mandatory)][string]$Name)
+    if (Get-Module $Name) { return }
+    if (Get-Module -ListAvailable $Name) {
+        Import-Module $Name -ErrorAction SilentlyContinue
+    }
+}
+
 function Initialize-WorkstationModule {
     if ($script:WorkstationModuleLoaded) { return }
     $script:WorkstationModuleLoaded = $true
-    $wsModule = 'C:\Scripts\Workstation\modules\KGreen.Workstation.psm1'
-    if (Test-Path $wsModule) {
-        Import-Module $wsModule -DisableNameChecking -Force -ErrorAction SilentlyContinue
+    if (Get-Command Import-WorkstationProfileModule -ErrorAction SilentlyContinue) {
+        Import-WorkstationProfileModule -Root $script:WSRoot | Out-Null
     }
 }
 
@@ -75,10 +89,8 @@ function Initialize-WorkstationSession {
         if (-not (Test-Path $omp)) { $omp = 'C:\Scripts\Workstation\terminal\active-theme.omp.json' }
         if (Test-Path $omp) { oh-my-posh init pwsh --config $omp | Invoke-Expression }
     }
-    foreach ($mod in @('posh-git', 'Terminal-Icons')) {
-        if (-not (Get-Module $mod) -and (Get-Module -ListAvailable $mod)) {
-            Import-Module $mod -ErrorAction SilentlyContinue
-        }
+    foreach ($mod in $script:ProfileBootSessionModules) {
+        Import-ProfileBootModule -Name $mod
     }
     if (Get-Command zoxide -ErrorAction SilentlyContinue) {
         Invoke-Expression (& zoxide init powershell --cmd z | Out-String)
@@ -88,7 +100,7 @@ function Initialize-WorkstationSession {
     }
 }
 
-# ── PSReadLine (minimal — fast) ───────────────────────────────────────────────
+# ── PSReadLine (profile boot step 1) ──────────────────────────────────────────
 if ($script:IsInteractive -and (Get-Module -ListAvailable PSReadLine)) {
     Import-Module PSReadLine -ErrorAction SilentlyContinue
     try {

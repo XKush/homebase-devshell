@@ -18,16 +18,40 @@ function Get-WorkstationBackupsRoot {
     return 'C:\Backups\Workstation'
 }
 
+function Get-WorkstationRepositoryRoot {
+    if ($script:WSRoot) { return $script:WSRoot }
+    if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+        return Get-HomeBasePath -Name RepositoryRoot
+    }
+    return 'C:\Scripts\Workstation'
+}
+
+function Get-WorkstationModulePath {
+    param(
+        [string]$ModuleName = 'KGreen.Workstation',
+        [string]$Root
+    )
+    if (-not $Root) { $Root = Get-WorkstationRepositoryRoot }
+    return Join-Path $Root "modules\$ModuleName.psm1"
+}
+
+function Import-WorkstationProfileModule {
+    param([string]$Root)
+    if (Get-Module KGreen.Workstation) { return $true }
+    $modPath = Get-WorkstationModulePath -Root $Root
+    if (-not (Test-Path $modPath)) { return $false }
+    Import-Module $modPath -DisableNameChecking -Force -Scope Global -ErrorAction Stop
+    return [bool](Get-Module KGreen.Workstation)
+}
+
 function Ensure-WorkstationModuleLoaded {
-    param([string]$Root = 'C:\Scripts\Workstation')
+    param([string]$Root)
     if (Get-Module KGreen.Workstation) { return $true }
     if ((Get-Command Get-WorkstationCommandHealth, Test-ShowCommandHelp -ErrorAction SilentlyContinue).Count -ge 2) {
         return $true
     }
-    $modPath = Join-Path $Root 'modules\KGreen.Workstation.psm1'
-    if (-not (Test-Path $modPath)) { return $false }
-    Import-Module $modPath -DisableNameChecking -Force -Scope Global -ErrorAction Stop
-    return [bool](Get-Module KGreen.Workstation)
+    if (-not $Root) { $Root = Get-WorkstationRepositoryRoot }
+    return Import-WorkstationProfileModule -Root $Root
 }
 
 function Test-WorkstationAdmin {
