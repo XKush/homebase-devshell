@@ -2,6 +2,8 @@
 
 HomeBase DevShell core stays small. Optional capabilities live in **plugins** without modifying frozen CLI commands.
 
+**Before any plugin code:** propose and accept an [RFC](../docs/rfc/README.md) (e.g. [RFC-0001 Docker](../docs/rfc/RFC-0001-docker-plugin.md), [RFC-0002 WSL](../docs/rfc/RFC-0002-wsl-plugin.md)).
+
 ## Planned layout
 
 ```
@@ -26,7 +28,7 @@ plugins/
 }
 ```
 
-## Integration (not implemented in v3.0.0)
+## Integration (not implemented until RFC Accepted)
 
 `devshell health` may merge plugin sections when `plugins/*/manifest.json` is present. Core health works **without** plugins.
 

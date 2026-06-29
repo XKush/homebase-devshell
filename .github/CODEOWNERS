@@ -12,6 +12,7 @@
 /docs/API-STABILITY.md @XKush
 /docs/JSON-SCHEMA.md @XKush
 /docs/RELEASE-CRITERIA.md @XKush
+/docs/rfc/ @XKush
 
 # CI & automation
 /.github/workflows/ @XKush

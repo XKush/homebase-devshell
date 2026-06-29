@@ -42,12 +42,12 @@ Explored **after** stabilization feedback — not committed dates:
 
 | Area | Notes |
 |------|--------|
-| **Plugin API** | `plugins/` — Docker, WSL, VS Code, Azure, AWS, GitHub, Rust, Go |
+| **Plugin API** | `plugins/` — see [RFC index](rfc/README.md) (Docker, WSL, …) |
 | **History** | Richer trends, export, compare |
 | **HTML reports** | Deeper styling, shareable bundles |
 | **Integrations** | GitHub Actions templates, Intune-friendly JSON |
 
-Ideas → [Discussions](https://github.com/XKush/homebase-devshell/discussions) · label `idea`
+Ideas → [RFC](rfc/README.md) (large) or [Discussions](https://github.com/XKush/homebase-devshell/discussions) (small)
 
 ---
 
