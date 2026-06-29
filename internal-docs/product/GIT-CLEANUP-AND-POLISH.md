@@ -33,11 +33,11 @@
 
 | Doc | Issue | Action |
 |-----|-------|--------|
-| `REPOSITORY-CLEANUP-PLAN.md` | Overlaps this file | Keep both; this file is authoritative for git polish |
-| `PUBLIC-REPO-STRUCTURE.md` | Superseded tree | Keep as short pointer |
-| `OSS-ADOPTION-GUIDE.md` | Growth messaging | Maintainer-only |
-| `VIRAL-README-OPTIMIZATION.md` | README SEO | Maintainer-only |
-| `docs/ru/README.md` | Command reference, not product | Linked from README.ru footer only |
+| `REPOSITORY-CLEANUP-PLAN.md` | Superseded | Moved to `archive/product-planning/` |
+| `PUBLIC-REPO-STRUCTURE.md` | Superseded | Moved to `archive/product-planning/` |
+| `OSS-ADOPTION-GUIDE.md` | Archived | Growth notes in archive |
+| `VIRAL-README-OPTIMIZATION.md` | Archived | README SEO in archive |
+| `docs/ru/COMMAND-CENTER.md` | Command reference | Linked from README.ru footer only |
 
 ### Remove from user-facing surface (not delete)
 

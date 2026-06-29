@@ -5,9 +5,8 @@ Canonical stable snapshots for regression comparison during Path Abstraction.
 | File | Label | Purpose |
 |------|-------|---------|
 | [phase2-step1-stable.json](./phase2-step1-stable.json) | **Phase2-Step1-Stable** | SSOT paths wired; legacy layout unchanged |
-| [platform-spec-wave-abcd-lock.json](./platform-spec-wave-abcd-lock.json) | **PlatformSpec-WaveABCD-Lock** | Wave A–D platform spec v1.0.0 (architecture lock) |
-| phase2-wave-a-pre.json | **Phase2-WaveA-Pre** | Profile layer baseline before Wave A migration |
-| phase2-wave-a-post.json | **Phase2-WaveA-Post** | Profile layer baseline after Wave A complete |
+| [platform-spec-wave-abcd-lock.json](./platform-spec-wave-abcd-lock.json) | **PlatformSpec-WaveABCD-Lock** | Platform spec v1.0.0 lock baseline |
+| [phase2-wave-a-pre.json](./phase2-wave-a-pre.json) | **Phase2-WaveA-Pre** | Profile layer baseline before Wave A migration |
 
 ## Capture
 

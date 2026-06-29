@@ -87,4 +87,4 @@ pwsh -File $HOME\.homebase\devshell\devshell.ps1 status
 
 ---
 
-**Помощь:** [Troubleshooting](docs/TROUBLESHOOTING.md) · [English](README.md) · [Команды в shell](docs/ru/README.md)
+**Помощь:** [Troubleshooting](docs/TROUBLESHOOTING.md) · [English](README.md) · [Команды в shell](docs/ru/COMMAND-CENTER.md)

@@ -1,12 +1,10 @@
-# Documentation
+# Docs
 
-User-facing docs only. Start with the [README](../README.md).
+Start with the [product README](../README.md): **install → doctor → Ready to work**.
 
-| Doc | Purpose |
-|-----|---------|
-| [GETTING-STARTED.md](GETTING-STARTED.md) | Install checklist |
-| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Recovery when install or doctor fails |
+| Doc | When |
+|-----|------|
+| [GETTING-STARTED.md](GETTING-STARTED.md) | First install checklist |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Something failed |
 | [README.ru.md](../README.ru.md) | Russian product README |
-| [ru/README.md](ru/README.md) | Russian command reference (advanced) |
-
-Maintainer and platform material lives in [`internal-docs/`](../internal-docs/) and is not part of the first-user path.
+| [ru/COMMAND-CENTER.md](ru/COMMAND-CENTER.md) | Russian in-shell command map (advanced) |
