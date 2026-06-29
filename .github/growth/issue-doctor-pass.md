@@ -26,7 +26,7 @@ If `devshell doctor` shows **Ready to work**, post proof here. It helps the next
 **Install (for others reading this thread):**
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.4/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.5/install.ps1 | iex
 pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
 ```
 

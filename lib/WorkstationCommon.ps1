@@ -20,10 +20,15 @@ function Get-WorkstationBackupsRoot {
 
 function Get-WorkstationRepositoryRoot {
     if ($script:WSRoot) { return $script:WSRoot }
+    if (Get-Command Get-HomeBaseRepositoryRoot -ErrorAction SilentlyContinue) {
+        return Get-HomeBaseRepositoryRoot
+    }
     if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
         return Get-HomeBasePath -Name RepositoryRoot
     }
-    return 'C:\Scripts\Workstation'
+    if ($env:WORKSTATION_ROOT) { return $env:WORKSTATION_ROOT }
+    if ($env:HOMEBASE_DEVSHELL_ROOT) { return $env:HOMEBASE_DEVSHELL_ROOT }
+    throw 'Workstation repository root not found. Set WORKSTATION_ROOT or run install.ps1.'
 }
 
 function Get-WorkstationModulePath {

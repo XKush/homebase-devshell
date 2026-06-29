@@ -19,7 +19,9 @@ function Resolve-WorkstationRepositoryRoot {
     if ((Split-Path $PSScriptRoot -Leaf) -eq 'profile') {
         return $parent
     }
-    return 'C:\Scripts\Workstation'
+    $ossDefault = Join-Path $env:USERPROFILE '.homebase\devshell'
+    if (Test-Path (Join-Path $ossDefault 'lib\HomeBasePaths.ps1')) { return $ossDefault }
+    throw 'WORKSTATION_ROOT not set. Run install.ps1 or set `$env:WORKSTATION_ROOT`.'
 }
 
 $script:WSRoot = Resolve-WorkstationRepositoryRoot

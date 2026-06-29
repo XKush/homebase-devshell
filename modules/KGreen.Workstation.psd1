@@ -1,6 +1,6 @@
 @{
     RootModule        = 'KGreen.Workstation.psm1'
-    ModuleVersion     = '2.0.4'
+    ModuleVersion     = '2.0.5'
     GUID              = '7f3a9c2e-4b81-4d5f-9e0a-1c8b6d4e2f90'
     Author            = 'KGreen'
     CompanyName       = 'KGreen'
@@ -42,7 +42,7 @@
             Tags         = @('HomeBase', 'DevShell', 'PowerShell', 'Windows', 'privacy', 'workstation')
             LicenseUri   = 'https://opensource.org/licenses/MIT'
             ProjectUri   = 'https://github.com/XKush/homebase-devshell'
-            ReleaseNotes = 'HomeBase DevShell v2.0.4 — Core/Full doctor tiers, OSS install with tools, CI.'
+            ReleaseNotes = 'HomeBase DevShell v2.0.5 — CI green, portable repo root resolution.'
         }
     }
 }

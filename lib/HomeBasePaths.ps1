@@ -3,11 +3,32 @@
 
 $script:HomeBaseConfigCache = $null
 
+function Get-HomeBaseRepositoryRoot {
+    if ($script:WSRoot -and (Test-Path (Join-Path $script:WSRoot 'lib\HomeBasePaths.ps1'))) {
+        return $script:WSRoot.TrimEnd('\')
+    }
+    foreach ($envName in @('WORKSTATION_ROOT', 'HOMEBASE_DEVSHELL_ROOT')) {
+        $value = [Environment]::GetEnvironmentVariable($envName)
+        if ($value -and (Test-Path (Join-Path $value 'lib\HomeBasePaths.ps1'))) {
+            return $value.TrimEnd('\')
+        }
+    }
+    $libParent = Split-Path $PSScriptRoot -Parent
+    if (Test-Path (Join-Path $libParent 'lib\HomeBasePaths.ps1')) {
+        return (Resolve-Path $libParent).Path.TrimEnd('\')
+    }
+    $ossDefault = Join-Path $env:USERPROFILE '.homebase\devshell'
+    if (Test-Path (Join-Path $ossDefault 'lib\HomeBasePaths.ps1')) {
+        return $ossDefault.TrimEnd('\')
+    }
+    throw 'HomeBase repository root not found. Set WORKSTATION_ROOT or run install.ps1.'
+}
+
 function Get-HomeBaseConfigPath {
     if ($env:HOMEBASE_CONFIG -and (Test-Path $env:HOMEBASE_CONFIG)) {
         return $env:HOMEBASE_CONFIG
     }
-    $root = if ($script:WSRoot) { $script:WSRoot } else { 'C:\Scripts\Workstation' }
+    $root = Get-HomeBaseRepositoryRoot
     return Join-Path $root 'Config\homebase.defaults.json'
 }
 
@@ -59,7 +80,12 @@ function Get-HomeBasePath {
 
     $cfg = Get-HomeBaseConfig
     $runtimeRoot = if ($env:HOMEBASE_RUNTIME) { $env:HOMEBASE_RUNTIME.TrimEnd('\') } else { $cfg.RuntimeRoot.TrimEnd('\') }
-    $repoRoot = Expand-HomeBasePathTemplate -Value $cfg.RepositoryRoot -Tokens @{ RuntimeRoot = $runtimeRoot }
+    $configuredRepo = Expand-HomeBasePathTemplate -Value ([string]$cfg.RepositoryRoot) -Tokens @{ RuntimeRoot = $runtimeRoot }
+    $repoRoot = if ([string]::IsNullOrWhiteSpace($configuredRepo)) {
+        Get-HomeBaseRepositoryRoot
+    } else {
+        $configuredRepo.TrimEnd('\')
+    }
 
     if ($Name -eq 'RuntimeRoot') { return $runtimeRoot }
     if ($Name -eq 'RepositoryRoot') { return $repoRoot }

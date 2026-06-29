@@ -12,6 +12,25 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
+## [2.0.5] - 2026-06-29
+
+**CI + portable paths hotfix** — platform spec `1.0.0` LOCKED.
+
+### Fixed
+
+- GitHub Actions: `install-smoke` copies checkout into correct subdirectory; all jobs set `WORKSTATION_ROOT`
+- `platform-hardening` on clean runner: resolve config via repo root, not hardcoded `C:\Scripts\Workstation`
+- `HomeBasePaths` / `_Resolve-RepoRoot` / profile: OSS-first root resolution (`WORKSTATION_ROOT`, `~/.homebase/devshell`)
+- `Config/homebase.defaults.json`: neutral `RepositoryRoot` (patched by `install.ps1`)
+- `Test-MenuDeepAudit.ps1` committed for Full doctor tier
+- CHANGELOG compare links; GitHub Releases for v2.0.4+
+
+### Changed
+
+- CI runs `Test-ReleaseVersion -RequireTagAtHead` on tag pushes
+
+---
+
 ## [2.0.4] - 2026-06-29
 
 **OSS honest entry — Core install passes doctor from zero** — platform spec `1.0.0` LOCKED.
@@ -121,7 +140,9 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.3...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.5...HEAD
+[2.0.5]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.5
+[2.0.4]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.4
 [2.0.3]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.3
 [2.0.2]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.2
 [2.0.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.1

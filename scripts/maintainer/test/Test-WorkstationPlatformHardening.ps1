@@ -17,6 +17,7 @@ $repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
 
 $ErrorActionPreference = 'Stop'
 $root = if ($env:WORKSTATION_ROOT) { $env:WORKSTATION_ROOT } else { $repoRoot }
+$script:WSRoot = $root
 
 . (Join-Path $root 'lib\HomeBasePaths.ps1')
 

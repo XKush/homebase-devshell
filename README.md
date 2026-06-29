@@ -9,7 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.4/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.5/install.ps1 | iex
 ```
 
 Close terminal. Open it again. Run:

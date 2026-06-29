@@ -18,10 +18,6 @@ function Resolve-WorkstationRepoRoot {
         $candidate = $parent
     }
 
-    if (Test-Path 'C:\Scripts\Workstation\lib\HomeBasePaths.ps1') {
-        return 'C:\Scripts\Workstation'
-    }
-
     throw "HomeBase DevShell repository root not found from: $Start"
 }
 

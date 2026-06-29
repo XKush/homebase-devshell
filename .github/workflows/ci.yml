@@ -3,18 +3,29 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
     branches: [main]
+
+env:
+  WORKSTATION_ROOT: ${{ github.workspace }}
+  HOMEBASE_DEVSHELL_ROOT: ${{ github.workspace }}
 
 jobs:
   release-version:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Test-ReleaseVersion
         shell: pwsh
         run: |
-          pwsh -NoProfile -File scripts/maintainer/test/Test-ReleaseVersion.ps1 -SkipGit
+          if ($env:GITHUB_REF -like 'refs/tags/v*') {
+            pwsh -NoProfile -File scripts/maintainer/test/Test-ReleaseVersion.ps1 -RequireTagAtHead
+          } else {
+            pwsh -NoProfile -File scripts/maintainer/test/Test-ReleaseVersion.ps1 -SkipGit
+          }
 
   command-health:
     runs-on: windows-latest
@@ -41,12 +52,16 @@ jobs:
       - name: Smoke install.ps1 in temp dir
         shell: pwsh
         run: |
+          $src = Get-Location
           $temp = Join-Path $env:RUNNER_TEMP "devshell-smoke"
           if (Test-Path $temp) { Remove-Item $temp -Recurse -Force }
           New-Item -ItemType Directory -Force -Path $temp | Out-Null
-          Copy-Item -Path (Get-Location) -Destination $temp -Recurse -Force
-          Push-Location $temp
+          Copy-Item -Path $src -Destination $temp -Recurse -Force
+          $work = Join-Path $temp (Split-Path $src -Leaf)
+          Push-Location $work
           try {
+            $env:WORKSTATION_ROOT = $work
+            $env:HOMEBASE_DEVSHELL_ROOT = $work
             pwsh -NoProfile -File install.ps1 -SkipTools -SkipDoctor
             if ($LASTEXITCODE -ne 0) { throw "install.ps1 exited $LASTEXITCODE" }
           } finally {
