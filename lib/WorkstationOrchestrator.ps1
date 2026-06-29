@@ -157,3 +157,10 @@ function Invoke-WorkstationProfile {
     $global:WorkstationExecutionContext = $ctx
     return $ctx
 }
+
+function Get-WorkstationExecutionContext {
+    if ($global:WorkstationExecutionContext) {
+        return $global:WorkstationExecutionContext
+    }
+    return New-WorkstationExecutionContext
+}
