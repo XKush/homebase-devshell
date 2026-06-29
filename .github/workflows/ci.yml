@@ -134,9 +134,14 @@ jobs:
       - name: PSScriptAnalyzer (lib + maintainer)
         shell: pwsh
         run: |
-          $paths = @('lib', 'scripts/maintainer/invoke', 'scripts/maintainer/test', 'devshell.ps1', 'install.ps1')
-          $errors = Invoke-ScriptAnalyzer -Path $paths -Recurse -Settings .PSScriptAnalyzerSettings.psd1 -Severity Error
-          if ($errors) {
+          $errors = [System.Collections.Generic.List[object]]::new()
+          foreach ($p in @('lib', 'scripts/maintainer/invoke', 'scripts/maintainer/test')) {
+            $errors.AddRange([object[]](Invoke-ScriptAnalyzer -Path $p -Recurse -Settings .PSScriptAnalyzerSettings.psd1 -Severity Error))
+          }
+          foreach ($f in @('devshell.ps1', 'install.ps1')) {
+            $errors.AddRange([object[]](Invoke-ScriptAnalyzer -Path $f -Settings .PSScriptAnalyzerSettings.psd1 -Severity Error))
+          }
+          if ($errors.Count -gt 0) {
             $errors | Format-Table RuleName, ScriptName, Line, Message -AutoSize
             throw "PSScriptAnalyzer errors: $($errors.Count)"
           }
