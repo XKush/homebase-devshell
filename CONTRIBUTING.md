@@ -23,6 +23,8 @@ Questions like “should I use `health` or `doctor`?” belong in **Discussions*
 
 Script layout: [`scripts/README.md`](scripts/README.md) · [Repository surface](docs/product/REPOSITORY-SURFACE.md)
 
+**Repository hygiene:** `main` is protected (PR + CI required). See [.github/CODEOWNERS](.github/CODEOWNERS).
+
 ## Good first contributions
 
 See **[docs/GOOD-FIRST-CONTRIBUTION.md](docs/GOOD-FIRST-CONTRIBUTION.md)** for a 15–20 minute path (README fix, troubleshooting line, smoke test assertion).

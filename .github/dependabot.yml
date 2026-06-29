@@ -1,0 +1,14 @@
+# Minimal Dependabot — GitHub Actions only (no package ecosystem bloat)
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: deps
+    groups:
+      github-actions:
+        patterns:
+          - '*'

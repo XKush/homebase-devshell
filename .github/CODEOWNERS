@@ -1,0 +1,22 @@
+# HomeBase DevShell — default owner
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+* @XKush
+
+# Product entry (public API surface)
+/install.ps1 @XKush
+/devshell.ps1 @XKush
+/modules/KGreen.Workstation.psd1 @XKush
+
+# Frozen contract & governance
+/docs/API-STABILITY.md @XKush
+/docs/JSON-SCHEMA.md @XKush
+/docs/RELEASE-CRITERIA.md @XKush
+
+# CI & automation
+/.github/workflows/ @XKush
+/.github/CODEOWNERS @XKush
+
+# Platform spec 1.0.0 LOCKED — orchestrator changes need explicit review
+/lib/WorkstationOrchestrator.ps1 @XKush
+/lib/WorkstationPlatformContract.ps1 @XKush

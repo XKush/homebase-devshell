@@ -75,9 +75,11 @@ See [ROADMAP](ROADMAP.md) for scope contract.
 ```powershell
 pwsh -File scripts/maintainer/test/Test-ReleaseVersion.ps1 -SkipGit
 # … run smoke tests …
-git tag -a vX.Y.Z -m "HomeBase DevShell vX.Y.Z — <one line>"
+git tag -s vX.Y.Z -m "HomeBase DevShell vX.Y.Z — <one line>"
 git push origin main
 git push origin vX.Y.Z
 ```
+
+**Signed tags:** use `git tag -s` for release tags when GPG is configured (`gpg --list-secret-keys`). Unsigned tags are acceptable only for emergency hotfix — document in CHANGELOG.
 
 Verify release: https://github.com/XKush/homebase-devshell/releases
