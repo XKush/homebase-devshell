@@ -10,21 +10,28 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ## [Unreleased]
 
+See [docs/ROADMAP.md](docs/ROADMAP.md) for the stabilization contract.
+
+---
+
+## [3.1.0] - 2026-06-29
+
 ### Added
 
-- **`devshell health -Sections`** — optional subset (`developer`, `privacy`, `browser`, `network`)
+- **`devshell health -Sections`** — optional subset (`developer`, `privacy`, `browser`, `network`) for faster checks
 - **Pester** unit tests (`tests/pester/Health.Baseline.Tests.ps1`)
 - **PSScriptAnalyzer** CI gate (`.PSScriptAnalyzerSettings.psd1`)
 - **`Measure-DevShellHealthProfile.ps1`** — maintainer timing helper
+- **`VERSION`** file and **`lib/DevShellProduct.ps1`** — product version SSOT
 
 ### Changed
 
-- **`lib/DevShellHealth.ps1`** — modular refactor: shared paths, safer history/baseline, `-Sections` filter, deduped privacy docs
-- **CI smoke** — `-SkipHistory` for faster health contract checks; shared `_Test-Common.ps1`
-- **Branding & hygiene** — `VERSION` file, `lib/DevShellProduct.ps1` SSOT, packaging pins `3.0.1`, removed redundant `Test-HealthResilience.ps1`
+- **`lib/DevShellHealth.ps1`** — modular refactor: shared paths, safer history/baseline, deduped privacy docs
+- **CI** — Pester + script-analysis jobs; `-SkipHistory` in smoke tests; `Test-DevShellStressMatrix.ps1`
+- **Branding** — DevReady-first CLI help; packaging Scoop/WinGet synced to current release
+- **`Write-DevShellVerifyOutput`** — unified verify human/JSON output in lib
 
-
-## [3.0.1] - 2026-06-28
+---
 
 ### Fixed
 
@@ -315,7 +322,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v3.0.1...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/XKush/homebase-devshell/compare/v3.0.1...v3.1.0
 [3.0.1]: https://github.com/XKush/homebase-devshell/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/XKush/homebase-devshell/releases/tag/v3.0.0
 [2.3.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.3.0

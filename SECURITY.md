@@ -4,7 +4,8 @@
 
 | Version | Supported |
 |---------|-----------|
-| **3.0.x** | ✅ Current |
+| **3.1.x** | ✅ Current |
+| **3.0.x** | Security fixes only |
 | 2.x | Best effort (no new features) |
 | < 2.0 | ❌ |
 

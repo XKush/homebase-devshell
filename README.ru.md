@@ -12,14 +12,14 @@
 
 ![DevReady — install, devshell health, Ready to work](docs/assets/devready-demo.gif)
 
-**Проверьте до запуска:** [`install.ps1` @ v3.0.1](https://github.com/XKush/homebase-devshell/blob/v3.0.1/install.ps1) · `devshell init` (dry-run) · [zip + SHA256](packaging/README.md)
+**Проверьте до запуска:** [`install.ps1` @ v3.1.0](https://github.com/XKush/homebase-devshell/blob/v3.1.0/install.ps1) · `devshell init` (dry-run) · [zip + SHA256](packaging/README.md)
 
 ---
 
 ## Старт за 30 секунд
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v3.0.1/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v3.1.0/install.ps1 | iex
 ```
 
 Закройте терминал. Откройте снова:
