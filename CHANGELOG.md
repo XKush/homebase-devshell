@@ -14,6 +14,25 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for the stabilization contract.
 
 ---
 
+## [3.0.1] - 2026-06-28
+
+### Fixed
+
+- **`Compare-DevShellHealthBaseline`** — graceful handling of missing or corrupt `baseline.json`
+- **`Show-DevShellHealthHistory`** — skip invalid jsonl lines instead of failing
+- **`devshell verify -Json`** — structured errors `no_baseline` and `baseline_invalid`
+
+### Added
+
+- **`Test-HealthResilience.ps1`**, **`Test-DevShellStressMatrix.ps1`** — offline CI resilience matrix
+- CI: resilience + stress tests in **health-smoke** job
+
+### Changed
+
+- **`SECURITY.md`** — supported versions updated for 3.0.x
+
+---
+
 ## [3.0.0] - 2026-06-29
 
 **Unified health & API freeze** — platform spec `1.0.0` LOCKED.
@@ -286,7 +305,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/XKush/homebase-devshell/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/XKush/homebase-devshell/releases/tag/v3.0.0
 [2.3.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.3.0
 [2.2.2]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.2

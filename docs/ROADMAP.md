@@ -2,7 +2,7 @@
 
 This is a **contract** with users — not a wishlist. Items move only after community signal or maintainer review.
 
-**Current product version:** 3.0.0 · **Platform spec:** 1.0.0 LOCKED
+**Current product version:** 3.0.1 · **Platform spec:** 1.0.0 LOCKED
 
 ---
 

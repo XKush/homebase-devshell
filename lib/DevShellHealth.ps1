@@ -191,11 +191,23 @@ function Show-DevShellHealthHistory {
         Write-Host 'No health history yet. Run: devshell health' -ForegroundColor DarkGray
         return
     }
-    $rows = Get-Content $HistoryPath -Encoding UTF8 | ForEach-Object { $_ | ConvertFrom-Json }
+    $rows = [System.Collections.Generic.List[object]]::new()
+    foreach ($line in (Get-Content $HistoryPath -Encoding UTF8)) {
+        if ([string]::IsNullOrWhiteSpace($line)) { continue }
+        try {
+            $rows.Add(($line | ConvertFrom-Json))
+        } catch {
+            Write-Verbose "Skipping invalid history line: $line"
+        }
+    }
+    if ($rows.Count -eq 0) {
+        Write-Host 'No readable health history entries.' -ForegroundColor DarkGray
+        return
+    }
     Write-Host ''
     Write-Host 'Health history' -ForegroundColor Cyan
     Write-Host ''
-    $slice = if ($rows.Count -gt $Last) { $rows[($rows.Count - $Last)..($rows.Count - 1)] } else { $rows }
+    $slice = if ($rows.Count -gt $Last) { @($rows)[($rows.Count - $Last)..($rows.Count - 1)] } else { @($rows) }
     foreach ($r in $slice) {
         $d = ([datetime]$r.timestamp).ToString('MMM dd')
         Write-Host ("{0,-8} Privacy {1,3}%  Developer {2,-4}  Ready {3}" -f $d, $r.privacy, $r.developer, $(if ($r.ready) { 'yes' } else { 'no' })) -ForegroundColor DarkGray
@@ -227,9 +239,26 @@ function Compare-DevShellHealthBaseline {
     }
     if (-not (Test-Path $BaselinePath)) {
         Write-Host 'No baseline. Run: devshell baseline' -ForegroundColor Yellow
-        return $null
+        return [PSCustomObject]@{
+            baselineTimestamp = $null
+            currentTimestamp  = $Current.timestamp
+            changes           = @()
+            driftDetected     = $false
+            noBaseline        = $true
+        }
     }
-    $base = Get-Content $BaselinePath -Raw | ConvertFrom-Json
+    try {
+        $base = Get-Content $BaselinePath -Raw -Encoding UTF8 | ConvertFrom-Json
+    } catch {
+        Write-Host 'Baseline file is invalid JSON. Run: devshell baseline' -ForegroundColor Yellow
+        return [PSCustomObject]@{
+            baselineTimestamp = $null
+            currentTimestamp  = $Current.timestamp
+            changes           = @('Baseline file is unreadable or corrupt')
+            driftDetected     = $true
+            baselineInvalid   = $true
+        }
+    }
     $changes = [System.Collections.Generic.List[string]]::new()
 
     foreach ($key in $Current.sections.Keys) {

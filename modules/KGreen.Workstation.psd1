@@ -1,6 +1,6 @@
 @{
     RootModule        = 'KGreen.Workstation.psm1'
-    ModuleVersion     = '3.0.0'
+    ModuleVersion     = '3.0.1'
     GUID              = '7f3a9c2e-4b81-4d5f-9e0a-1c8b6d4e2f90'
     Author            = 'KGreen'
     CompanyName       = 'KGreen'
@@ -42,7 +42,7 @@
             Tags         = @('DevReady', 'HomeBase', 'DevShell', 'PowerShell', 'Windows', 'health-check', 'developer-experience', 'workstation-setup')
             LicenseUri   = 'https://opensource.org/licenses/MIT'
             ProjectUri   = 'https://github.com/XKush/homebase-devshell'
-            ReleaseNotes = 'DevReady v3.0.0 — unified health dashboard, API freeze, baseline/verify/history.'
+            ReleaseNotes = 'DevReady v3.0.1 — health resilience (corrupt baseline/history), stress matrix tests.'
         }
     }
 }

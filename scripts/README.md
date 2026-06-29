@@ -11,7 +11,7 @@ Runtime scripts for **HomeBase DevShell** (public name: **DevReady**).
 | Script | Command | Purpose |
 |--------|---------|---------|
 | [`install.ps1`](../install.ps1) | `irm … \| iex` | Clone, bootstrap, optional winget tools |
-| [`devshell.ps1`](../devshell.ps1) | `devshell …` | `init` · `install` · `doctor` · `status` |
+| [`devshell.ps1`](../devshell.ps1) | `devshell …` | `health` · `install` · `doctor` · `init` · `status` |
 
 PATH shims: `devready.cmd` (doctor Core) · `devshell.cmd` (full CLI)
 
@@ -48,6 +48,7 @@ PATH shims: `devready.cmd` (doctor Core) · `devshell.cmd` (full CLI)
 |--------|--------|---------|
 | `Test-ReleaseVersion.ps1` | release-version | psd1 + install pin + CHANGELOG + tag |
 | `Test-HealthSmoke.ps1` | health-smoke | `health -Json` contract |
+| `Test-HealthResilience.ps1` | manual / CI optional | corrupt baseline/history handling |
 | `Test-DoctorSmoke.ps1` | doctor-smoke | `doctor` Core JSON |
 | `Test-PrivacyAuditSmoke.ps1` | privacy-smoke | Privacy audits + doctor `-Privacy` |
 | `Test-WorkstationCommands.ps1` | command-health | 72 commands + command-health.json |
