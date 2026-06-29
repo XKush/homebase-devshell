@@ -11,9 +11,9 @@ param(
 )
 
 $ErrorActionPreference = 'Continue'
-. "$PSScriptRoot\lib\WorkstationCommon.ps1"
-
-$repoRoot       = if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) { Get-HomeBasePath -Name RepositoryRoot } else { $PSScriptRoot }
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+. (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
 $logsRoot       = Get-WorkstationLogsRoot
 $modulePath     = Join-Path $repoRoot 'modules\KGreen.Workstation.psm1'
 $canonical      = Join-Path $repoRoot 'profile\Microsoft.PowerShell_profile.ps1'
@@ -390,7 +390,7 @@ if (git config --global user.email 2>$null) { Add-Pass "Git user.email set" } el
 if ($Fix -and $report.Failed.Count -gt 0) {
     Write-WorkstationStep 'Auto-fix attempt'
     if ($report.Failed -match 'profile') {
-        & "$PSScriptRoot\Install-ShellProfile.ps1" -Force
+        & (Resolve-WorkstationScript -Name 'Install-ShellProfile.ps1' -Start $PSScriptRoot) -Force
         Add-Warn 'Re-deployed shell profile'
     }
     if ($report.Failed -match 'Module missing') {

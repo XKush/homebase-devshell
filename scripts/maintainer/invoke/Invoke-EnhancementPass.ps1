@@ -20,36 +20,36 @@ Write-WorkstationStep 'KGREEN WORKSTATION ENHANCEMENT PASS'
 
 # Phase 1 — Audit
 Write-WorkstationStep 'Phase 1 — Organization audit'
-& "$repoRoot\Invoke-OrganizationAudit.ps1"
+& "$repoRoot\scripts\maintainer\invoke\Invoke-OrganizationAudit.ps1"
 
 # Phase 2 — Organize
 if (-not $SkipOrganize) {
     Write-WorkstationStep 'Phase 2 — Workstation organization'
-    & "$repoRoot\Invoke-WorkstationOrganization.ps1" -WhatIf:$WhatIf
+    & "$repoRoot\scripts\maintainer\invoke\Invoke-WorkstationOrganization.ps1" -WhatIf:$WhatIf
 }
 
 # Phase 3 — Network toolkit
 if (-not $SkipInstall) {
     Write-WorkstationStep 'Phase 3 — Network toolkit install/validate'
-    & "$repoRoot\Install-NetworkToolkit.ps1" -SkipOptional:$false
+    & "$repoRoot\scripts\maintainer\install\Install-NetworkToolkit.ps1" -SkipOptional:$false
 }
 
 # Phase 4 — Deploy profile (loads toolkit commands)
 Write-WorkstationStep 'Phase 4 — Terminal integration'
-& "$repoRoot\Install-ShellProfile.ps1" -Force
+& "$repoRoot\scripts\maintainer\install\Install-ShellProfile.ps1" -Force
 
 # Phase 5 — Housekeeping
 Write-WorkstationStep 'Phase 5 — Housekeeping'
-& "$repoRoot\Invoke-Housekeeping.ps1" -IncludeTemp
+& "$repoRoot\scripts\maintainer\invoke\Invoke-Housekeeping.ps1" -IncludeTemp
 
 # Phase 6 — Beautification (fonts + path + env)
 Write-WorkstationStep 'Phase 6 — Polish'
-& "$repoRoot\Repair-WorkstationFonts.ps1" -Force
-& "$repoRoot\Fix-WorkstationPath.ps1"
+& "$repoRoot\scripts\maintainer\configure\Repair-WorkstationFonts.ps1" -Force
+& "$repoRoot\scripts\maintainer\configure\Fix-WorkstationPath.ps1"
 
 # Phase 7 — Final validation
 Write-WorkstationStep 'Phase 7 — Final validation'
-& "$repoRoot\Validate-Workstation.ps1" -StartupBudgetMs 300
+& "$repoRoot\scripts\maintainer\install\Validate-Workstation.ps1" -StartupBudgetMs 300
 $valOk = ($LASTEXITCODE -eq 0)
 
 # Generate final reports

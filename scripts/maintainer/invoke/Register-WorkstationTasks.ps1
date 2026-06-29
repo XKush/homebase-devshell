@@ -6,19 +6,20 @@
 param([switch]$Force)
 
 $ErrorActionPreference = 'Stop'
-$root = 'C:\Scripts\Workstation'
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$root = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
 
 $tasks = @(
     @{
         Name = 'KGreen-TrustProbe-Daily'
         Description = 'Daily HOME BASE trust probe + command health'
-        Script = Join-Path $root 'Invoke-ScheduledTrustProbe.ps1'
+        Script = Resolve-WorkstationScript -Name 'Invoke-ScheduledTrustProbe.ps1' -Start $PSScriptRoot
         Schedule = @{ Daily = $true; At = '08:00' }
     }
     @{
         Name = 'KGreen-Maintenance-Weekly'
         Description = 'Weekly workstation maintenance + WOC cache'
-        Script = Join-Path $root 'Invoke-Maintenance.ps1'
+        Script = Resolve-WorkstationScript -Name 'Invoke-Maintenance.ps1' -Start $PSScriptRoot
         Args = '-Full'
         Schedule = @{ Weekly = $true; DaysOfWeek = 'Sunday'; At = '09:00' }
     }

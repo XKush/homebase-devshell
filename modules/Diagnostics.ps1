@@ -5,7 +5,7 @@ function doctor {
     if (Test-ShowCommandHelp -Name 'doctor' -Help:$Help) { return }
     Invoke-WorkstationCmd 'doctor' {
         Write-Host "`n  Проверка здоровья системы...`n" -ForegroundColor Cyan
-        $script = Join-Path $script:WSRoot 'Validate-Workstation.ps1'
+        $script = Join-Path $script:WSRoot 'scripts\maintainer\install\Validate-Workstation.ps1'
         & $script -StartupBudgetMs 600
         if ($LASTEXITCODE -eq 0) {
             Write-Host "`n  Doctor: все проверки пройдены." -ForegroundColor Green
@@ -26,8 +26,8 @@ function sysreport {
     if (Test-ShowCommandHelp -Name 'sysreport' -Help:$Help) { return }
     Invoke-WorkstationCmd 'sysreport' {
         $out = Join-Path (Get-WorkstationLogsRoot) ("sysreport-$(Get-Date -Format 'yyyyMMdd-HHmmss').txt")
-        & (Join-Path $script:WSRoot 'Invoke-SystemDiscovery.ps1') | Out-Null
-        & (Join-Path $script:WSRoot 'Validate-Workstation.ps1') -StartupBudgetMs 650 | Tee-Object -FilePath $out
+        & (Join-Path $script:WSRoot 'scripts\maintainer\invoke\Invoke-SystemDiscovery.ps1') | Out-Null
+        & (Join-Path $script:WSRoot 'scripts\maintainer\install\Validate-Workstation.ps1') -StartupBudgetMs 650 | Tee-Object -FilePath $out
         Write-Host "  Отчёт сохранён: $out" -ForegroundColor Green
     }
 }

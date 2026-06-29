@@ -10,9 +10,12 @@ param(
     [switch]$Upgrade,
     [switch]$SkipOptional
 )
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+$script:WSRoot = $repoRoot
 
 $ErrorActionPreference = 'Continue'
-. "$PSScriptRoot\lib\WorkstationCommon.ps1"
+. (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
 Assert-DefenderUntouched
 
 Write-WorkstationStep 'Network toolkit — inventory before install'

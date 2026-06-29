@@ -66,11 +66,11 @@ if ($Command -in @('status', 'reload', 'trace', 'version')) {
 
 switch ($Command) {
     'install' {
-        & (Join-Path $repoRoot 'Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin
+        & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin
         if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
     'doctor' {
-        & (Join-Path $repoRoot 'Validate-Workstation.ps1') -StartupBudgetMs 600
+        & (Join-Path $repoRoot 'scripts\maintainer\install\Validate-Workstation.ps1') -StartupBudgetMs 600
         exit $LASTEXITCODE
     }
     'status' {

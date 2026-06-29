@@ -81,7 +81,7 @@ function backupconfig {
     param([switch]$Help)
     if (Test-ShowCommandHelp -Name 'backupconfig' -Help:$Help) { return }
     Invoke-WorkstationCmd 'backupconfig' {
-        & (Join-Path $script:WSRoot 'Backup-Configuration.ps1') -Force
+        & (Join-Path $script:WSRoot 'scripts\maintainer\invoke\Backup-Configuration.ps1') -Force
         $global:LASTEXITCODE = 0
     }
 }
@@ -93,7 +93,7 @@ function organize {
         if (Get-Command Ensure-WorkstationFolderLayout -ErrorAction SilentlyContinue) {
             Ensure-WorkstationFolderLayout -Quiet | Out-Null
         }
-        & (Join-Path $script:WSRoot 'Invoke-WorkstationOrganization.ps1') -WhatIf:$WhatIf -Force:$Force
+        & (Join-Path $script:WSRoot 'scripts\maintainer\invoke\Invoke-WorkstationOrganization.ps1') -WhatIf:$WhatIf -Force:$Force
         $global:LASTEXITCODE = 0
     }
 }

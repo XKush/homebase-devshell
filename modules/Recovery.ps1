@@ -5,7 +5,7 @@ function repairterminal {
     if (Test-ShowCommandHelp -Name 'repairterminal' -Help:$Help) { return }
     Invoke-WorkstationCmd 'repairterminal' {
         Write-Host '  Восстановление терминала (шрифты, OMP, WT, fastfetch)...' -ForegroundColor Cyan
-        & (Join-Path $script:WSRoot 'Invoke-TerminalRecovery.ps1')
+        & (Join-Path $script:WSRoot 'scripts\maintainer\invoke\Invoke-TerminalRecovery.ps1')
     }
 }
 
@@ -33,11 +33,11 @@ function restoreconfig {
         $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
         if (-not $isAdmin) {
             Write-Host '  Восстановление требует прав администратора. Запуск...' -ForegroundColor Yellow
-            $argList = @('-NoProfile', '-File', (Join-Path $script:WSRoot 'Rollback-Workstation.ps1'), '-Force')
+            $argList = @('-NoProfile', '-File', (Join-Path $script:WSRoot 'scripts\maintainer\invoke\Rollback-Workstation.ps1'), '-Force')
             if ($BackupFolder) { $argList += '-BackupFolder', $BackupFolder }
             Start-Process pwsh -Verb RunAs -ArgumentList $argList
             return
         }
-        & (Join-Path $script:WSRoot 'Rollback-Workstation.ps1') @args
+        & (Join-Path $script:WSRoot 'scripts\maintainer\invoke\Rollback-Workstation.ps1') @args
     }
 }

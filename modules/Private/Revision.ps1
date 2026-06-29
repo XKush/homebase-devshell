@@ -11,7 +11,7 @@ function revise {
         $args = @{}
         if ($Quick) { $args.Quick = $true }
         if ($Backup) { $args.Backup = $true }
-        & (Join-Path $script:WSRoot 'Invoke-WorkstationRevision.ps1') @args
+        & (Join-Path $script:WSRoot 'scripts\maintainer\invoke\Invoke-WorkstationRevision.ps1') @args
     }
 }
 

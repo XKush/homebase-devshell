@@ -6,9 +6,11 @@
 param([switch]$Force)
 
 $ErrorActionPreference = 'Stop'
-$script:WSRoot = $PSScriptRoot
-. "$PSScriptRoot\lib\HomeBasePaths.ps1"
-. "$PSScriptRoot\lib\WorkstationCommon.ps1"
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+$script:WSRoot = $repoRoot
+. (Join-Path $repoRoot 'lib\HomeBasePaths.ps1')
+. (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
 
 $backupRoot = Get-HomeBasePath -Name Backups
 if (-not (Test-Path $backupRoot)) { New-Item -ItemType Directory -Force -Path $backupRoot | Out-Null }
@@ -17,13 +19,12 @@ $toolsRoot = Get-HomeBasePath -Name Tools
 $scriptsRoot = Get-HomeBasePath -Name Scripts
 
 Write-WorkstationStep 'Deploying PowerShell profile'
-$canonical = Join-Path $PSScriptRoot 'profile\Microsoft.PowerShell_profile.ps1'
+$canonical = Join-Path $repoRoot 'profile\Microsoft.PowerShell_profile.ps1'
 $targets = @(
     Join-Path $HOME 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'
     Join-Path $HOME 'Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1'
     Join-Path $HOME 'PowerShell\profile.ps1'
 )
-
 foreach ($target in $targets) {
     $dir = Split-Path $target -Parent
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
@@ -48,7 +49,7 @@ Set-Content -Path (Join-Path $HOME 'Documents\WindowsPowerShell\Microsoft.PowerS
 
 Write-WorkstationStep 'Configuring Windows Terminal'
 $wtPath = Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json'
-$template = Join-Path $PSScriptRoot 'terminal\settings.template.json'
+$template = Join-Path $repoRoot 'terminal\settings.template.json'
 if (Test-Path $wtPath) {
     $backup = Join-Path $backupRoot "terminal-settings-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
     Copy-Item $wtPath $backup -Force

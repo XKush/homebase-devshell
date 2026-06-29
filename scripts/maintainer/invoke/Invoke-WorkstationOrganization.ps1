@@ -143,7 +143,7 @@ if ($sysDir -and -not $WhatIf) {
 
 # ── PATH dedupe ────────────────────────────────────────────────────────────────
 if (-not $WhatIf) {
-    & "$repoRoot\Fix-WorkstationPath.ps1" | Out-Null
+    & "$repoRoot\scripts\maintainer\configure\Fix-WorkstationPath.ps1" | Out-Null
     Log-Action 'PathDedupe' 'Fix-WorkstationPath.ps1'
 }
 

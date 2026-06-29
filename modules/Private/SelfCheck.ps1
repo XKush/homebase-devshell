@@ -85,7 +85,19 @@ function Test-CommandSelfCheck {
     if ($script:SelfCheckDeps.ContainsKey($Name)) {
         foreach ($dep in $script:SelfCheckDeps[$Name]) {
             if ($dep -match '\.ps1$') {
-                $path = Join-Path $script:WSRoot $dep
+                $resolveLib = Join-Path $script:WSRoot 'scripts\maintainer\_Resolve-RepoRoot.ps1'
+                if (Test-Path $resolveLib) {
+                    if (-not (Get-Command Resolve-WorkstationScript -ErrorAction SilentlyContinue)) {
+                        . $resolveLib
+                    }
+                    try {
+                        $path = Resolve-WorkstationScript -Name $dep -Start $script:WSRoot
+                    } catch {
+                        $path = Join-Path $script:WSRoot $dep
+                    }
+                } else {
+                    $path = Join-Path $script:WSRoot $dep
+                }
                 if (-not (Test-Path $path)) {
                     $result.OK = $false
                     $result.Detail = "Файл ``$dep`` отсутствует"

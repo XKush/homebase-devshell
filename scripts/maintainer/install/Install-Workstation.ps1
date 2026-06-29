@@ -14,8 +14,9 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$root = $PSScriptRoot
-. "$root\lib\WorkstationCommon.ps1"
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$root = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+. (Join-Path $root 'lib\WorkstationCommon.ps1')
 
 Write-Host @'
 
@@ -36,28 +37,29 @@ foreach ($d in @('C:\Tools','C:\Scripts','C:\Projects','C:\Logs','C:\Backups','C
 Write-WorkstationLog 'Folders verified' 'OK'
 
 # 2. Backup before changes
-& "$root\Backup-Configuration.ps1" -Force:$Force
+& (Resolve-WorkstationScript -Name 'Backup-Configuration.ps1' -Start $PSScriptRoot) -Force:$Force
 
 # 3. Software
 if (-not $SkipSoftware) {
-    & "$root\Install-Software.ps1" -Force:$Force
+    & (Resolve-WorkstationScript -Name 'Install-Software.ps1' -Start $PSScriptRoot) -Force:$Force
 }
 
 # 4. Shell profile (user scope)
-& "$root\Install-ShellProfile.ps1" -Force:$Force
+& (Resolve-WorkstationScript -Name 'Install-ShellProfile.ps1' -Start $PSScriptRoot) -Force:$Force
 
 # 5. Admin scripts
 if (-not $SkipAdmin) {
     if (Test-WorkstationAdmin) {
-        & "$root\Optimize-Performance.ps1" -Force:$Force
-        & "$root\Configure-Privacy.ps1" -Force:$Force -DnsProvider $DnsProvider
-        & "$root\Harden-Security.ps1" -Force:$Force
-        & "$root\Configure-Network.ps1" -Force:$Force
+        & (Resolve-WorkstationScript -Name 'Optimize-Performance.ps1' -Start $PSScriptRoot) -Force:$Force
+        & (Resolve-WorkstationScript -Name 'Configure-Privacy.ps1' -Start $PSScriptRoot) -Force:$Force -DnsProvider $DnsProvider
+        & (Resolve-WorkstationScript -Name 'Harden-Security.ps1' -Start $PSScriptRoot) -Force:$Force
+        & (Resolve-WorkstationScript -Name 'Configure-Network.ps1' -Start $PSScriptRoot) -Force:$Force
     } else {
-        Write-Host @'
+        $elevated = Resolve-WorkstationScript -Name 'Install-Workstation.ps1' -Start $PSScriptRoot
+        Write-Host @"
 
 Admin steps skipped — re-run elevated:
-  Start-Process pwsh -Verb RunAs -ArgumentList '-File C:\Scripts\Workstation\Install-Workstation.ps1 -Force -SkipSoftware'
+  Start-Process pwsh -Verb RunAs -ArgumentList '-File $elevated -Force -SkipSoftware'
 
 Or run individually:
   Optimize-Performance.ps1
@@ -65,32 +67,33 @@ Or run individually:
   Harden-Security.ps1
   Configure-Network.ps1
 
-'@ -ForegroundColor Yellow
+"@ -ForegroundColor Yellow
     }
 } else {
     Write-WorkstationLog 'Admin scripts skipped (-SkipAdmin)' 'WARN'
 }
 
 Write-WorkstationStep 'Git identity defaults'
-& "$root\Configure-GitIdentity.ps1"
+& (Resolve-WorkstationScript -Name 'Configure-GitIdentity.ps1' -Start $PSScriptRoot)
 
 Write-WorkstationStep 'PATH repair'
-& "$root\Fix-WorkstationPath.ps1"
+& (Resolve-WorkstationScript -Name 'Fix-WorkstationPath.ps1' -Start $PSScriptRoot)
 
 Write-WorkstationStep 'Final validation'
-& "$root\Validate-Workstation.ps1" -StartupBudgetMs 600
+& (Resolve-WorkstationScript -Name 'Validate-Workstation.ps1' -Start $PSScriptRoot) -StartupBudgetMs 600
 if ($LASTEXITCODE -ne 0) {
     Write-WorkstationLog 'Validation reported failures — review C:\Logs\Workstation\' 'ERROR'
     exit 1
 }
 
 Write-WorkstationStep 'Setup complete'
-Write-Host @'
+$readme = Join-Path $root 'README.md'
+Write-Host @"
 Next steps:
   1. Restart Windows Terminal
   2. Run: . `$PROFILE
   3. Set git identity: git config --global user.name / user.email
   4. Review C:\Security\Alfa-Adapter-Guidelines.md
-  5. Read C:\Scripts\Workstation\README.md
+  5. Read $readme
 
-'@ -ForegroundColor Cyan
+"@ -ForegroundColor Cyan

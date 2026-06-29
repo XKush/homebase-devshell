@@ -5,11 +5,14 @@
     Register weekly maintenance scheduled task for KGreen workstation.
 #>
 $ErrorActionPreference = 'Stop'
-. "$PSScriptRoot\lib\WorkstationCommon.ps1"
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+. (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
 Assert-WorkstationAdmin
 
 $taskName = 'ReviOS-Workstation-Maintenance'
-$action = New-ScheduledTaskAction -Execute 'pwsh.exe' -Argument '-NoProfile -WindowStyle Hidden -File C:\Scripts\Workstation\Invoke-Maintenance.ps1 -Full'
+$maintenance = Resolve-WorkstationScript -Name 'Invoke-Maintenance.ps1' -Start $PSScriptRoot
+$action = New-ScheduledTaskAction -Execute 'pwsh.exe' -Argument "-NoProfile -WindowStyle Hidden -File `"$maintenance`" -Full"
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Sunday -At 3am
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
 Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Force -Description 'Weekly workstation health, log rotation, and config backup' | Out-Null

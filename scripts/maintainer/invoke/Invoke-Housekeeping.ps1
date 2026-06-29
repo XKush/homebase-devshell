@@ -141,7 +141,7 @@ $report.LargeFiles = @($largeFiles | Sort-Object SizeMB -Descending | Select-Obj
 
 # ── 8. PATH dedupe ────────────────────────────────────────────────────────────
 if (-not $WhatIf) {
-    & "$repoRoot\Fix-WorkstationPath.ps1" | Out-Null
+    & "$repoRoot\scripts\maintainer\configure\Fix-WorkstationPath.ps1" | Out-Null
     Log 'PathDedupe' 'Fix-WorkstationPath.ps1'
 }
 

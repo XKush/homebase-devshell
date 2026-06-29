@@ -30,7 +30,7 @@ function Show-SingularityCockpit {
     Write-HackerStat 'WINDOWS' (Format-HackerBar -Percent $win.Score) -Color $P.Muted
     $health = Get-WorkstationCommandHealth -ErrorAction SilentlyContinue
     if (-not $health) {
-        & (Join-Path ($script:WSRoot ?? 'C:\Scripts\Workstation') 'Test-WorkstationCommands.ps1') -Quick | Out-Null
+        & (Join-Path ($script:WSRoot ?? 'C:\Scripts\Workstation') 'scripts\maintainer\test\Test-WorkstationCommands.ps1') -Quick | Out-Null
     }
 
     Write-HackerSection -Tag 'PHASE' -Title 'PHASE 3 — Operator DNA synthesis' -Color $P.Neon

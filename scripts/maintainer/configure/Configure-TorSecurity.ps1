@@ -20,7 +20,7 @@ Clear-TorKillSwitchLegacy
 
 if (-not $SkipInstall -and -not (Find-TorBrowserExe)) {
     Write-WorkstationLog 'Tor Browser missing — installing…' 'INFO'
-    & (Join-Path $repoRoot 'Install-TorBrowser.ps1')
+    & (Join-Path $repoRoot 'scripts\maintainer\install\Install-TorBrowser.ps1')
 }
 
 $torExe = Find-TorBrowserExe

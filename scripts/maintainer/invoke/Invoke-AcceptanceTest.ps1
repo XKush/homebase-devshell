@@ -12,7 +12,7 @@ $fail = 0
 Write-WorkstationStep 'ACCEPTANCE TEST — KGreen Workstation'
 
 # 1. Core validation
-& "$repoRoot\Validate-Workstation.ps1" -StartupBudgetMs $StartupBudgetMs
+& "$repoRoot\scripts\maintainer\install\Validate-Workstation.ps1" -StartupBudgetMs $StartupBudgetMs
 if ($LASTEXITCODE -ne 0) { $fail++ }
 
 # 2. Command center commands

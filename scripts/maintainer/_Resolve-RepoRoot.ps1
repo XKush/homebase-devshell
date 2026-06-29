@@ -24,3 +24,20 @@ function Resolve-WorkstationRepoRoot {
 
     throw "HomeBase DevShell repository root not found from: $Start"
 }
+
+function Resolve-WorkstationScript {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name,
+        [string]$Start = $PSScriptRoot
+    )
+
+    $repoRoot = Resolve-WorkstationRepoRoot -Start $Start
+    foreach ($sub in @('install', 'invoke', 'configure', 'test', 'phase2')) {
+        $path = Join-Path $repoRoot "scripts\maintainer\$sub\$Name"
+        if (Test-Path $path) { return $path }
+    }
+
+    throw "Workstation script not found under scripts/maintainer: $Name"
+}

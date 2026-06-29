@@ -59,7 +59,7 @@ function pgp-repair {
     if (Test-ShowCommandHelp -Name 'pgp-repair' -Help:$Help) { return }
     Invoke-WorkstationCmd 'pgp-repair' {
         if (-not (Test-GpgAvailable)) { return }
-        & (Join-Path $script:WSRoot 'Repair-PgpIdentity.ps1')
+        & (Join-Path $script:WSRoot 'scripts\maintainer\configure\Repair-PgpIdentity.ps1')
     }
 }
 
@@ -67,7 +67,7 @@ function pgp-setup {
     param([switch]$Help)
     if (Test-ShowCommandHelp -Name 'pgp-setup' -Help:$Help) { return }
     Invoke-WorkstationCmd 'pgp-setup' {
-        & (Join-Path $script:WSRoot 'Configure-PgpIdentity.ps1')
+        & (Join-Path $script:WSRoot 'scripts\maintainer\configure\Configure-PgpIdentity.ps1')
     }
 }
 

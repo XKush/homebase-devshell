@@ -47,7 +47,7 @@ if ($audit.Metrics.ProfileLoadMs -le 600) { Add-OK "Profile startup $($audit.Met
 else { Add-Risk 'Medium' 'Slow profile' 'Run Optimize-Profile.ps1 -Apply' }
 
 # ── Run validation suite ─────────────────────────────────────────────────────
-& "$repoRoot\Validate-Workstation.ps1" -StartupBudgetMs 650 | Out-Null
+& "$repoRoot\scripts\maintainer\install\Validate-Workstation.ps1" -StartupBudgetMs 650 | Out-Null
 $audit.Metrics.ValidationExitCode = $LASTEXITCODE
 if ($LASTEXITCODE -eq 0) { Add-OK 'Validate-Workstation: all checks passed' }
 else { Add-Risk 'High' 'Validation failures' 'Run doctor; review C:\Logs\Workstation\validation-*.json' }
@@ -133,8 +133,8 @@ if ($ApplyFixes) {
     if (-not $email -or ($email -match '@local\.workstation$' -and $email -ne 'kgreen@local.workstation')) {
         git config --global user.email 'kgreen@local.workstation'
     }
-    & "$repoRoot\Fix-WorkstationPath.ps1"
-    & "$repoRoot\Install-ShellProfile.ps1" -Force | Out-Null
+    & "$repoRoot\scripts\maintainer\configure\Fix-WorkstationPath.ps1"
+    & "$repoRoot\scripts\maintainer\install\Install-ShellProfile.ps1" -Force | Out-Null
     Add-OK 'Applied: git identity, PATH fix, profile redeploy'
 }
 

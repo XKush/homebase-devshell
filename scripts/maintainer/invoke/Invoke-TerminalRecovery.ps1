@@ -36,7 +36,7 @@ Write-WorkstationLog "Backup: $bakRoot" 'OK'
 
 # Phase 1 — Audit
 Write-WorkstationStep 'Phase 1 — Terminal audit'
-& "$repoRoot\Invoke-TerminalAudit.ps1" | Out-Null
+& "$repoRoot\scripts\maintainer\invoke\Invoke-TerminalAudit.ps1" | Out-Null
 $auditIssues = @()
 $latestAudit = Get-ChildItem $logsRoot -Filter 'terminal-audit-*.json' -ErrorAction SilentlyContinue |
     Sort-Object Name -Descending | Select-Object -First 1
@@ -64,7 +64,7 @@ if ($PreferJetBrains) {
         if ($reg -like '*JetBrainsMono NF Regular*') { $fontFace = 'JetBrainsMono NF' }
     }
 } else {
-    & "$repoRoot\Repair-WorkstationFonts.ps1" -Force
+    & "$repoRoot\scripts\maintainer\configure\Repair-WorkstationFonts.ps1" -Force
     $fontFace = 'CaskaydiaCove NF'
 }
 
@@ -87,7 +87,7 @@ if (Test-Path $wtPath) {
 
 # Phase 3 — Windows Terminal standardization
 Write-WorkstationStep 'Phase 3 — Windows Terminal standardization'
-& "$repoRoot\Install-ShellProfile.ps1" -Force
+& "$repoRoot\scripts\maintainer\install\Install-ShellProfile.ps1" -Force
 # Default terminal app (console + terminal)
 $defTermPath = 'HKCU:\Console\%%Startup'
 if (-not (Test-Path $defTermPath)) { New-Item -Path $defTermPath -Force | Out-Null }
@@ -134,7 +134,7 @@ if (Test-Path $wocSession) {
 }
 [Environment]::SetEnvironmentVariable('FASTFETCH_CONFIG', (Join-Path $configsRoot 'fastfetch-config.jsonc'), 'User')
 
-& "$repoRoot\Install-ShellProfile.ps1" -Force
+& "$repoRoot\scripts\maintainer\install\Install-ShellProfile.ps1" -Force
 
 # Phase 6-8 — Validation
 Write-WorkstationStep 'Phase 8 — Validation'
@@ -149,9 +149,9 @@ $reports = [ordered]@{
 }
 
 if (-not $SkipValidation) {
-    & "$repoRoot\Validate-Workstation.ps1" -StartupBudgetMs 300 | Out-Null
+    & "$repoRoot\scripts\maintainer\install\Validate-Workstation.ps1" -StartupBudgetMs 300 | Out-Null
     $reports.ValidationPassed = ($LASTEXITCODE -eq 0)
-    & "$repoRoot\Invoke-TerminalAudit.ps1" | Out-Null
+    & "$repoRoot\scripts\maintainer\invoke\Invoke-TerminalAudit.ps1" | Out-Null
     $latestAuditAfter = Get-ChildItem $logsRoot -Filter 'terminal-audit-*.json' -ErrorAction SilentlyContinue |
         Sort-Object Name -Descending | Select-Object -First 1
     if ($latestAuditAfter) {

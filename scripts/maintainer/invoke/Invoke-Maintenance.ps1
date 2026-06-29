@@ -18,12 +18,12 @@ Write-WorkstationStep 'Maintenance started'
 
 # 1. Health report
 Write-WorkstationStep 'Health check'
-& "$repoRoot\Validate-Workstation.ps1" -StartupBudgetMs 650 | Out-Null
+& "$repoRoot\scripts\maintainer\install\Validate-Workstation.ps1" -StartupBudgetMs 650 | Out-Null
 $healthOk = ($LASTEXITCODE -eq 0)
 
 # 2. Log cleanup
 Write-WorkstationStep 'Log rotation'
-& "$repoRoot\Invoke-Housekeeping.ps1" -WhatIf:$WhatIf
+& "$repoRoot\scripts\maintainer\invoke\Invoke-Housekeeping.ps1" -WhatIf:$WhatIf
 
 # 3. Config backup (weekly)
 $lastBackup = Get-ChildItem 'C:\Backups\Workstation' -Directory -ErrorAction SilentlyContinue |
@@ -31,7 +31,7 @@ $lastBackup = Get-ChildItem 'C:\Backups\Workstation' -Directory -ErrorAction Sil
 $backupAge = if ($lastBackup) { ((Get-Date) - $lastBackup.CreationTime).TotalDays } else { 999 }
 if ($Full -or $backupAge -gt 7) {
     Write-WorkstationStep 'Configuration backup'
-    & "$repoRoot\Backup-Configuration.ps1" -Force
+    & "$repoRoot\scripts\maintainer\invoke\Backup-Configuration.ps1" -Force
 }
 
 # 4. Disk space + memory snapshot (for dashboard cache)

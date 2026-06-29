@@ -75,7 +75,7 @@ Write-Host "Repository: $repoRoot" -ForegroundColor DarkGray
 
 Write-Host ''
 Write-Host '==> Bootstrap (folders + profile, user scope)' -ForegroundColor Cyan
-& (Join-Path $repoRoot 'Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin
+& (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin
 if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
     Write-Host ''
     Write-Host 'FAIL: Bootstrap reported errors. See output above and C:\Logs\Workstation\' -ForegroundColor Red

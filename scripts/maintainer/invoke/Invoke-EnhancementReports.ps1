@@ -15,8 +15,8 @@ $dir = 'C:\Logs\Workstation'
 Write-WorkstationStep 'Final enhancement reports'
 
 # Re-run lightweight audits
-& "$repoRoot\Invoke-OrganizationAudit.ps1" | Out-Null
-& "$repoRoot\Validate-Workstation.ps1" -StartupBudgetMs 300 | Out-Null
+& "$repoRoot\scripts\maintainer\invoke\Invoke-OrganizationAudit.ps1" | Out-Null
+& "$repoRoot\scripts\maintainer\install\Validate-Workstation.ps1" -StartupBudgetMs 300 | Out-Null
 $valOk = ($LASTEXITCODE -eq 0)
 
 # Tool inventory snapshot

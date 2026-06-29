@@ -20,15 +20,15 @@ $wtPath = Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb
 $wt = Get-Content $wtPath -Raw | ConvertFrom-Json
 if ($wt.profiles.defaults.font.face -ne 'CaskaydiaCove NF') {
     Write-WorkstationLog 'Auto-repairing font mismatch' 'WARN'
-    & "$repoRoot\Repair-WorkstationAll.ps1"
+    & "$repoRoot\scripts\maintainer\invoke\Repair-WorkstationAll.ps1"
 }
 
 # Validation
-& "$repoRoot\Validate-Workstation.ps1" -StartupBudgetMs $StartupBudgetMs
+& "$repoRoot\scripts\maintainer\install\Validate-Workstation.ps1" -StartupBudgetMs $StartupBudgetMs
 $valOk = ($LASTEXITCODE -eq 0)
 
 # Acceptance
-& "$repoRoot\Invoke-AcceptanceTest.ps1" -StartupBudgetMs $StartupBudgetMs
+& "$repoRoot\scripts\maintainer\invoke\Invoke-AcceptanceTest.ps1" -StartupBudgetMs $StartupBudgetMs
 $accOk = ($LASTEXITCODE -eq 0)
 
 # Benchmark

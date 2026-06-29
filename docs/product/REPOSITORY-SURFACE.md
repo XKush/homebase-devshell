@@ -26,21 +26,21 @@ devshell doctor
 devshell status
 ```
 
-Everything else in this repository is **operator / maintainer tooling**, not part of the public product.
+Everything else lives under **`scripts/maintainer/`** — not at the repository root.
 
 ---
 
-## Why root still has other `.ps1` files
+## Where maintainer scripts live
 
-Many scripts appear at the repository root as **thin shims** for backwards compatibility:
+| Subfolder | Examples |
+|-----------|----------|
+| `scripts/maintainer/install/` | `Install-Workstation.ps1`, `Validate-Workstation.ps1`, install chain |
+| `scripts/maintainer/invoke/` | `Invoke-Maintenance.ps1`, audits, organization |
+| `scripts/maintainer/configure/` | `Configure-Privacy.ps1`, `Fix-WorkstationPath.ps1` |
+| `scripts/maintainer/test/` | `Test-WorkstationPlatformHardening.ps1`, release gates |
+| `scripts/maintainer/phase2/` | Phase 2 migration tooling |
 
-```
-Root Invoke-Maintenance.ps1  →  scripts/maintainer/invoke/Invoke-Maintenance.ps1
-Root Configure-GitIdentity.ps1  →  scripts/maintainer/configure/...
-Root Test-WorkstationPlatformHardening.ps1  →  scripts/maintainer/test/...
-```
-
-Install chain (`Install-Workstation.ps1`, `Validate-Workstation.ps1`, …) stays at root because product install calls them by path.
+`install.ps1` and `devshell.ps1` call `scripts/maintainer/install/` directly. There are **no root shims** in the OSS surface.
 
 ---
 

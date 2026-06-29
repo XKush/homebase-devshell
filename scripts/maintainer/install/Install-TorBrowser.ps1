@@ -6,8 +6,11 @@
 param([switch]$Force)
 
 $ErrorActionPreference = 'Continue'
-. "$PSScriptRoot\lib\WorkstationCommon.ps1"
-. "$PSScriptRoot\lib\TorCommon.ps1"
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+$script:WSRoot = $repoRoot
+. (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
+. (Join-Path $repoRoot 'lib\TorCommon.ps1')
 Assert-DefenderUntouched
 
 Write-WorkstationStep 'Tor Browser installation'
@@ -22,6 +25,9 @@ $args = @(
     'install', '-e', '--id', 'TorProject.TorBrowser'
     '--accept-package-agreements', '--accept-source-agreements', '--disable-interactivity'
 )
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+$script:WSRoot = $repoRoot
 if ($Force) { $args += '--force' }
 $proc = Start-Process -FilePath winget -ArgumentList $args -Wait -PassThru -NoNewWindow
 if ($proc.ExitCode -notin 0, -1978335189) {

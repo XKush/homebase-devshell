@@ -8,7 +8,10 @@
 param([switch]$Force)
 
 $ErrorActionPreference = 'Continue'
-. "$PSScriptRoot\lib\WorkstationCommon.ps1"
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+$script:WSRoot = $repoRoot
+. (Join-Path $repoRoot 'lib\WorkstationCommon.ps1')
 Assert-DefenderUntouched
 
 Write-WorkstationStep 'GnuPG (OpenPGP) installation'
@@ -31,6 +34,9 @@ $gpgBins = @(
     'C:\Program Files (x86)\GnuPG\bin'
     'C:\Program Files\GnuPG\bin'
 )
+. (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
+$repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
+$script:WSRoot = $repoRoot
 $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
 foreach ($bin in $gpgBins) {
     if ((Test-Path $bin) -and $userPath -notlike "*$bin*") {
@@ -40,7 +46,7 @@ foreach ($bin in $gpgBins) {
     }
 }
 
-& (Join-Path $PSScriptRoot 'Fix-WorkstationPath.ps1') | Out-Null
+& (Resolve-WorkstationScript -Name 'Fix-WorkstationPath.ps1' -Start $PSScriptRoot) | Out-Null
 
 Write-WorkstationStep 'Validate GnuPG'
 if (Get-Command gpg -ErrorAction SilentlyContinue) {

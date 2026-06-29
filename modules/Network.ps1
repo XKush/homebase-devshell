@@ -102,8 +102,8 @@ function Invoke-SysAudit {
     if (Test-ShowCommandHelp -Name 'sysaudit' -Help:$Help) { return }
     Invoke-WorkstationCmd 'sysaudit' {
         Write-Host "`n  Аудит организации файлов" -ForegroundColor Cyan
-        $script = Join-Path $script:WSRoot 'Invoke-OrganizationAudit.ps1'
-        if (Test-Path $script) { & $script } else { & (Join-Path $script:WSRoot 'Invoke-SystemDiscovery.ps1') }
+        $script = Join-Path $script:WSRoot 'scripts\maintainer\invoke\Invoke-OrganizationAudit.ps1'
+        if (Test-Path $script) { & $script } else { & (Join-Path $script:WSRoot 'scripts\maintainer\invoke\Invoke-SystemDiscovery.ps1') }
         Write-Host "`n  Отчёты: C:\Logs\Workstation\" -ForegroundColor DarkGray
     }
 }

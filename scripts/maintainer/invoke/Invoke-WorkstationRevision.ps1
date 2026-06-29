@@ -24,10 +24,10 @@ $backupsRoot = Get-WorkstationBackupsRoot
 Write-WorkstationStep 'HOME BASE revision pass'
 
 # 1. PATH + docs sync
-& (Join-Path $repoRoot 'Fix-WorkstationPath.ps1') | Out-Null
-& (Join-Path $repoRoot 'Sync-WorkstationDocs.ps1') -CheckOnly
+& (Join-Path $repoRoot 'scripts\maintainer\configure\Fix-WorkstationPath.ps1') | Out-Null
+& (Join-Path $repoRoot 'scripts\maintainer\invoke\Sync-WorkstationDocs.ps1') -CheckOnly
 if ($LASTEXITCODE -ne 0) {
-    & (Join-Path $repoRoot 'Sync-WorkstationDocs.ps1') | Out-Null
+    & (Join-Path $repoRoot 'scripts\maintainer\invoke\Sync-WorkstationDocs.ps1') | Out-Null
 }
 
 # 2. Tor profile cleanup (wrong Profile Groups user.js)
@@ -42,7 +42,7 @@ if ((Test-Path $wrongJs) -and (Test-Path $rightJs)) {
 $doctorOk = $true
 if (-not $Quick) {
     Write-WorkstationStep 'Doctor (Validate-Workstation)'
-    & (Join-Path $repoRoot 'Validate-Workstation.ps1')
+    & (Join-Path $repoRoot 'scripts\maintainer\install\Validate-Workstation.ps1')
     $latest = Get-ChildItem $logsRoot -Filter 'validation-*.json' -ErrorAction SilentlyContinue |
         Sort-Object Name -Descending | Select-Object -First 1
     if ($latest) {
@@ -84,7 +84,7 @@ if ($Backup) {
     }
     if ($days -gt 7) {
         Write-WorkstationStep 'Backup (stale > 7d)'
-        & (Join-Path $repoRoot 'Backup-Configuration.ps1') -Force
+        & (Join-Path $repoRoot 'scripts\maintainer\invoke\Backup-Configuration.ps1') -Force
     } else {
         Write-WorkstationLog "Backup fresh ($days d) — skipped" 'OK'
     }

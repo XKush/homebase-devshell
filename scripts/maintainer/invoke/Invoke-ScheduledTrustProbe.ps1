@@ -13,7 +13,7 @@ $modulePath = Join-Path $repoRoot 'modules\KGreen.Workstation.psm1'
 Import-Module $modulePath -DisableNameChecking -Force
 
 $trust = Get-SystemTrustReport -Live -Save
-& (Join-Path $repoRoot 'Test-WorkstationCommands.ps1') -Quick | Out-Null
+& (Join-Path $repoRoot 'scripts\maintainer\test\Test-WorkstationCommands.ps1') -Quick | Out-Null
 
 @{
     Timestamp = (Get-Date).ToString('o')
