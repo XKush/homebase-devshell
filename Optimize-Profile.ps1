@@ -1,14 +1,20 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    Optimize profile for startup performance — benchmark before/after.
+    Profile startup diagnostics — benchmark and optimization suggestions (read-only).
+.NOTES
+    Wave A Commit 5: recommendations only. Does not deploy or mutate profile state.
 #>
-param([switch]$Apply)
+param(
+    [switch]$Apply
+)
 
 $ErrorActionPreference = 'Stop'
+$script:WSRoot = $PSScriptRoot
+. "$PSScriptRoot\lib\HomeBasePaths.ps1"
 . "$PSScriptRoot\lib\WorkstationCommon.ps1"
 
-$profilePath = 'C:\Scripts\Workstation\profile\Microsoft.PowerShell_profile.ps1'
+$profilePath = Join-Path (Get-HomeBasePath -Name RepositoryRoot) 'profile\Microsoft.PowerShell_profile.ps1'
 $livePath    = Join-Path $HOME 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'
 
 function Measure-ProfileLoad {
@@ -23,25 +29,51 @@ function Measure-ProfileLoad {
     return $sw.ElapsedMilliseconds
 }
 
-Write-WorkstationStep 'Benchmark current profile'
-$before = Measure-ProfileLoad -Path $livePath
-Write-WorkstationLog "Before: ${before}ms"
+function Get-ProfileOptimizationRecommendations {
+    param([int]$LoadMs)
 
-if (-not $Apply) {
-    Write-Host "Current load: ${before}ms. Run with -Apply to deploy optimized profile."
-    return
+    $rec = [System.Collections.Generic.List[string]]::new()
+    if ($LoadMs -gt 600) {
+        $rec.Add('Profile load exceeds 600ms budget — review deferred imports in profile bootstrap')
+    } elseif ($LoadMs -gt 300) {
+        $rec.Add('Profile load above 300ms target — consider WORKSTATION_STARTUP_MODE=minimal')
+    } else {
+        $rec.Add('Profile load within target — no startup optimization required')
+    }
+
+    if (-not (Test-Path $livePath)) {
+        $rec.Add('Live PS7 profile missing — run Install-ShellProfile.ps1 or fixprofile')
+    } elseif ((Test-Path $profilePath) -and ((Get-FileHash $profilePath).Hash -ne (Get-FileHash $livePath).Hash)) {
+        $rec.Add('Canonical profile differs from live profile — run fixprofile to sync')
+    }
+
+    if (-not (Get-Command oh-my-posh -ErrorAction SilentlyContinue)) {
+        $rec.Add('Oh My Posh not installed — prompt theme unavailable')
+    }
+
+    return @($rec)
 }
 
-Write-WorkstationStep 'Deploying optimized profile (already in canonical file after edit)'
-Copy-Item $profilePath $livePath -Force
-& "$PSScriptRoot\Install-ShellProfile.ps1" -Force | Out-Null
+if ($Apply) {
+    Write-Warning 'Optimize-Profile -Apply is disabled in diagnostics layer. Review suggestions below and apply fixes manually.'
+}
 
-$after = Measure-ProfileLoad -Path $livePath
-Write-WorkstationLog "After: ${after}ms" 'OK'
-Write-Host "Improvement: $before ms -> $after ms ($([math]::Round(100 - ($after/$before*100), 1))% faster)"
+Write-WorkstationStep 'Benchmark current profile'
+$loadMs = Measure-ProfileLoad -Path $livePath
+Write-WorkstationLog "Profile load: ${loadMs}ms"
 
-@{
-    BeforeMs = $before
-    AfterMs  = $after
-    Timestamp = (Get-Date).ToString('o')
-} | ConvertTo-Json | Set-Content 'C:\Logs\Workstation\profile-benchmark.json' -Encoding UTF8
+$recommendations = Get-ProfileOptimizationRecommendations -LoadMs $loadMs
+
+Write-Host ''
+Write-Host 'Profile optimization suggestions:' -ForegroundColor Cyan
+foreach ($r in $recommendations) {
+    Write-Host "  → $r" -ForegroundColor Yellow
+}
+Write-Host ''
+
+[ordered]@{
+    LoadMs            = $loadMs
+    Recommendations   = @($recommendations)
+    Timestamp         = (Get-Date).ToString('o')
+    ApplySupported    = $false
+}

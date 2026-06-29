@@ -18,6 +18,25 @@ function Get-WocBackupsRoot {
     return 'C:\Backups\Workstation'
 }
 
+function Get-WocRepositoryRoot {
+    if ($script:WSRoot) { return $script:WSRoot }
+    if ($env:WORKSTATION_ROOT) { return $env:WORKSTATION_ROOT }
+    if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+        return Get-HomeBasePath -Name RepositoryRoot
+    }
+    return 'C:\Scripts\Workstation'
+}
+
+function Get-WocOmpThemePath {
+    if ($script:ProfileOmpTheme -and (Test-Path $script:ProfileOmpTheme)) {
+        return $script:ProfileOmpTheme
+    }
+    $repo = Get-WocRepositoryRoot
+    $active = Join-Path $repo 'terminal\active-theme.omp.json'
+    if (Test-Path $active) { return $active }
+    return Join-Path $repo 'terminal\homebase-hacker.omp.json'
+}
+
 $script:WocLogDir    = Get-WocLogsRoot
 $script:WocStatePath = Join-Path $script:WocLogDir 'woc-last-session.json'
 $script:WocCachePath = Join-Path $script:WocLogDir 'woc-cache.json'
@@ -53,7 +72,8 @@ function New-WocCheck([string]$Name, [string]$Status, [string]$Detail = '') {
 
 function Test-WocHealthChecks {
     $checks = [System.Collections.Generic.List[object]]::new()
-    $canon = 'C:\Scripts\Workstation\profile\Microsoft.PowerShell_profile.ps1'
+    $repo  = Get-WocRepositoryRoot
+    $canon = Join-Path $repo 'profile\Microsoft.PowerShell_profile.ps1'
     $live  = Join-Path $env:USERPROFILE 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'
 
     # PowerShell
@@ -64,7 +84,7 @@ function Test-WocHealthChecks {
     elseif (-not (Test-Path $canon)) { $checks.Add((New-WocCheck 'Profile' 'ERROR' 'canonical missing')) }
     else {
         $match = (Get-FileHash $canon).Hash -eq (Get-FileHash $live).Hash
-        $checks.Add((New-WocCheck 'Profile' $(if ($match) { 'OK' } else { 'WARNING' }) $(if ($match) { 'synced' } else { 'drift — fixprofile' })))
+        $checks.Add((New-WocCheck 'Profile' $(if ($match) { 'OK' } else { 'WARNING' }) $(if ($match) { 'synced' } else { 'drift detected' })))
     }
 
     # Windows Terminal
@@ -77,9 +97,8 @@ function Test-WocHealthChecks {
         } catch { $checks.Add((New-WocCheck 'Windows Terminal' 'WARNING' 'settings unreadable')) }
     } else { $checks.Add((New-WocCheck 'Windows Terminal' 'WARNING' 'settings not found')) }
 
-    # Oh My Posh — active theme (homebase-hacker)
-    $omp = 'C:\Scripts\Workstation\terminal\active-theme.omp.json'
-    if (-not (Test-Path $omp)) { $omp = 'C:\Scripts\Workstation\terminal\homebase-hacker.omp.json' }
+    # Oh My Posh — active theme (read-only config check)
+    $omp = Get-WocOmpThemePath
     if ((Get-Command oh-my-posh -EA SilentlyContinue) -and (Test-Path $omp)) {
         $checks.Add((New-WocCheck 'Oh My Posh' 'OK' (Split-Path $omp -Leaf)))
     } elseif (Get-Command oh-my-posh -EA SilentlyContinue) {
@@ -93,7 +112,7 @@ function Test-WocHealthChecks {
             $f = Get-Content $fs -Raw | ConvertFrom-Json
             $checks.Add((New-WocCheck 'Nerd Font' $(if ($f.FontFace -eq 'CaskaydiaCove NF') { 'OK' } else { 'ERROR' }) $f.FontFace))
         } catch { $checks.Add((New-WocCheck 'Nerd Font' 'WARNING' 'status unknown')) }
-    } else { $checks.Add((New-WocCheck 'Nerd Font' 'WARNING' 'run repairterminal')) }
+    } else { $checks.Add((New-WocCheck 'Nerd Font' 'WARNING' 'font-status.json missing')) }
 
     # Modules
     foreach ($mod in @('PSReadLine', 'posh-git')) {
@@ -133,7 +152,7 @@ function Test-WocHealthChecks {
 
     # Core scripts
     foreach ($scr in @('Validate-Workstation.ps1', 'Repair-WorkstationFonts.ps1', 'Invoke-Maintenance.ps1')) {
-        $p = Join-Path 'C:\Scripts\Workstation' $scr
+        $p = Join-Path (Get-WocRepositoryRoot) $scr
         $checks.Add((New-WocCheck "Script $scr" $(if (Test-Path $p) { 'OK' } else { 'ERROR' }) ''))
     }
 
@@ -439,22 +458,9 @@ function Write-WocActionCenter {
 }
 
 function Invoke-WocSelfHeal {
+    <# Wave A Commit 5 — observability only; repair/install removed from diagnostics layer. #>
     param($Report)
-    $healed = @()
-    $ws = 'C:\Scripts\Workstation'
-    $fontErr = $Report.Health | Where-Object { $_.Name -eq 'Nerd Font' -and $_.Status -eq 'ERROR' }
-    if ($fontErr) {
-        $rf = Join-Path $ws 'Repair-WorkstationFonts.ps1'
-        if (Test-Path $rf) { & $rf -Force -EA SilentlyContinue | Out-Null; $healed += 'font' }
-    }
-    $profWarn = $Report.Health | Where-Object { $_.Name -eq 'Profile' -and $_.Status -ne 'OK' }
-    if ($profWarn) {
-        $ip = Join-Path $ws 'Install-ShellProfile.ps1'
-        if (Test-Path $ip) { & $ip -Force -EA SilentlyContinue | Out-Null; $healed += 'profile' }
-    }
-    $fp = Join-Path $ws 'Fix-WorkstationPath.ps1'
-    if (Test-Path $fp) { & $fp -EA SilentlyContinue | Out-Null; $healed += 'path' }
-    return $healed
+    return @()
 }
 
 function Save-WocSessionState {
@@ -531,14 +537,6 @@ function Show-Woc {
 
     $report = Build-WocReport
 
-    if (-not $NoHeal) {
-        $healed = Invoke-WocSelfHeal -Report $report
-        if ($healed.Count) {
-            Write-WocLine "Self-heal: $($healed -join ', ')" 'DarkCyan'
-            $report = Build-WocReport
-        }
-    }
-
     Write-WocHeader
     Write-WocScoreBanner -Score $report.Score -Label $report.Label
 
@@ -555,7 +553,6 @@ function Show-Woc {
 
     if ($mode -eq 'minimal') {
         Write-WocLine "Next: $($report.Recommendations | Select-Object -First 1)" 'Yellow'
-        Save-WocSessionState -Report $report
         $sw.Stop()
         Write-Host ""
         return
@@ -624,7 +621,6 @@ function Show-Woc {
 
     Write-WocActionCenter
 
-    Save-WocSessionState -Report $report
     $sw.Stop()
     if ($sw.ElapsedMilliseconds -gt 1000) {
         Write-WocLine "Loaded in $($sw.ElapsedMilliseconds)ms — run Invoke-Maintenance.ps1 -Full to refresh cache" 'DarkGray'
