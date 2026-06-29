@@ -29,7 +29,7 @@ function Get-DevShellProductVersion {
     param([string]$Root)
     $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
     if (Test-Path $psd1) { return [string](Import-PowerShellDataFile $psd1).ModuleVersion }
-    return '2.0.0'
+    return '2.0.1'
 }
 
 function Show-DevShellHelp {

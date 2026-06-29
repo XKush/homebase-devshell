@@ -10,11 +10,23 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ## [Unreleased]
 
+---
+
+## [2.0.1] - 2026-06-29
+
+**OSS packaging & cleanup patch** — same platform spec `1.0.0` LOCKED, no architecture changes.
+
+### Fixed
+
+- Track runtime dependencies (`MenuSystem`, `AnonymityKit`, `Invoke-MenuPreview`) — fresh clone works
+- Restore missing Shell navigation commands (`downloads`, `desktop`, `backups`, `configs`, `networking`)
+- Command registry parity (`go`, `anon`, `tor-browser`) — 72/72 command health
+
 ### Changed
 
-- Repository cleanup for OSS adoption: user docs in `docs/`, maintainer material in `internal-docs/`
-- README simplified — public surface is install → doctor → status only
-- `.gitignore` expanded for WIP scripts and validation reports
+- Repository root collapsed to product surface: `install.ps1`, `devshell.ps1` only
+- All maintainer/install scripts under `scripts/maintainer/` with path resolution helper
+- Removed 37 root shims — zero confusion for OSS visitors
 
 ---
 
@@ -55,5 +67,6 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.1
 [2.0.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.0

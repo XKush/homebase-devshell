@@ -3,7 +3,7 @@
 .SYNOPSIS
     HomeBase DevShell one-line bootstrap installer.
 .EXAMPLE
-    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
+    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.1/install.ps1 | iex
 .EXAMPLE
     pwsh -File install.ps1
 #>
