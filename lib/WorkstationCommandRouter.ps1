@@ -5,7 +5,8 @@
 # Does not interpret capabilities, filter commands, or mutate environment.
 
 function Get-WorkstationCommandMap {
-    $registry = Get-WorkstationCommandRegistry
+    $registry = $script:WorkstationCommandRegistry
+    if (-not $registry) { return @{} }
     $map = @{}
     foreach ($name in $registry.Keys) {
         $map[$name] = $registry[$name].Handler
@@ -21,12 +22,20 @@ function Invoke-WorkstationCommand {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string]$Name,
-        [hashtable]$Args = @{}
+        [Alias('Args')]
+        [hashtable]$CommandArgs = @{}
     )
 
-    $entry = Get-WorkstationCommandByName -Name $Name
+    if (Get-Command New-WorkstationLifecycleEvent -ErrorAction SilentlyContinue) {
+        New-WorkstationLifecycleEvent -Layer Router -Family command.execute -Phase start -Target $Name | Out-Null
+    }
+
+    $registry = $script:WorkstationCommandRegistry
+    $entry = if ($registry -and $registry.ContainsKey($Name)) { $registry[$Name] } else { $null }
     if (-not $entry) {
-        $registry = Get-WorkstationCommandRegistry
+        if (Get-Command New-WorkstationLifecycleEvent -ErrorAction SilentlyContinue) {
+            New-WorkstationLifecycleEvent -Layer Router -Family command.execute -Phase fail -Target $Name | Out-Null
+        }
         return [PSCustomObject]@{
             Status     = 'NotFound'
             Name       = $Name
@@ -34,5 +43,16 @@ function Invoke-WorkstationCommand {
         }
     }
 
-    return & $entry.Handler -Args $Args
+    try {
+        $result = & $entry.Handler $CommandArgs
+        if (Get-Command New-WorkstationLifecycleEvent -ErrorAction SilentlyContinue) {
+            New-WorkstationLifecycleEvent -Layer Router -Family command.execute -Phase success -Target $Name | Out-Null
+        }
+        return $result
+    } catch {
+        if (Get-Command New-WorkstationLifecycleEvent -ErrorAction SilentlyContinue) {
+            New-WorkstationLifecycleEvent -Layer Router -Family command.execute -Phase fail -Target $Name | Out-Null
+        }
+        throw
+    }
 }

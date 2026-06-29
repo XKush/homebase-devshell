@@ -5,7 +5,9 @@
 # Does not execute commands, filter routing, enforce permissions, or mutate registry.
 
 function Get-WorkstationCapabilityMatrix {
-    $registry = Get-WorkstationCommandRegistry
+    $registry = $script:WorkstationCommandRegistry
+    if (-not $registry) { $registry = @{} }
+
     $grouped = @{}
 
     foreach ($name in ($registry.Keys | Sort-Object)) {
@@ -27,11 +29,12 @@ function Get-WorkstationCommandsByCapability {
     param([Parameter(Mandatory)][string]$Capability)
     $matrix = Get-WorkstationCapabilityMatrix
     if (-not $matrix.Contains($Capability)) { return @() }
-    return @($matrix[$Capability])
+    return ,@($matrix[$Capability])
 }
 
 function Get-WorkstationCapabilityUsageReport {
-    $registry = Get-WorkstationCommandRegistry
+    $registry = $script:WorkstationCommandRegistry
+    if (-not $registry) { $registry = @{} }
     $matrix   = Get-WorkstationCapabilityMatrix
 
     $commandsPerCapability = [ordered]@{}

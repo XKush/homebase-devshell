@@ -1,0 +1,43 @@
+{
+  "label": "PlatformSpec-WaveABCD-Lock",
+  "specVersion": "1.0.0",
+  "lockStatus": "LOCKED",
+  "signedAt": "2026-06-29",
+  "scope": "profile-orchestration-platform",
+  "excludes": ["KGreen.Workstation module catalog"],
+  "hardening": {
+    "script": "Test-WorkstationPlatformHardening.ps1",
+    "scenariosPassed": 11,
+    "verifiedAt": "2026-06-29",
+    "loadSample": {
+      "iterations": 25,
+      "command": "env.show",
+      "avgMs": 0.48
+    }
+  },
+  "stack": [
+    "WaveA: HomeBasePaths, WorkstationCommon, ProfileEnvironment",
+    "WaveB: WorkstationOrchestrator, WorkstationCommandRegistry, WorkstationCommandRouter",
+    "WaveC: WorkstationCapabilityObservability, WorkstationEventCore, WorkstationPlatformContract, WorkstationExecutionTrace",
+    "WaveD: WorkstationCapabilityExtensions, WorkstationExtensionEventBridge, WorkstationExtensionRuntime"
+  ],
+  "registries": {
+    "coreCommands": "$script:WorkstationCommandRegistry",
+    "extensions": "$script:WorkstationExtensions",
+    "events": "$script:WorkstationEventBuffer",
+    "moduleCatalog": "Get-WorkstationCommandRegistry (KGreen.Workstation — separate)"
+  },
+  "coreCommands": ["profile.reload", "env.show", "diag.boot"],
+  "eventLifecycle": {
+    "router": ["command.execute.start", "command.execute.success", "command.execute.fail"],
+    "orchestrator": ["profile.init.start", "profile.init.success", "profile.init.fail"],
+    "extension": ["extension.execute.start", "extension.execute.success", "extension.execute.fail"]
+  },
+  "traceModel": {
+    "input": "$script:WorkstationEventBuffer",
+    "api": "Get-WorkstationExecutionTrace",
+    "outputFields": ["Time", "Command", "Layer", "Capability", "Status"],
+    "usageNote": "Assign directly; do not wrap in @(...)"
+  },
+  "signoffDoc": "docs/charter/PLATFORM-SPEC-SIGNOFF.md"
+}

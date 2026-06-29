@@ -38,8 +38,26 @@ $script:WSRoot = Resolve-WorkstationRepositoryRoot
 # ── B-layer capability observability (registry introspection — no control) ───
 . (Join-Path $script:WSRoot 'lib\WorkstationCapabilityObservability.ps1')
 
+# ── C-layer event core (passive execution trace — in-memory append only) ─────
+. (Join-Path $script:WSRoot 'lib\WorkstationEventCore.ps1')
+
+# ── C-layer platform contract (read-only Wave A–D boundaries) ───────────────
+. (Join-Path $script:WSRoot 'lib\WorkstationPlatformContract.ps1')
+
+# ── C-layer execution trace view (read-only join — events + registry metadata) ─
+. (Join-Path $script:WSRoot 'lib\WorkstationExecutionTrace.ps1')
+
 # ── B-layer command router (dispatch only — reads registry) ───────────────────
 . (Join-Path $script:WSRoot 'lib\WorkstationCommandRouter.ps1')
+
+# ── D-layer capability extensions (plugin boundary — no core routing/control) ─
+. (Join-Path $script:WSRoot 'lib\WorkstationCapabilityExtensions.ps1')
+
+# ── D-layer extension event bridge (emit-only wiring to Event Core) ──────────
+. (Join-Path $script:WSRoot 'lib\WorkstationExtensionEventBridge.ps1')
+
+# ── D-layer extension runtime (controlled sandbox invocation only) ───────────
+. (Join-Path $script:WSRoot 'lib\WorkstationExtensionRuntime.ps1')
 
 $script:IsInteractive = [Environment]::UserInteractive -and -not $env:CI -and $Host.Name -ne 'ServerRemoteHost'
 $script:WorkstationSessionReady = $false

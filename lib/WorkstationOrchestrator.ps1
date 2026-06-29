@@ -123,6 +123,11 @@ function Invoke-WorkstationProfile {
     }
 
     $root = Resolve-WorkstationOrchestratorRoot -RepositoryRoot $RepositoryRoot
+
+    if (Get-Command New-WorkstationLifecycleEvent -ErrorAction SilentlyContinue) {
+        New-WorkstationLifecycleEvent -Layer Orchestrator -Family profile.init -Phase start -Target $root | Out-Null
+    }
+
     $ctx  = New-WorkstationExecutionContext
 
     # C1 — Path SSOT (read-only verify)
@@ -155,6 +160,12 @@ function Invoke-WorkstationProfile {
 
     $script:WorkstationProfileOrchestrated = $true
     $global:WorkstationExecutionContext = $ctx
+
+    if (Get-Command New-WorkstationLifecycleEvent -ErrorAction SilentlyContinue) {
+        $lifecyclePhase = if ($ctx.Bootstrap -eq 'ERROR' -or $ctx.Environment -eq 'ERROR') { 'fail' } else { 'success' }
+        New-WorkstationLifecycleEvent -Layer Orchestrator -Family profile.init -Phase $lifecyclePhase -Target $root | Out-Null
+    }
+
     return $ctx
 }
 
