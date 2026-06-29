@@ -1,5 +1,5 @@
 {
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "DevReady — Windows dev environment health check for PowerShell 7",
   "homepage": "https://github.com/XKush/homebase-devshell",
   "license": "MIT",
@@ -8,7 +8,7 @@
     "pwsh": "extras/pwsh",
     "git": "git"
   },
-  "url": "https://github.com/XKush/homebase-devshell/releases/download/v2.2.1/devready-v2.2.1.zip",
+  "url": "https://github.com/XKush/homebase-devshell/releases/download/v2.2.2/devready-v2.2.2.zip",
   "hash": "sha256:f8af6047f58a59e93330183f4796b095d20047813fb1c892c82717128397e6a8",
   "extract_dir": ".",
   "post_install": [

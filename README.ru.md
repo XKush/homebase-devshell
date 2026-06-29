@@ -12,14 +12,14 @@
 
 ![DevReady — install, devready, Ready to work](docs/assets/devready-demo.gif)
 
-**Проверьте до запуска:** [`install.ps1` @ v2.2.1](https://github.com/XKush/homebase-devshell/blob/v2.2.1/install.ps1) · `devshell init` (dry-run) · [zip + SHA256](packaging/README.md)
+**Проверьте до запуска:** [`install.ps1` @ v2.2.2](https://github.com/XKush/homebase-devshell/blob/v2.2.2/install.ps1) · `devshell init` (dry-run) · [zip + SHA256](packaging/README.md)
 
 ---
 
 ## Старт за 30 секунд
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.1/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.2.2/install.ps1 | iex
 ```
 
 Закройте терминал. Откройте снова:
@@ -37,7 +37,7 @@ devready
 |---------|--------|
 | **`devready`** | Ежедневная проверка |
 | **`devshell install`** | Первая настройка (Core) |
-| **`devshell doctor`** | То же; `-Tier Full` для полного стека |
+| **`devshell doctor`** | То же; `-Tier Full` для полного стека; **`-Fix`** — авто-ремонт (winget + PSGallery) |
 
 </details>
 

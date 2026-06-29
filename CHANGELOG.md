@@ -12,6 +12,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
+## [2.2.2] - 2026-06-29
+
+**Doctor auto-repair** — platform spec `1.0.0` LOCKED.
+
+### Added
+
+- **`devshell doctor -Fix`** — auto-repair failed checks (winget, PSGallery, local scripts), then re-run doctor
+- **`Repair-DevReadyEnvironment.ps1`** — safe-source repair map (no Defender changes)
+
+### Changed
+
+- Fix hints suggest `devshell doctor -Fix` for missing tools and common failures
+
+---
+
 ## [2.2.1] - 2026-06-29
 
 **Product clarity P0** — platform spec `1.0.0` LOCKED.
@@ -220,7 +235,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.2.1...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.2.2...HEAD
+[2.2.2]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.2
 [2.2.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.1
 [2.2.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.2.0
 [2.1.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.1.1

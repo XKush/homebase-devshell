@@ -11,11 +11,13 @@
 
 `devready` ends with **Ready to work.** (green) or **Not ready yet.** with **Try this:** hints.
 
-1. Follow the hints, then run `devready` again  
-2. Or run `devshell install` and open a **new** terminal  
-3. Still stuck? See failed lines above or the JSON report path in the output  
+1. Run **`devshell doctor -Fix`** (or `devready -Fix` if shims work) — installs/repairs from winget + PSGallery  
+2. Follow the **Try this:** hints, then run `devready` again  
+3. Or run `devshell install` and open a **new** terminal  
+4. Still stuck? See failed lines above or the JSON report path in the output  
 
 ```powershell
+pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor -Fix
 pwsh -File $HOME\.homebase\devshell\devshell.ps1 install
 pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
 ```

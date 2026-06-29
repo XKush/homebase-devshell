@@ -12,6 +12,7 @@ param(
     [string]$Tier = 'Core',
     [switch]$SkipTools,
     [switch]$WithTools,
+    [switch]$Fix,
     [int]$Last = 20
 )
 
@@ -33,7 +34,7 @@ function Get-DevShellProductVersion {
     param([string]$Root)
     $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
     if (Test-Path $psd1) { return [string](Import-PowerShellDataFile $psd1).ModuleVersion }
-    return '2.2.1'
+    return '2.2.2'
 }
 
 function Show-DevShellHelp {
@@ -44,7 +45,7 @@ DevReady — HomeBase DevShell
   devready           Quick health check (same as devshell doctor)
   devshell init      Dry-run — show install plan (no winget, no changes)
   devshell install   Set up your shell (Core; add -WithTools for winget stack)
-  devshell doctor    Am I ready? (-Tier Core | Full)
+  devshell doctor    Am I ready? (-Tier Core | Full). Add -Fix to auto-repair.
   devshell status    Platform load status
 
   devshell help      Show this help
@@ -80,7 +81,12 @@ switch ($Command) {
         if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
     'doctor' {
-        & (Join-Path $repoRoot 'scripts\maintainer\install\Validate-Workstation.ps1') -Tier $Tier -StartupBudgetMs 650
+        $doctorArgs = @{
+            Tier             = $Tier
+            StartupBudgetMs  = 650
+        }
+        if ($Fix) { $doctorArgs['Fix'] = $true }
+        & (Join-Path $repoRoot 'scripts\maintainer\install\Validate-Workstation.ps1') @doctorArgs
         exit $LASTEXITCODE
     }
     'init' {

@@ -7,6 +7,7 @@
 #>
 param(
     [switch]$Fix,
+    [switch]$FixPassCompleted,
     [ValidateSet('Core', 'Full')]
     [string]$Tier = 'Full',
     [int]$StartupBudgetMs = 650
@@ -69,16 +70,19 @@ function Get-DevReadyFixHints {
                 'Install PowerShell 7+ (https://aka.ms/powershell), open a new terminal, run: devshell install'
             }
             if ($f -match 'profile|OMP|Windows Terminal|encoding|UTF-8') {
-                'Run: devshell install — then close every terminal and open a new one before devready'
+                'Run: devshell doctor -Fix — or devshell install, then open a new terminal'
             }
             if ($f -match 'command-health|Command center|module missing|WOC module') {
-                'Run: devshell install — if it persists, see docs/TROUBLESHOOTING.md'
+                'Run: devshell doctor -Fix — if it persists, see docs/TROUBLESHOOTING.md'
             }
             if ($f -match 'Tool missing') {
-                'Core needs pwsh + git only. For optional tools: devshell install -WithTools or devshell doctor -Tier Full'
+                'Core needs pwsh + git. Run: devshell doctor -Fix (or devshell install -WithTools for full stack)'
             }
             if ($f -match 'Directory missing') {
-                'Run: devshell install — creates standard folders from Config'
+                'Run: devshell doctor -Fix — creates standard folders from Config'
+            }
+            if ($f -match 'PATH') {
+                'Run: devshell doctor -Fix — repairs PATH entries'
             }
         ) | Where-Object { $_ }
 
@@ -91,7 +95,7 @@ function Get-DevReadyFixHints {
     }
 
     if ($hints.Count -eq 0 -and $Failed.Count -gt 0) {
-        $hints.Add('Run: devshell install — then devready again. See docs/TROUBLESHOOTING.md')
+        $hints.Add('Run: devshell doctor -Fix — or devshell install. See docs/TROUBLESHOOTING.md')
     }
     return $hints
 }
@@ -499,19 +503,12 @@ if (git config --global user.name 2>$null) { Add-Pass "Git user.name set" } else
 if (git config --global user.email 2>$null) { Add-Pass "Git user.email set" } else { Add-Warn 'Git user.email not configured' }
 
 # ── Auto-fix pass ────────────────────────────────────────────────────────────
-if ($Fix -and $report.Failed.Count -gt 0) {
-    Write-WorkstationStep 'Auto-fix attempt'
-    if ($report.Failed -match 'profile') {
-        & (Resolve-WorkstationScript -Name 'Install-ShellProfile.ps1' -Start $PSScriptRoot) -Force
-        Add-Warn 'Re-deployed shell profile'
-    }
-    if ($report.Failed -match 'Module missing') {
-        Install-Module PSReadLine, posh-git, Terminal-Icons -Scope CurrentUser -Force -AllowClobber -Repository PSGallery
-        Add-Warn 'Reinstalled PS modules'
-    }
-    if ($report.Failed -match 'Profile load too slow') {
-        Add-Warn 'Profile optimization required — run Optimize-Profile.ps1'
-    }
+if ($Fix -and -not $FixPassCompleted -and $report.Failed.Count -gt 0) {
+    & (Join-Path $PSScriptRoot 'Repair-DevReadyEnvironment.ps1') -Tier $Tier -FailedChecks @($report.Failed)
+    Write-Host ''
+    Write-Host 'Re-checking after auto-repair...' -ForegroundColor Cyan
+    & $PSCommandPath -Tier $Tier -StartupBudgetMs $StartupBudgetMs -FixPassCompleted
+    return
 }
 
 # ── Summary ──────────────────────────────────────────────────────────────────

@@ -24,7 +24,8 @@ PATH shims: `devready.cmd` (doctor Core) · `devshell.cmd` (full CLI)
 | `Install-Workstation.ps1` | install / devshell install | Master orchestrator |
 | `Install-ShellProfile.ps1` | Install-Workstation | Deploy profile |
 | `Install-Software.ps1` | Install-Workstation (unless `-SkipSoftware`) | winget stack |
-| `Validate-Workstation.ps1` | devshell doctor | Health gate `-Tier Core\|Full` |
+| `Validate-Workstation.ps1` | devshell doctor | Health gate `-Tier Core\|Full`; `-Fix` auto-repair |
+| `Repair-DevReadyEnvironment.ps1` | doctor `-Fix` | winget + PSGallery + local scripts (safe sources) |
 | `Show-DevShellInitPlan.ps1` | devshell init | Dry-run install plan |
 | `Backup-Configuration.ps1` | Install-Workstation | Pre-change backup |
 | `Fix-WorkstationPath.ps1` | Install-Workstation | PATH repair |
