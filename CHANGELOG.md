@@ -10,6 +10,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ## [Unreleased]
 
+### Changed
+
+- Studio cleanup: growth copy moved to `internal-docs/marketing/`; no upload automation in repo
+- `.gitignore` blocks maintainer scratch (`.tmp-*.json`)
+
 ---
 
 ## [2.1.0] - 2026-06-29

@@ -21,6 +21,20 @@ PATH shims (after install): **`devready.cmd`** · **`devshell.cmd`** in `%LOCALA
 
 ---
 
+## `.github/` — automation & templates
+
+| Path | Purpose |
+|------|---------|
+| `workflows/ci.yml` | Release gates (4 jobs) |
+| `ISSUE_TEMPLATE/` | Bug, install-help |
+| `pull_request_template.md` | PR checklist |
+| `FUNDING.yml` | Sponsor link (optional) |
+| `social-preview.png` | Maintainer asset for Settings → Social preview |
+
+Growth copy and launch templates: `internal-docs/marketing/` (not public tree).
+
+---
+
 ## Root — CI audit gates
 
 | File | Purpose |

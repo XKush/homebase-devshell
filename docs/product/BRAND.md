@@ -52,13 +52,9 @@ Badge colors: PowerShell blue `#5391FE`, success green for "Ready to work".
 
 ### GitHub social preview (1200×630)
 
-File: [`.github/social-preview.png`](../../.github/social-preview.png)
+Asset: [`.github/social-preview.png`](../../.github/social-preview.png)
 
-After pushing, set it once in the repo:
-
-**Settings → General → Social preview → Upload an image** → choose `.github/social-preview.png`
-
-This image appears when the repo link is shared on X, Slack, Discord, etc.
+Set once in **Settings → General → Social preview** when preparing a release. Not required for install or doctor.
 
 ---
 

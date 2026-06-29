@@ -23,6 +23,7 @@ credentials.json
 
 # Scratch and WIP (do not ship to public users)
 *.tmp
+.tmp-*.json
 *.bak
 modules/Shell.ps1.tmp
 
