@@ -34,7 +34,7 @@ Engineering guardrails for contributors and future maintainers. When in doubt, p
 
 | Before you… | Read |
 |-------------|------|
-| Propose a feature | [MANIFESTO](MANIFESTO.md) · [ROADMAP](ROADMAP.md) |
+| Propose a feature | [MANIFESTO](MANIFESTO.md) · [ROADMAP](ROADMAP.md) · [RFC](rfc/README.md) if large |
 | Change JSON output | [JSON-SCHEMA](JSON-SCHEMA.md) |
 | Change architecture | New [ADR](adr/) |
 | Cut a release | [RELEASE-CRITERIA](RELEASE-CRITERIA.md) |

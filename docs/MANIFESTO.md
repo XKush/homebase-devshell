@@ -2,6 +2,8 @@
 
 One page on **why** this project exists and **what it refuses to become**.
 
+We optimize for **trust**, not feature count. Trust comes from consistent decisions over a long time — not from shipping the largest PowerShell toolkit.
+
 ---
 
 ## Why we exist
