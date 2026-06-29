@@ -1,14 +1,47 @@
 # DevShell Health — unified readiness dashboard (v3)
 # C:\Scripts\Workstation\lib\DevShellHealth.ps1
 
+$script:DevShellHealthAllSections = @(
+    'developer'
+    'privacyConfiguration'
+    'browserConfiguration'
+    'network'
+)
+
+$script:DevShellHealthSectionAliases = @{
+    developer            = 'developer'
+    dev                  = 'developer'
+    privacy              = 'privacyConfiguration'
+    privacyconfiguration = 'privacyConfiguration'
+    browser              = 'browserConfiguration'
+    browserconfiguration = 'browserConfiguration'
+    network              = 'network'
+    net                  = 'network'
+}
+
+function Get-DevShellHealthLogsRoot {
+    param([string]$RepoRoot)
+    if (Get-Command Get-WorkstationLogsRoot -ErrorAction SilentlyContinue) {
+        return Get-WorkstationLogsRoot
+    }
+    if ($RepoRoot) {
+        return (Join-Path $RepoRoot '..\..\Logs\Workstation')
+    }
+    return 'C:\Logs\Workstation'
+}
+
+function Initialize-DevShellParentDirectory {
+    param([Parameter(Mandatory)][string]$FilePath)
+    $dir = [System.IO.Path]::GetDirectoryName($FilePath)
+    if ($dir -and -not (Test-Path -LiteralPath $dir)) {
+        $null = New-Item -ItemType Directory -Force -Path $dir
+    }
+}
+
 function Get-DevShellHealthPaths {
     param([string]$RepoRoot)
     $homeBase = Join-Path $env:USERPROFILE '.homebase'
-    $logs = if (Get-Command Get-WorkstationLogsRoot -ErrorAction SilentlyContinue) {
-        Get-WorkstationLogsRoot
-    } else {
-        'C:\Logs\Workstation'
-    }
+    $logs = Get-DevShellHealthLogsRoot -RepoRoot $RepoRoot
     [PSCustomObject]@{
         Baseline     = Join-Path $homeBase 'baseline.json'
         History      = Join-Path $logs 'health-history.jsonl'
@@ -20,7 +53,7 @@ function Get-DevShellSectionStatus {
     param(
         [int]$FailCount,
         [int]$WarnCount,
-        [string]$ScoreLabel = $null
+        [string]$ScoreLabel
     )
     if ($FailCount -gt 0) { return 'FAIL' }
     if ($ScoreLabel) { return $ScoreLabel }
@@ -30,55 +63,72 @@ function Get-DevShellSectionStatus {
 
 function Invoke-DevShellDoctorJson {
     param(
-        [string]$RepoRoot,
+        [Parameter(Mandatory)][string]$RepoRoot,
         [ValidateSet('Core', 'Full')]
         [string]$Tier = 'Core'
     )
-    $logs = if (Get-Command Get-WorkstationLogsRoot -ErrorAction SilentlyContinue) {
-        Get-WorkstationLogsRoot
-    } else {
-        Join-Path $RepoRoot '..\..\Logs\Workstation'
+    $logs = Get-DevShellHealthLogsRoot -RepoRoot $RepoRoot
+    if (-not (Test-Path -LiteralPath $logs)) {
+        $null = New-Item -ItemType Directory -Force -Path $logs
     }
-    if (-not (Test-Path $logs)) { New-Item -ItemType Directory -Force -Path $logs | Out-Null }
     $scriptPath = Join-Path $RepoRoot 'scripts\maintainer\install\Validate-Workstation.ps1'
+    if (-not (Test-Path -LiteralPath $scriptPath)) { return $null }
     $null = & $scriptPath -Tier $Tier -JsonOnly *> $null
-    $latest = Get-ChildItem $logs -Filter 'validation-*.json' -ErrorAction SilentlyContinue |
-        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $latest = Get-ChildItem -LiteralPath $logs -Filter 'validation-*.json' -File -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
     if (-not $latest) { return $null }
-    try { return Get-Content $latest.FullName -Raw | ConvertFrom-Json } catch { return $null }
+    try {
+        return Get-Content -LiteralPath $latest.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+    } catch {
+        return $null
+    }
 }
 
 function Resolve-DevShellHealthSectionKeys {
     param([string[]]$Sections)
-    $all = @('developer', 'privacyConfiguration', 'browserConfiguration', 'network')
-    if (-not $Sections -or $Sections.Count -eq 0) { return $all }
-    $map = @{
-        developer            = 'developer'
-        dev                  = 'developer'
-        privacy              = 'privacyConfiguration'
-        privacyConfiguration = 'privacyConfiguration'
-        browser              = 'browserConfiguration'
-        browserConfiguration = 'browserConfiguration'
-        network              = 'network'
-        net                  = 'network'
+    if (-not $Sections -or $Sections.Count -eq 0) {
+        return $script:DevShellHealthAllSections
     }
-    $selected = [System.Collections.Generic.List[string]]::new()
+    $selected = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
     foreach ($s in $Sections) {
         foreach ($part in ($s -split '[,;]')) {
-            $key = $part.Trim()
-            if ([string]::IsNullOrWhiteSpace($key)) { continue }
-            $resolved = $map[$key]
-            if (-not $resolved) {
-                $lower = $key.ToLowerInvariant()
-                foreach ($entry in $map.GetEnumerator()) {
-                    if ($entry.Key -eq $lower) { $resolved = $entry.Value; break }
-                }
-            }
-            if ($resolved -and -not $selected.Contains($resolved)) { $selected.Add($resolved) }
+            $token = $part.Trim().ToLowerInvariant()
+            if ([string]::IsNullOrWhiteSpace($token)) { continue }
+            $canonical = $script:DevShellHealthSectionAliases[$token]
+            if ($canonical) { [void]$selected.Add($canonical) }
         }
     }
-    if ($selected.Count -eq 0) { return $all }
+    if ($selected.Count -eq 0) {
+        return $script:DevShellHealthAllSections
+    }
     return @($selected)
+}
+
+function New-DevShellScoredPrivacySection {
+    param(
+        [Parameter(Mandatory)][string]$Id,
+        [Parameter(Mandatory)][string]$Label,
+        [Parameter(Mandatory)]$Audit,
+        [Parameter(Mandatory)]$Document,
+        [string]$Disclaimer,
+        [string]$Detail
+    )
+    $entry = [ordered]@{
+        id       = $Id
+        label    = $Label
+        status   = Get-DevShellSectionStatus -FailCount $Audit.FailCount -WarnCount $Audit.WarnCount -ScoreLabel "$($Audit.Score)%"
+        score    = $Audit.Score
+        warnings = $Audit.WarnCount
+        failed   = $Audit.FailCount
+    }
+    if ($Disclaimer) { $entry.disclaimer = $Disclaimer }
+    if ($Detail) { $entry.detail = $Detail }
+    if ($Document -and $Document.score) { $entry.maxScore = $Document.score.max }
+    if ($Audit.RiskLevel) { $entry.riskLevel = $Audit.RiskLevel }
+    return $entry
 }
 
 function Get-DevShellHealthReport {
@@ -86,74 +136,86 @@ function Get-DevShellHealthReport {
         [Parameter(Mandatory)][string]$RepoRoot,
         [ValidateSet('Core', 'Full')]
         [string]$Tier = 'Core',
-        [string]$ProductVersion = '3.0.0',
+        [string]$ProductVersion = '3.0.1',
         [string[]]$SectionFilter
     )
 
-    $want = Resolve-DevShellHealthSectionKeys -Sections $SectionFilter
-    $runDeveloper = $want -contains 'developer'
-    $runPrivacy = $want -contains 'privacyConfiguration'
-    $runBrowser = $want -contains 'browserConfiguration'
-    $runNetwork = $want -contains 'network'
+    $requested = @(Resolve-DevShellHealthSectionKeys -Sections $SectionFilter)
+    $want = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($key in $requested) { [void]$want.Add($key) }
+
+    $runDeveloper = $want.Contains('developer')
+    $runPrivacy = $want.Contains('privacyConfiguration')
+    $runBrowser = $want.Contains('browserConfiguration')
+    $runNetwork = $want.Contains('network')
 
     if ($runPrivacy -or $runBrowser -or $runNetwork) {
         . (Join-Path $RepoRoot 'lib\PrivacyAudit.ps1')
     }
 
     $doctor = if ($runDeveloper) { Invoke-DevShellDoctorJson -RepoRoot $RepoRoot -Tier $Tier } else { $null }
-    $privacy = if ($runPrivacy) { Get-PrivacyAuditReport -Scope System -RepoRoot $RepoRoot -ProductVersion $ProductVersion } else { $null }
-    $browser = if ($runBrowser) { Get-PrivacyAuditReport -Scope Browser -RepoRoot $RepoRoot -ProductVersion $ProductVersion } else { $null }
-    $network = if ($runNetwork) { Get-PrivacyAuditReport -Scope Vpn -RepoRoot $RepoRoot -ProductVersion $ProductVersion } else { $null }
+    $privacy = if ($runPrivacy) {
+        Get-PrivacyAuditReport -Scope System -RepoRoot $RepoRoot -ProductVersion $ProductVersion
+    } else { $null }
+    $browser = if ($runBrowser) {
+        Get-PrivacyAuditReport -Scope Browser -RepoRoot $RepoRoot -ProductVersion $ProductVersion
+    } else { $null }
+    $network = if ($runNetwork) {
+        Get-PrivacyAuditReport -Scope Vpn -RepoRoot $RepoRoot -ProductVersion $ProductVersion
+    } else { $null }
 
-    $devFail = if ($runDeveloper) { if ($doctor) { @($doctor.Failed).Count } else { 1 } } else { 0 }
+    $devFail = if (-not $runDeveloper) { 0 } elseif ($doctor) { @($doctor.Failed).Count } else { 1 }
     $devWarn = if ($runDeveloper -and $doctor) { @($doctor.Warnings).Count } else { 0 }
     $devPass = if ($runDeveloper -and $doctor) { @($doctor.Passed).Count } else { 0 }
 
-    $privacyDoc = if ($runPrivacy) { ConvertTo-PrivacyReportDocument -Report $privacy -ProductVersion $ProductVersion -Context $privacy.Context } else { $null }
+    $privacyDoc = if ($runPrivacy) {
+        ConvertTo-PrivacyReportDocument -Report $privacy -ProductVersion $ProductVersion -Context $privacy.Context
+    } else { $null }
 
-    $sections = [ordered]@{}
+    $sectionMap = [ordered]@{}
     if ($runDeveloper) {
-        $sections['developer'] = [ordered]@{
-            id          = 'developer'
-            label       = 'Developer'
-            status      = Get-DevShellSectionStatus -FailCount $devFail -WarnCount $devWarn
-            passed      = $devPass
-            failed      = $devFail
-            warnings    = $devWarn
-            tier        = $Tier
-            detail      = if ($devFail -eq 0) { 'Shell, tools, profile checks' } else { (@($doctor.Failed) | Select-Object -First 2) -join '; ' }
+        $sectionMap['developer'] = [ordered]@{
+            id       = 'developer'
+            label    = 'Developer'
+            status   = Get-DevShellSectionStatus -FailCount $devFail -WarnCount $devWarn
+            passed   = $devPass
+            failed   = $devFail
+            warnings = $devWarn
+            tier     = $Tier
+            detail   = if ($devFail -eq 0) {
+                'Shell, tools, profile checks'
+            } else {
+                (@($doctor.Failed) | Select-Object -First 2) -join '; '
+            }
         }
     }
     if ($runPrivacy) {
-        $sections['privacyConfiguration'] = [ordered]@{
-            id          = 'privacyConfiguration'
-            label       = 'Privacy Configuration'
-            status      = Get-DevShellSectionStatus -FailCount $privacy.FailCount -WarnCount $privacy.WarnCount -ScoreLabel "$($privacy.Score)%"
-            score       = $privacy.Score
-            maxScore    = $privacyDoc.score.max
-            riskLevel   = $privacy.RiskLevel
-            disclaimer  = 'OS configuration only. Does not measure network anonymity.'
-            warnings    = $privacy.WarnCount
-            failed      = $privacy.FailCount
-        }
+        $sectionMap['privacyConfiguration'] = New-DevShellScoredPrivacySection `
+            -Id 'privacyConfiguration' `
+            -Label 'Privacy Configuration' `
+            -Audit $privacy `
+            -Document $privacyDoc `
+            -Disclaimer 'OS configuration only. Does not measure network anonymity.'
     }
     if ($runBrowser) {
-        $sections['browserConfiguration'] = [ordered]@{
-            id       = 'browserConfiguration'
-            label    = 'Browser Configuration'
-            status   = Get-DevShellSectionStatus -FailCount $browser.FailCount -WarnCount $browser.WarnCount -ScoreLabel "$($browser.Score)%"
-            score    = $browser.Score
-            warnings = $browser.WarnCount
-            detail   = 'Policy and prefs audit — not a full browser security review.'
-        }
+        $sectionMap['browserConfiguration'] = New-DevShellScoredPrivacySection `
+            -Id 'browserConfiguration' `
+            -Label 'Browser Configuration' `
+            -Audit $browser `
+            -Document (ConvertTo-PrivacyReportDocument -Report $browser -ProductVersion $ProductVersion -Context $browser.Context) `
+            -Detail 'Policy and prefs audit — not a full browser security review.'
     }
     if ($runNetwork) {
-        $sections['network'] = [ordered]@{
+        $networkDoc = ConvertTo-PrivacyReportDocument -Report $network -ProductVersion $ProductVersion -Context $network.Context
+        $sectionMap['network'] = [ordered]@{
             id       = 'network'
             label    = 'Network'
             status   = Get-DevShellSectionStatus -FailCount $network.FailCount -WarnCount $network.WarnCount
             score    = $network.Score
             warnings = $network.WarnCount
+            failed   = $network.FailCount
             detail   = 'VPN/TUN/DNS heuristics — offline, no leak test to external sites.'
         }
     }
@@ -161,7 +223,6 @@ function Get-DevShellHealthReport {
     $ready = $true
     if ($runDeveloper -and $devFail -gt 0) { $ready = $false }
     if ($runPrivacy -and $privacy.FailCount -gt 0) { $ready = $false }
-    $message = if ($ready) { 'Ready to work.' } else { 'Not ready yet.' }
 
     [PSCustomObject]@{
         healthSchemaVersion = '1.0.0'
@@ -169,16 +230,51 @@ function Get-DevShellHealthReport {
         timestamp           = (Get-Date).ToString('o')
         philosophy          = 'HomeBase DevShell prepares, verifies and maintains professional Windows workstations.'
         tier                = $Tier
-        sectionsRequested   = @($want)
-        sections            = $sections
+        sectionsRequested   = $requested
+        sections            = $sectionMap
         privacyReport       = $privacyDoc
-        browserReport       = if ($runBrowser) { ConvertTo-PrivacyReportDocument -Report $browser -ProductVersion $ProductVersion -Context $browser.Context } else { $null }
-        networkReport       = if ($runNetwork) { ConvertTo-PrivacyReportDocument -Report $network -ProductVersion $ProductVersion -Context $network.Context } else { $null }
+        browserReport       = if ($runBrowser) {
+            ConvertTo-PrivacyReportDocument -Report $browser -ProductVersion $ProductVersion -Context $browser.Context
+        } else { $null }
+        networkReport       = if ($runNetwork) {
+            ConvertTo-PrivacyReportDocument -Report $network -ProductVersion $ProductVersion -Context $network.Context
+        } else { $null }
         doctorReport        = $doctor
         summary             = [ordered]@{
             ready   = $ready
-            message = $message
+            message = if ($ready) { 'Ready to work.' } else { 'Not ready yet.' }
         }
+    }
+}
+
+function Get-DevShellHealthSectionField {
+    param(
+        $Sections,
+        [Parameter(Mandatory)][string]$Key,
+        [Parameter(Mandatory)][string]$Property,
+        $Default = $null
+    )
+    if (-not $Sections) { return $Default }
+    $section = $Sections[$Key]
+    if (-not $section) { return $Default }
+    $value = $section.$Property
+    if ($null -eq $value) { return $Default }
+    return $value
+}
+
+function Get-DevShellHealthDashboardColor {
+    param([Parameter(Mandatory)]$Section)
+    switch -Regex ($Section.status) {
+        '^FAIL$' { return 'Red' }
+        '^WARN$' { return 'Yellow' }
+        '^\d+%$' {
+            $pct = [int]($Section.status -replace '%', '')
+            if ($pct -ge 85) { return 'Green' }
+            if ($pct -ge 65) { return 'Yellow' }
+            return 'Red'
+        }
+        '^PASS$' { return 'Green' }
+        default { return 'DarkGray' }
     }
 }
 
@@ -192,15 +288,7 @@ function Write-DevShellHealthDashboard {
 
     foreach ($key in $Report.sections.Keys) {
         $s = $Report.sections[$key]
-        $col = switch ($s.status) {
-            'PASS' { 'Green' }
-            'FAIL' { 'Red' }
-            { $_ -match '%' } { if ([int]($s.status -replace '%','') -ge 85) { 'Green' } elseif ([int]($s.status -replace '%','') -ge 65) { 'Yellow' } else { 'Red' } }
-            'WARN' { 'Yellow' }
-            default { 'DarkGray' }
-        }
-        $line = if ($s.status -match '%') { "$($s.label.PadRight(22)) $($s.status)" } else { "$($s.label.PadRight(22)) $($s.status)" }
-        Write-Host $line -ForegroundColor $col
+        Write-Host ("{0,-22} {1}" -f $s.label, $s.status) -ForegroundColor (Get-DevShellHealthDashboardColor -Section $s)
         if ($s.disclaimer) {
             Write-Host "  $($s.disclaimer)" -ForegroundColor DarkGray
         }
@@ -208,8 +296,7 @@ function Write-DevShellHealthDashboard {
 
     Write-Host ''
     Write-Host 'Summary' -ForegroundColor Cyan
-    $sumCol = if ($Report.summary.ready) { 'Green' } else { 'Yellow' }
-    Write-Host $Report.summary.message -ForegroundColor $sumCol
+    Write-Host $Report.summary.message -ForegroundColor $(if ($Report.summary.ready) { 'Green' } else { 'Yellow' })
     Write-Host ''
 }
 
@@ -221,17 +308,17 @@ function Save-DevShellHealthHistory {
     if (-not $HistoryPath) {
         $HistoryPath = (Get-DevShellHealthPaths -RepoRoot $env:HOMEBASE_DEVSHELL_ROOT).History
     }
-    $dir = Split-Path $HistoryPath -Parent
-    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+    Initialize-DevShellParentDirectory -FilePath $HistoryPath
     $row = [ordered]@{
         timestamp = $Report.timestamp
-        developer = $Report.sections.developer.status
-        privacy   = $Report.sections.privacyConfiguration.score
-        browser   = $Report.sections.browserConfiguration.score
-        network   = $Report.sections.network.status
+        developer = Get-DevShellHealthSectionField -Sections $Report.sections -Key 'developer' -Property 'status' -Default 'N/A'
+        privacy   = Get-DevShellHealthSectionField -Sections $Report.sections -Key 'privacyConfiguration' -Property 'score'
+        browser   = Get-DevShellHealthSectionField -Sections $Report.sections -Key 'browserConfiguration' -Property 'score'
+        network   = Get-DevShellHealthSectionField -Sections $Report.sections -Key 'network' -Property 'status' -Default 'N/A'
         ready     = $Report.summary.ready
+        sections  = @($Report.sectionsRequested)
     }
-    ($row | ConvertTo-Json -Compress) | Add-Content -Path $HistoryPath -Encoding UTF8
+    ($row | ConvertTo-Json -Compress) | Add-Content -LiteralPath $HistoryPath -Encoding UTF8
 }
 
 function Show-DevShellHealthHistory {
@@ -239,12 +326,14 @@ function Show-DevShellHealthHistory {
     if (-not $HistoryPath) {
         $HistoryPath = (Get-DevShellHealthPaths -RepoRoot $env:HOMEBASE_DEVSHELL_ROOT).History
     }
-    if (-not (Test-Path $HistoryPath)) {
+    if (-not (Test-Path -LiteralPath $HistoryPath)) {
         Write-Host 'No health history yet. Run: devshell health' -ForegroundColor DarkGray
         return
     }
+
     $rows = [System.Collections.Generic.List[object]]::new()
-    foreach ($line in (Get-Content $HistoryPath -Encoding UTF8)) {
+    $tailBuffer = [Math]::Max($Last * 4, 64)
+    foreach ($line in (Get-Content -LiteralPath $HistoryPath -Encoding UTF8 -Tail $tailBuffer -ErrorAction SilentlyContinue)) {
         if ([string]::IsNullOrWhiteSpace($line)) { continue }
         try {
             $rows.Add(($line | ConvertFrom-Json))
@@ -256,13 +345,16 @@ function Show-DevShellHealthHistory {
         Write-Host 'No readable health history entries.' -ForegroundColor DarkGray
         return
     }
+
     Write-Host ''
     Write-Host 'Health history' -ForegroundColor Cyan
     Write-Host ''
     $slice = if ($rows.Count -gt $Last) { @($rows)[($rows.Count - $Last)..($rows.Count - 1)] } else { @($rows) }
     foreach ($r in $slice) {
         $d = ([datetime]$r.timestamp).ToString('MMM dd')
-        Write-Host ("{0,-8} Privacy {1,3}%  Developer {2,-4}  Ready {3}" -f $d, $r.privacy, $r.developer, $(if ($r.ready) { 'yes' } else { 'no' })) -ForegroundColor DarkGray
+        $privacy = if ($null -ne $r.privacy) { "{0,3}%" -f $r.privacy } else { ' N/A' }
+        $developer = if ($r.developer) { $r.developer } else { 'N/A' }
+        Write-Host ("{0,-8} Privacy {1}  Developer {2,-4}  Ready {3}" -f $d, $privacy, $developer, $(if ($r.ready) { 'yes' } else { 'no' })) -ForegroundColor DarkGray
     }
     Write-Host ''
 }
@@ -275,10 +367,29 @@ function Save-DevShellHealthBaseline {
     if (-not $BaselinePath) {
         $BaselinePath = (Get-DevShellHealthPaths -RepoRoot $env:HOMEBASE_DEVSHELL_ROOT).Baseline
     }
-    $dir = Split-Path $BaselinePath -Parent
-    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
-    $Report | ConvertTo-Json -Depth 12 | Set-Content $BaselinePath -Encoding UTF8
+    Initialize-DevShellParentDirectory -FilePath $BaselinePath
+    $Report | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $BaselinePath -Encoding UTF8
     Write-Host "Baseline saved: $BaselinePath" -ForegroundColor DarkGray
+}
+
+function New-DevShellBaselineCompareResult {
+    param(
+        $BaselineTimestamp,
+        [Parameter(Mandatory)][string]$CurrentTimestamp,
+        [string[]]$Changes = @(),
+        [bool]$DriftDetected,
+        [switch]$NoBaseline,
+        [switch]$BaselineInvalid
+    )
+    $result = [ordered]@{
+        baselineTimestamp = $BaselineTimestamp
+        currentTimestamp  = $CurrentTimestamp
+        changes           = @($Changes)
+        driftDetected     = $DriftDetected
+    }
+    if ($NoBaseline) { $result.noBaseline = $true }
+    if ($BaselineInvalid) { $result.baselineInvalid = $true }
+    return [PSCustomObject]$result
 }
 
 function Compare-DevShellHealthBaseline {
@@ -289,36 +400,36 @@ function Compare-DevShellHealthBaseline {
     if (-not $BaselinePath) {
         $BaselinePath = (Get-DevShellHealthPaths -RepoRoot $env:HOMEBASE_DEVSHELL_ROOT).Baseline
     }
-    if (-not (Test-Path $BaselinePath)) {
+    if (-not (Test-Path -LiteralPath $BaselinePath)) {
         Write-Host 'No baseline. Run: devshell baseline' -ForegroundColor Yellow
-        return [PSCustomObject]@{
-            baselineTimestamp = $null
-            currentTimestamp  = $Current.timestamp
-            changes           = @()
-            driftDetected     = $false
-            noBaseline        = $true
-        }
+        return New-DevShellBaselineCompareResult `
+            -BaselineTimestamp $null `
+            -CurrentTimestamp $Current.timestamp `
+            -DriftDetected $false `
+            -NoBaseline
     }
     try {
-        $base = Get-Content $BaselinePath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $base = Get-Content -LiteralPath $BaselinePath -Raw -Encoding UTF8 | ConvertFrom-Json
     } catch {
         Write-Host 'Baseline file is invalid JSON. Run: devshell baseline' -ForegroundColor Yellow
-        return [PSCustomObject]@{
-            baselineTimestamp = $null
-            currentTimestamp  = $Current.timestamp
-            changes           = @('Baseline file is unreadable or corrupt')
-            driftDetected     = $true
-            baselineInvalid   = $true
-        }
+        return New-DevShellBaselineCompareResult `
+            -BaselineTimestamp $null `
+            -CurrentTimestamp $Current.timestamp `
+            -Changes @('Baseline file is unreadable or corrupt') `
+            -DriftDetected $true `
+            -BaselineInvalid
     }
-    $changes = [System.Collections.Generic.List[string]]::new()
 
+    $changes = [System.Collections.Generic.List[string]]::new()
     foreach ($key in $Current.sections.Keys) {
         $c = $Current.sections[$key]
         $b = $base.sections.$key
-        if (-not $b) { $changes.Add("$($c.label): new section"); continue }
-        $cStat = if ($c.score) { "$($c.score)" } else { $c.status }
-        $bStat = if ($b.score) { "$($b.score)" } else { $b.status }
+        if (-not $b) {
+            $changes.Add("$($c.label): new section")
+            continue
+        }
+        $cStat = if ($null -ne $c.score) { "$($c.score)" } else { $c.status }
+        $bStat = if ($null -ne $b.score) { "$($b.score)" } else { $b.status }
         if ($cStat -ne $bStat) {
             $changes.Add("$($c.label): $bStat → $cStat")
         }
@@ -326,8 +437,10 @@ function Compare-DevShellHealthBaseline {
 
     if ($Current.privacyReport -and $base.privacyReport) {
         $baseChecks = @{}
-        foreach ($chk in $base.privacyReport.checks) { $baseChecks[$chk.id] = $chk.status }
-        foreach ($chk in $Current.privacyReport.checks) {
+        foreach ($chk in @($base.privacyReport.checks)) {
+            if ($chk.id) { $baseChecks[$chk.id] = $chk.status }
+        }
+        foreach ($chk in @($Current.privacyReport.checks)) {
             $old = $baseChecks[$chk.id]
             if ($old -and $old -ne $chk.status) {
                 $changes.Add("Privacy check $($chk.id): $old → $($chk.status)")
@@ -335,12 +448,11 @@ function Compare-DevShellHealthBaseline {
         }
     }
 
-    [PSCustomObject]@{
-        baselineTimestamp = $base.timestamp
-        currentTimestamp  = $Current.timestamp
-        changes           = @($changes)
-        driftDetected     = ($changes.Count -gt 0)
-    }
+    return New-DevShellBaselineCompareResult `
+        -BaselineTimestamp $base.timestamp `
+        -CurrentTimestamp $Current.timestamp `
+        -Changes @($changes) `
+        -DriftDetected ($changes.Count -gt 0)
 }
 
 function Export-DevShellHealthHtml {
@@ -350,17 +462,20 @@ function Export-DevShellHealthHtml {
     )
     $esc = { param($t) if ($null -eq $t) { return '' }; [System.Net.WebUtility]::HtmlEncode([string]$t) }
 
-    $sectionRows = ''
+    $sb = [System.Text.StringBuilder]::new()
     foreach ($key in $Report.sections.Keys) {
         $s = $Report.sections[$key]
         $badge = & $esc $s.status
-        $sectionRows += @"
+        $label = & $esc $s.label
+        $disclaimer = if ($s.disclaimer) { "<p class='muted'>$( & $esc $s.disclaimer )</p>" } else { '' }
+        $detail = if ($s.detail) { "<p class='muted'>$( & $esc $s.detail )</p>" } else { '' }
+        [void]$sb.AppendLine(@"
     <div class="card">
-      <div class="card-head"><span>$( & $esc $s.label )</span><span class="badge">$badge</span></div>
-      $(if ($s.disclaimer) { "<p class='muted'>$( & $esc $s.disclaimer )</p>" } else { '' })
-      $(if ($s.detail) { "<p class='muted'>$( & $esc $s.detail )</p>" } else { '' })
+      <div class="card-head"><span>$label</span><span class="badge">$badge</span></div>
+      $disclaimer
+      $detail
     </div>
-"@
+"@)
     }
 
     $readyClass = if ($Report.summary.ready) { 'ok' } else { 'warn' }
@@ -387,13 +502,12 @@ function Export-DevShellHealthHtml {
 <body>
   <h1>HomeBase DevShell</h1>
   <p class="sub">$( & $esc $Report.philosophy )<br/>$( & $esc $Report.timestamp )</p>
-  <div class="grid">$sectionRows</div>
+  <div class="grid">$($sb.ToString())</div>
   <div class="summary $readyClass"><strong>Summary:</strong> $( & $esc $Report.summary.message )</div>
 </body>
 </html>
 "@
-    $dir = Split-Path $OutPath -Parent
-    if ($dir -and -not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
-    $html | Set-Content $OutPath -Encoding UTF8
+    Initialize-DevShellParentDirectory -FilePath $OutPath
+    $html | Set-Content -LiteralPath $OutPath -Encoding UTF8
     Write-Host "HTML report: $OutPath" -ForegroundColor DarkGray
 }
