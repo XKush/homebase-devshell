@@ -11,5 +11,5 @@ function Get-DevShellProductVersionFromRoot {
     if (Test-Path -LiteralPath $versionFile) {
         return (Get-Content -LiteralPath $versionFile -Raw).Trim()
     }
-    return '3.0.1'
+    return '3.1.0'
 }

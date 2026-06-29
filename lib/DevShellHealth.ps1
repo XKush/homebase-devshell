@@ -151,7 +151,7 @@ function Get-DevShellHealthReport {
         [Parameter(Mandatory)][string]$RepoRoot,
         [ValidateSet('Core', 'Full')]
         [string]$Tier = 'Core',
-        [string]$ProductVersion = '3.0.1',
+        [string]$ProductVersion = '3.1.0',
         [string[]]$SectionFilter
     )
 
