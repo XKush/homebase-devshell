@@ -31,4 +31,4 @@ function devshell { pwsh -NoProfile -File "$HOME\.homebase\devshell\devshell.ps1
 ## More help
 
 - [Troubleshooting](TROUBLESHOOTING.md)  
-- [Русская документация](ru/README.md)
+- [Русский README](../README.ru.md)

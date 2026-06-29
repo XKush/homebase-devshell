@@ -1,6 +1,8 @@
-# HOME BASE — документация (RU)
+# HOME BASE — справочник команд (RU)
 
-Центр управления рабочей станцией KGreen.
+> **Продукт и установка:** главная документация — [README.ru.md](../README.ru.md) (русский) · [README.md](../README.md) (English)
+
+Центр управления рабочей станцией после установки HomeBase DevShell.
 
 ## Навигация
 
@@ -24,22 +26,12 @@
 | разработка / сеть / безопасность / обслуживание / справка | как в komandy |
 | **[nav] all** | все команды + `[cmd]` из справочника |
 
-## Быстрый старт
+## Быстрый старт (после install)
 
-1. Откройте **Windows Terminal** → PowerShell 7
-2. `home` — обзор (режим minimal по умолчанию)
-3. `go` — **[следующий]** шаг сверху или категория **порядок**
-4. `organize -WhatIf` — проверить структуру папок и Downloads
-5. `revise` / `poriadok` — полный порядок (doctor + trust + sec)
-6. `sec` — Tor + PGP (SHADOW OPS)
-
-## Режимы запуска
-
-| Переменная | Значение | Эффект |
-|------------|----------|--------|
-| `WORKSTATION_STARTUP_MODE` | `minimal` | Trust + telemetry (по умолчанию) |
-| | `normal` | + changelog + command matrix + SHADOW OPS |
-| | `full` | + inventory + network intel |
+1. Windows Terminal → PowerShell 7  
+2. `devshell doctor` — окружение готово  
+3. `home` — обзор  
+4. `go` — меню действий  
 
 ## Доверие
 
@@ -56,19 +48,6 @@ HOME BASE **не врёт**: score = min(WOC, Trust). Подробнее: [TRUST
 
 Подробнее: [TOR-MAX-SECURITY.md](TOR-MAX-SECURITY.md) · [PGP-TOR-BASICS.md](PGP-TOR-BASICS.md)
 
-## Порядок на диске
-
-| Команда | Назначение |
-|---------|------------|
-| `organize` | Структура папок, README, архив installers из Downloads |
-| `organize -WhatIf` | Только план, без изменений |
-| `sysaudit` | Аудит: что нужно поправить |
-| `revise` / `poriadok` | Полный прогон: PATH, docs, doctor, trust, sec |
-| `cleanup -WhatIf` | Безопасная очистка (сначала просмотр) |
-| `backupconfig` | Бэкап настроек |
-
-Карта папок: `C:\Projects`, `C:\Tools`, `C:\Scripts`, Downloads → `C:\Downloads\Archive`, см. `lib/WorkstationFolders.ps1`.
-
 ## Обслуживание
 
 | Команда | Назначение |
@@ -80,14 +59,3 @@ HOME BASE **не врёт**: score = min(WOC, Trust). Подробнее: [TRUST
 ## Команды
 
 Полный список: [COMMANDS.md](COMMANDS.md) · шпаргалка: [QUICKREF.md](QUICKREF.md)
-
-Обновить docs из каталога: `Sync-WorkstationDocs.ps1`
-
-## Обновление стека
-
-```powershell
-revise -Backup
-C:\Scripts\Workstation\Invoke-HomeBaseUpgrade.ps1
-```
-
-Справка по любой команде: `имя -help`

@@ -1,5 +1,7 @@
 # HomeBase DevShell
 
+🌍 **Language:** English | [Русский](README.ru.md)
+
 **Stop guessing if your dev environment is broken. Run one command — know instantly.**
 
 A clean PowerShell environment for Windows that tells you in seconds if your machine is ready to work.
@@ -171,4 +173,4 @@ Minimal surface. Honest health check. If that's what you need, you're in the rig
 ## More
 
 - [Getting started](docs/GETTING-STARTED.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Contributing](CONTRIBUTING.md)  
-- [CHANGELOG](CHANGELOG.md) · [License MIT](LICENSE) · [Русский](docs/ru/README.md)
+- [CHANGELOG](CHANGELOG.md) · [License MIT](LICENSE) · [Русский](README.ru.md)
