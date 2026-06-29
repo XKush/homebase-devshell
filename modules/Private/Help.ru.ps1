@@ -1,6 +1,17 @@
 # Каталог справки HOME BASE — все команды и инструменты на русском
 
 function Get-WorkstationHelpCatalog {
+    $h = @{
+        Logs       = (Get-HomeBasePath -Name Logs)
+        Projects   = (Get-HomeBasePath -Name Projects)
+        Tools      = (Get-HomeBasePath -Name Tools)
+        Scripts    = (Get-HomeBasePath -Name Scripts)
+        Backups    = (Get-HomeBasePath -Name Backups)
+        Security   = (Get-HomeBasePath -Name Security)
+    }
+    $h.GenesisExport = Join-Path $h.Security 'exports\genesis-certificate.txt'
+    $h.PgpDir = Join-Path $h.Security 'pgp'
+
     $groups = @{
         'Система' = 'Проверка здоровья, отчёты и информация о компьютере'
         'Сеть' = 'Диагностика сети, инструменты и сканирование'
@@ -60,7 +71,7 @@ function Get-WorkstationHelpCatalog {
         }
         genesis = @{
             Group = 'Система'; Title = 'genesis — Genesis Certificate'
-            Description = 'Обновляет OP-DNA, append Trust Chain, экспорт C:\\Security\\exports\\genesis-certificate.txt'
+            Description = "Обновляет OP-DNA, append Trust Chain, экспорт $($h.GenesisExport)"
             Does = 'Export-GenesisCertificate — ASCII seal unique to this workstation.'
             When = 'После изменений profile/module/git или раз в месяц.'
             How = 'genesis'
@@ -123,7 +134,7 @@ function Get-WorkstationHelpCatalog {
         }
         sysreport = @{
             Group = 'Система'; Title = 'sysreport — полный отчёт о системе'
-            Description = 'Создаёт подробный текстовый отчёт и сохраняет его в C:\Logs\Workstation.'
+            Description = "Создаёт подробный текстовый отчёт и сохраняет его в $($h.Logs)."
             Does = 'Собирает информацию о системе и результаты валидации в один файл.'
             When = 'Перед резервным копированием, при диагностике или для архива.'
             How = 'sysreport'
@@ -205,7 +216,7 @@ function Get-WorkstationHelpCatalog {
         devstart = @{
             Group = 'Разработка'; Title = 'devstart — начало рабочего дня'
             Description = 'Переходит в папку проектов и открывает домашнюю панель.'
-            Does = 'Set-Location C:\Projects + показ HOME BASE.'
+            Does = "Set-Location $($h.Projects) + показ HOME BASE."
             When = 'Каждый раз, когда начинаете писать код.'
             How = 'devstart'
             Examples = @('devstart')
@@ -221,9 +232,9 @@ function Get-WorkstationHelpCatalog {
             Related = @('whereami', 'devstart', 'projects')
         }
         projects = @{
-            Group = 'Разработка'; Title = 'projects — перейти в C:\Projects'
+            Group = 'Разработка'; Title = "projects — перейти в $($h.Projects)"
             Description = 'Быстрый переход в папку со всеми проектами.'
-            Does = 'Set-Location C:\Projects'
+            Does = "Set-Location $($h.Projects)"
             When = 'Нужно открыть или создать проект.'
             How = 'projects'
             Examples = @('projects')
@@ -232,7 +243,7 @@ function Get-WorkstationHelpCatalog {
         'new-project' = @{
             Group = 'Разработка'; Title = 'new-project — создать новый проект'
             Description = 'Создаёт папку проекта с git init и .gitignore.'
-            Does = 'Новая папка в C:\Projects, инициализация git, опционально Python venv.'
+            Does = "Новая папка в $($h.Projects), инициализация git, опционально Python venv."
             When = 'Начинаете новый проект с нуля.'
             How = 'new-project ИмяПроекта -Type python|empty'
             Examples = @('new-project MyApp', 'new-project Bot -Type python')
@@ -258,7 +269,7 @@ function Get-WorkstationHelpCatalog {
         }
         backupconfig = @{
             Group = 'Обслуживание'; Title = 'backupconfig — резервная копия настроек'
-            Description = 'Сохраняет профиль PowerShell и конфиги в C:\Backups\Workstation.'
+            Description = "Сохраняет профиль PowerShell и конфиги в $($h.Backups)."
             Does = 'Создаёт снимок настроек терминала и профиля.'
             When = 'Перед изменением профиля или раз в неделю.'
             How = 'backupconfig'
@@ -276,7 +287,7 @@ function Get-WorkstationHelpCatalog {
         }
         logs = @{
             Group = 'Обслуживание'; Title = 'logs — просмотр журналов'
-            Description = 'Показывает последние файлы в C:\Logs\Workstation.'
+            Description = "Показывает последние файлы в $($h.Logs)."
             Does = 'Список логов с датой и размером; -Open открывает папку.'
             When = 'Нужно найти отчёт валидации или ошибку.'
             How = 'logs или logs -Open'
@@ -303,7 +314,7 @@ function Get-WorkstationHelpCatalog {
         }
         restoreconfig = @{
             Group = 'Восстановление'; Title = 'restoreconfig — восстановить из бэкапа'
-            Description = 'Откатывает настройки из папки C:\Backups\Workstation (нужен admin).'
+            Description = "Откатывает настройки из папки $($h.Backups) (нужен admin)."
             Does = 'Запускает Rollback-Workstation.ps1 с правами администратора.'
             When = 'После ошибочных изменений, когда backupconfig уже делали.'
             How = 'restoreconfig или restoreconfig -BackupFolder имя_папки'
@@ -396,16 +407,16 @@ function Get-WorkstationHelpCatalog {
             How = 'dashboard'; Examples = @('dashboard'); Related = @('home', 'jarvis')
         }
         tools = @{
-            Group = 'Навигация'; Title = 'tools — перейти в C:\Tools'
+            Group = 'Навигация'; Title = "tools — перейти в $($h.Tools)"
             Description = 'Переход в папку с установленными утилитами.'
-            Does = 'Set-Location C:\Tools'
+            Does = "Set-Location $($h.Tools)"
             When = 'Ищете исполняемый файл утилиты.'
             How = 'tools'; Examples = @('tools'); Related = @('scripts', 'projects')
         }
         scripts = @{
-            Group = 'Навигация'; Title = 'scripts — перейти в C:\Scripts'
+            Group = 'Навигация'; Title = "scripts — перейти в $($h.Scripts)"
             Description = 'Переход в папку со скриптами рабочей станции.'
-            Does = 'Set-Location C:\Scripts'
+            Does = "Set-Location $($h.Scripts)"
             When = 'Нужно найти или запустить скрипт.'
             How = 'scripts'; Examples = @('scripts'); Related = @('tools', 'doctor')
         }
@@ -430,7 +441,7 @@ function Get-WorkstationHelpCatalog {
         'pgp-repair' = @{
             Group = 'Безопасность'; Title = 'pgp-repair — завершить настройку PGP'
             Description = 'Экспорт публичного ключа и backup revocation, если ключ есть, но setup не завершился.'
-            Does = 'Repair-PgpIdentity.ps1 → C:\Security\pgp\'
+            Does = "Repair-PgpIdentity.ps1 → $($h.PgpDir)\"
             When = 'После ошибки Key creation failed при уже созданном ключе.'
             How = 'pgp-repair'
             Examples = @('pgp-repair')
@@ -457,7 +468,7 @@ function Get-WorkstationHelpCatalog {
         'pgp-export' = @{
             Group = 'Безопасность'; Title = 'pgp-export — публичный ключ'
             Description = 'Экспорт .asc для контактов (не приватный ключ!).'
-            Does = 'gpg --armor --export → C:\Security\pgp\'
+            Does = "gpg --armor --export → $($h.PgpDir)\"
             When = 'Дать контакту ключ для шифрования.'
             How = 'pgp-export'
             Examples = @('pgp-export')
@@ -653,6 +664,6 @@ function Get-WorkstationToolCatalogRu {
         @{ Name = 'fastfetch'; Cmd = 'fastfetch'; What = 'красивая сводка о системе'
            Why = 'sysinfo — быстрый обзор железа'; Example = 'sysinfo' }
         @{ Name = 'ripgrep'; Cmd = 'rg'; What = 'быстрый поиск текста в файлах'
-           Why = 'найти строку в коде или логах'; Example = 'rg pattern C:\Projects' }
+           Why = 'найти строку в коде или логах'; Example = "rg pattern $($h.Projects)" }
     )
 }

@@ -13,7 +13,7 @@ function projects {
     param([switch]$Help)
     if (Test-ShowCommandHelp -Name 'projects' -Help:$Help) { return }
     Set-Location $script:WorkstationRoots.Projects
-    Write-Host "  → C:\Projects (папка проектов)" -ForegroundColor DarkGray
+    Write-Host "  → $($script:WorkstationRoots.Projects) (папка проектов)" -ForegroundColor DarkGray
     Write-CommandLog 'projects' 'OK'
 }
 
@@ -21,7 +21,7 @@ function tools {
     param([switch]$Help)
     if (Test-ShowCommandHelp -Name 'tools' -Help:$Help) { return }
     Set-Location $script:WorkstationRoots.Tools
-    Write-Host "  → C:\Tools (установленные утилиты)" -ForegroundColor DarkGray
+    Write-Host "  → $($script:WorkstationRoots.Tools) (установленные утилиты)" -ForegroundColor DarkGray
     Write-CommandLog 'tools' 'OK'
 }
 
@@ -29,7 +29,7 @@ function scripts {
     param([switch]$Help)
     if (Test-ShowCommandHelp -Name 'scripts' -Help:$Help) { return }
     Set-Location $script:WorkstationRoots.Scripts
-    Write-Host "  → C:\Scripts (скрипты рабочей станции)" -ForegroundColor DarkGray
+    Write-Host "  → $($script:WorkstationRoots.Scripts) (скрипты рабочей станции)" -ForegroundColor DarkGray
     Write-CommandLog 'scripts' 'OK'
 }
 

@@ -1,6 +1,10 @@
 # Подсказки после успешного выполнения команд (ru)
 
 function Get-CommandHints {
+    $hintLogs = if (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue) {
+        Get-HomeBasePath -Name Logs
+    } else { 'C:\Logs\Workstation' }
+
     return @{
         doctor          = 'Следующий шаг: при ошибках — repairterminal · при OK — devstart'
         nettools        = 'Попробуйте: networkstatus · portscan 192.168.1.1 · instrumenty'
@@ -22,7 +26,7 @@ function Get-CommandHints {
         networkstatus   = 'Скан портов: portscan hostname'
         learn           = 'Темы: learn -Topic git|python|powershell'
         logs            = 'Открыть папку: logs -Open'
-        sysreport       = 'Отчёт в C:\Logs\Workstation\'
+        sysreport       = "Отчёт в $hintLogs\"
         default         = 'Справка: ``{0} -help`` · Обзор: komandy · Доверие: trustcheck'
     }
 }
