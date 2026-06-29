@@ -26,7 +26,7 @@ Installers:
     InstallerType: zip
     NestedInstallerType: portable
     InstallerUrl: https://github.com/XKush/homebase-devshell/releases/download/v3.0.0/devready-v3.0.0.zip
-    InstallerSha256: f8af6047f58a59e93330183f4796b095d20047813fb1c892c82717128397e6a8
+    InstallerSha256: 52949e182aec6bff2d26d2c77f5f4d9c63fc6e4827dd2a399978395ceed17df0
     NestedInstallerFiles:
       - RelativeFilePath: install.ps1
         PortableCommandAlias: devready-install
