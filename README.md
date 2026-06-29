@@ -2,9 +2,9 @@
 
 🌍 **Language:** English | [Русский](README.ru.md)
 
-**Stop guessing if your dev environment is broken. Run one command — know instantly.**
+**Your dev environment might be broken. You just don't know it yet.**
 
-A clean PowerShell environment for Windows that tells you in seconds if your machine is ready to work.
+**One install. One check. Instant answer.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -12,27 +12,26 @@ A clean PowerShell environment for Windows that tells you in seconds if your mac
 irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
 ```
 
-Restart your terminal, then run **`devshell doctor`**. When you see **Ready to work**, you're good.
+Restart terminal → run **`devshell doctor`** → see **Ready to work**.
 
 ---
 
-## Why this matters
+## Why this exists
 
-Your shell can be broken — and you won't know until something fails mid-task.
+- **Broken setups hide in plain sight** — bad paths, missing tools, slow profiles  
+- **Onboarding eats your day** — new machine, new job, new reinstall  
+- **You can't trust what you can't verify** — "probably fine" isn't a strategy  
+- **Drift kills productivity** — config changes silently until something breaks  
 
-Broken paths, missing tools, a profile that loads too slow, config that drifted since last week. It all looks fine until it isn't.
-
-**`devshell doctor`** catches that drift *before* it breaks your day: one pass/fail check so you trust the environment before you write code.
+HomeBase DevShell fixes one thing: **know if you're ready to work — in seconds.**
 
 ---
 
-## The proof moment
+## See it work (3 seconds)
 
 ```powershell
 devshell doctor
 ```
-
-When everything is healthy:
 
 ```
 ✔ Profile OK
@@ -40,137 +39,78 @@ When everything is healthy:
 ✔ Environment OK
 ✔ Ready to work
 
-Profile load: 489ms
-Passed: 71 · Failed: 0
+Passed: 71 · Failed: 0 · Profile: 489ms
 ```
 
-No guesswork. No "probably fine." You know.
-
-<details>
-<summary>Full report (when you need details)</summary>
-
-```
-═══════════════════ VALIDATION REPORT ═══════════════════
-Passed:   71
-Failed:   0
-Warnings: 0
-Profile load: 489ms <= 600ms
-Report: C:\Logs\Workstation\validation-20260629-030000.json
-═══════════════════════════════════════════════════════
-```
-
-If **`Failed` > 0**, open the JSON report, fix what's listed, run `devshell doctor` again.
-
-</details>
+That's it. No guesswork.
 
 ---
 
-## Quick start (60 seconds)
-
-**1. Install**
+## Three commands. That's the product.
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
+devshell install   # set up (safe to re-run)
+devshell doctor    # pass or fail — are you ready?
+devshell status    # quick sanity check
 ```
 
-**2. Restart** Windows Terminal (or open a new PowerShell 7 window).
+| Command | One line |
+|---------|----------|
+| **`devshell install`** | Deploy profile + baseline setup |
+| **`devshell doctor`** | Full health check before you code |
+| **`devshell status`** | Version + load state |
 
-**3. Verify**
-
-```powershell
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
-```
-
-**4. Check status**
-
-```powershell
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 status
-```
-
-**Optional — add a short alias for daily use:**
+<details>
+<summary>Without alias (copy once after install)</summary>
 
 ```powershell
 function devshell { pwsh -NoProfile -File "$HOME\.homebase\devshell\devshell.ps1" @args }
 ```
 
-Then: `devshell install` · `devshell doctor` · `devshell status` — that's the whole product surface.
+</details>
 
 ---
 
-## Core commands
+## Use it when
 
-Three commands. Nothing else required.
-
-| Command | What it does |
-|---------|----------------|
-| **`devshell install`** | Sets up folders, deploys your PowerShell profile, runs baseline setup |
-| **`devshell doctor`** | Health check — catches broken shell, paths, and tools before you work |
-| **`devshell status`** | Confirms version and that the environment loaded correctly |
-
-```powershell
-devshell install
-devshell doctor
-devshell status
-```
-
-Without the alias:
-
-```powershell
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
-```
+**New machine** — install → doctor → start coding  
+**Something feels wrong** — one command finds what's broken  
+**Every morning** — 5-second readiness check before deep work  
 
 ---
 
-## Real use cases
+## Trust
 
-**New Windows machine**  
-Install → doctor → start working. Know the shell is wired before you clone anything.
-
-**"Something feels off"**  
-Your environment might be broken and you don't know it yet. Doctor finds drift in one run.
-
-**Second PC or reinstall**  
-Same install URL, same pass/fail gate — less "works on my machine."
-
-**Daily driver**  
-Fast profile with `home`, `go`, and shortcuts — without hand-maintaining a 500-line `$PROFILE`.
-
----
-
-## If something fails
-
-See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) or the quick fixes below.
-
-| Problem | What to do |
-|---------|------------|
-| Install says **PowerShell 7+ required** | Install from [aka.ms/powershell](https://aka.ms/powershell), reopen terminal |
-| **git not found** during remote install | Install [Git for Windows](https://git-scm.com/download/win), retry the install line |
-| **`devshell doctor` fails** | Read `C:\Logs\Workstation\validation-*.json`, fix listed items, re-run doctor |
-| **Commands not found after install** | Restart terminal; use full path or add the `devshell` alias above |
-| **Re-run setup safely** | `devshell install` is idempotent — run it again after fixes |
-
----
-
-## Requirements
-
-- Windows 10 or 11  
-- [PowerShell 7+](https://aka.ms/powershell)  
-- Git (for the one-line remote install)  
-- Optional: Windows Terminal, Python (checked by doctor)
+- **Fail-safe install** — setup runs `doctor` automatically; no silent "success"  
+- **Idempotent** — run `devshell install` again anytime after fixes  
+- **No admin by default** — product install skips privileged system changes  
+- **Local only** — nothing leaves your machine  
+- **Clear reports** — failures write to `C:\Logs\Workstation\validation-*.json`  
 
 ---
 
 ## What this is **not**
 
-- Not a cloud service — everything runs locally  
-- Not a framework you must learn before doing work  
-- Not Linux/macOS (Windows + PowerShell 7 only)  
+- ❌ Not a framework to learn before you work  
+- ❌ Not a shell replacement (it's PowerShell 7, enhanced)  
+- ❌ Not a dev platform / plugin ecosystem  
+- ❌ Not Linux or macOS  
 
-Minimal surface. Honest health check. If that's what you need, you're in the right place.
+Just: **install → doctor → work.**
 
 ---
 
-## More
+## Quick start
 
-- [Getting started](docs/GETTING-STARTED.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Contributing](CONTRIBUTING.md)  
-- [CHANGELOG](CHANGELOG.md) · [License MIT](LICENSE) · [Русский](README.ru.md)
+```powershell
+# 1 — install
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
+
+# 2 — new terminal, then verify
+devshell doctor
+devshell status
+```
+
+**Needs:** Windows 10/11 · [PowerShell 7+](https://aka.ms/powershell) · Git  
+
+**Stuck?** [Troubleshooting](docs/TROUBLESHOOTING.md) · [Contributing](CONTRIBUTING.md)

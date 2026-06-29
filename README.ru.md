@@ -2,9 +2,9 @@
 
 🌍 **Язык:** [English](README.md) | Русский
 
-**Хватит гадать, сломано ли окружение. Одна команда — и вы знаете.**
+**Окружение может быть сломано. Вы просто ещё не знаете об этом.**
 
-Чистое PowerShell-окружение для Windows: за секунды показывает, готова ли машина к работе.
+**Одна установка. Одна проверка. Мгновенный ответ.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -12,27 +12,26 @@
 irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
 ```
 
-Перезапустите терминал и выполните **`devshell doctor`**. Когда увидите **Ready to work** — можно работать.
+Перезапустите терминал → **`devshell doctor`** → **Ready to work**.
 
 ---
 
 ## Зачем это нужно
 
-Оболочка может быть сломана — и вы не узнаете об этом, пока задача не упадёт посередине.
+- **Сломанное окружение не видно сразу** — битые пути, нет инструментов, медленный профиль  
+- **Онбординг съедает день** — новый ПК, новая работа, переустановка  
+- **Нельзя доверять тому, что не проверил** — «наверное, норм» — не стратегия  
+- **Drift убивает продуктивность** — конфиг меняется тихо, пока что-то не упадёт  
 
-Битые пути, отсутствующие инструменты, профиль, который грузится слишком долго, конфиг, который «уплыл» с прошлой недели. Всё выглядит нормально — пока не перестаёт.
-
-**`devshell doctor`** ловит этот drift *до* того, как испортит день: один pass/fail-тест, чтобы доверять окружению до того, как писать код.
+HomeBase DevShell решает одну задачу: **понять, готовы ли вы работать — за секунды.**
 
 ---
 
-## Момент доказательства
+## Увидеть за 3 секунды
 
 ```powershell
 devshell doctor
 ```
-
-Когда всё в порядке:
 
 ```
 ✔ Profile OK
@@ -40,138 +39,78 @@ devshell doctor
 ✔ Environment OK
 ✔ Ready to work
 
-Profile load: 489ms
-Passed: 71 · Failed: 0
+Passed: 71 · Failed: 0 · Profile: 489ms
 ```
 
-Без догадок. Без «наверное, норм». Вы знаете.
-
-<details>
-<summary>Полный отчёт (когда нужны детали)</summary>
-
-```
-═══════════════════ VALIDATION REPORT ═══════════════════
-Passed:   71
-Failed:   0
-Warnings: 0
-Profile load: 489ms <= 600ms
-Report: C:\Logs\Workstation\validation-20260629-030000.json
-═══════════════════════════════════════════════════════
-```
-
-Если **`Failed` > 0** — откройте JSON-отчёт, исправьте пункты из списка, снова запустите `devshell doctor`.
-
-</details>
+Всё. Без догадок.
 
 ---
 
-## Быстрый старт (60 секунд)
-
-**1. Установка**
+## Три команды. Весь продукт.
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
+devshell install   # настройка (можно запускать снова)
+devshell doctor    # pass или fail — готовы ли вы?
+devshell status    # быстрая проверка
 ```
 
-**2. Перезапуск** Windows Terminal (или новое окно PowerShell 7).
+| Команда | Одной строкой |
+|---------|----------------|
+| **`devshell install`** | Профиль + базовая настройка |
+| **`devshell doctor`** | Полная проверка перед кодом |
+| **`devshell status`** | Версия и состояние загрузки |
 
-**3. Проверка**
-
-```powershell
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
-```
-
-**4. Статус**
-
-```powershell
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 status
-```
-
-**По желанию — короткий alias для каждый день:**
+<details>
+<summary>Без alias (скопируйте один раз после install)</summary>
 
 ```powershell
 function devshell { pwsh -NoProfile -File "$HOME\.homebase\devshell\devshell.ps1" @args }
 ```
 
-Дальше только: `devshell install` · `devshell doctor` · `devshell status` — весь продукт на этом.
+</details>
 
 ---
 
-## Три команды
+## Когда использовать
 
-Больше ничего не обязательно.
-
-| Команда | Что делает |
-|---------|------------|
-| **`devshell install`** | Папки, профиль PowerShell, базовая настройка |
-| **`devshell doctor`** | Проверка здоровья — ловит сломанную оболочку, пути и инструменты |
-| **`devshell status`** | Версия и факт, что окружение загрузилось корректно |
-
-```powershell
-devshell install
-devshell doctor
-devshell status
-```
-
-Без alias:
-
-```powershell
-pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
-```
+**Новый ПК** — install → doctor → код  
+**Что-то не так** — одна команда найдёт поломку  
+**Каждое утро** — 5 секунд перед глубокой работой  
 
 ---
 
-## Реальные сценарии
+## Доверие
 
-**Новая Windows**  
-Установка → doctor → работа. Оболочка проверена до клонирования проектов.
-
-**«Что-то не так»**  
-Окружение может быть сломано, а вы ещё не знаете. Doctor находит drift за один прогон.
-
-**Второй ПК или переустановка**  
-Тот же URL установки, тот же pass/fail — меньше «у меня работает».
-
-**Ежедневная оболочка**  
-Быстрый профиль с `home`, `go` и shortcuts — без ручного `$PROFILE` на 500 строк.
-
----
-
-## Если что-то пошло не так
-
-Подробнее: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) (на английском) или таблица ниже.
-
-| Проблема | Решение |
-|----------|---------|
-| **Нужен PowerShell 7+** | Установите с [aka.ms/powershell](https://aka.ms/powershell), откройте терминал заново |
-| **git not found** при remote install | [Git for Windows](https://git-scm.com/download/win), повторите строку установки |
-| **`devshell doctor` не проходит** | `C:\Logs\Workstation\validation-*.json` → исправить → doctor снова |
-| **Команды не находятся** | Перезапуск терминала; полный путь или alias выше |
-| **Переустановить безопасно** | `devshell install` идемпотентен — можно запускать после правок |
-
----
-
-## Требования
-
-- Windows 10 или 11  
-- [PowerShell 7+](https://aka.ms/powershell)  
-- Git (для установки одной строкой)  
-- По желанию: Windows Terminal, Python (проверяет doctor)
+- **Fail-safe install** — после setup автоматически запускается `doctor`  
+- **Идемпотентность** — `devshell install` можно запускать снова после правок  
+- **Без admin по умолчанию** — product install не трогает привилегированные настройки  
+- **Только локально** — ничего не уходит с машины  
+- **Понятные отчёты** — ошибки в `C:\Logs\Workstation\validation-*.json`  
 
 ---
 
 ## Чем это **не** является
 
-- Не облачный сервис — всё локально на вашей машине  
-- Не фреймворк, который нужно изучать перед работой  
-- Не Linux/macOS (только Windows + PowerShell 7)  
+- ❌ Не фреймворк, который надо учить перед работой  
+- ❌ Не замена shell (это PowerShell 7, улучшенный)  
+- ❌ Не dev-платформа / экосистема плагинов  
+- ❌ Не Linux и не macOS  
 
-Минимальная поверхность. Честная проверка. Если это вам нужно — вы по адресу.
+Просто: **install → doctor → работа.**
 
 ---
 
-## Ещё
+## Быстрый старт
 
-- [Getting started](docs/GETTING-STARTED.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Contributing](CONTRIBUTING.md)  
-- [CHANGELOG](CHANGELOG.md) · [License MIT](LICENSE)  
-- **Команды и меню (RU):** [docs/ru/README.md](docs/ru/README.md) · [COMMANDS.md](docs/ru/COMMANDS.md)
+```powershell
+# 1 — установка
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
+
+# 2 — новый терминал, проверка
+devshell doctor
+devshell status
+```
+
+**Нужно:** Windows 10/11 · [PowerShell 7+](https://aka.ms/powershell) · Git  
+
+**Проблемы?** [Troubleshooting](docs/TROUBLESHOOTING.md) · [English](README.md) · [Справочник команд](docs/ru/README.md) · [Contributing](CONTRIBUTING.md)
