@@ -12,6 +12,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
+## [2.0.6] - 2026-06-29
+
+**CI install-smoke hotfix** — platform spec `1.0.0` LOCKED.
+
+### Fixed
+
+- `Install-Workstation -SkipValidation` — product install no longer runs Full doctor mid-bootstrap (was hanging CI 1h+)
+- `install.ps1` / `devshell install` pass `-SkipValidation`; doctor runs after `command-health`
+- Folder bootstrap creates all paths from `homebase.defaults.json` (Networking, Configs, …)
+- CI `install-smoke` job: 15-minute timeout, `CI=1`
+
+---
+
 ## [2.0.5] - 2026-06-29
 
 **CI + portable paths hotfix** — platform spec `1.0.0` LOCKED.
@@ -140,7 +153,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.5...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.0.6...HEAD
+[2.0.6]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.6
 [2.0.5]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.5
 [2.0.4]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.4
 [2.0.3]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.3

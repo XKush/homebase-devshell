@@ -3,7 +3,7 @@
 .SYNOPSIS
     HomeBase DevShell one-line bootstrap installer.
 .EXAMPLE
-    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.5/install.ps1 | iex
+    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.6/install.ps1 | iex
 .EXAMPLE
     pwsh -File install.ps1
 .EXAMPLE
@@ -19,7 +19,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$script:DevShellReleaseTag = 'v2.0.5'
+$script:DevShellReleaseTag = 'v2.0.6'
 
 function Test-DevShellRepo {
     param([string]$Path)
@@ -136,10 +136,10 @@ Write-Host "Repository: $repoRoot" -ForegroundColor DarkGray
 Write-Host ''
 if ($installTools) {
     Write-Host '==> Bootstrap (folders + profile + tools, user scope)' -ForegroundColor Cyan
-    & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipAdmin
+    & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipAdmin -SkipValidation
 } else {
     Write-Host '==> Bootstrap (folders + profile, user scope)' -ForegroundColor Cyan
-    & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin
+    & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin -SkipValidation
 }
 if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
     Write-Host ''

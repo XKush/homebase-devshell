@@ -47,10 +47,13 @@ jobs:
 
   install-smoke:
     runs-on: windows-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Smoke install.ps1 in temp dir
         shell: pwsh
+        env:
+          CI: '1'
         run: |
           $src = Get-Location
           $temp = Join-Path $env:RUNNER_TEMP "devshell-smoke"

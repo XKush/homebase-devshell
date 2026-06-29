@@ -1,6 +1,6 @@
 @{
     RootModule        = 'KGreen.Workstation.psm1'
-    ModuleVersion     = '2.0.5'
+    ModuleVersion     = '2.0.6'
     GUID              = '7f3a9c2e-4b81-4d5f-9e0a-1c8b6d4e2f90'
     Author            = 'KGreen'
     CompanyName       = 'KGreen'

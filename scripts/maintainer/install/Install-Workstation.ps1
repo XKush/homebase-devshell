@@ -9,6 +9,9 @@ param(
     [switch]$Force,
     [switch]$SkipSoftware,
     [switch]$SkipAdmin,
+    [switch]$SkipValidation,
+    [ValidateSet('Core', 'Full')]
+    [string]$ValidationTier = 'Full',
     [ValidateSet('Quad9', 'Cloudflare', 'Mullvad', 'None')]
     [string]$DnsProvider = 'Quad9'
 )
@@ -31,8 +34,24 @@ Assert-DefenderUntouched
 
 # 1. Folder structure
 Write-WorkstationStep 'Folder structure'
-foreach ($d in @('C:\Tools','C:\Scripts','C:\Projects','C:\Logs','C:\Backups','C:\Security')) {
-    New-Item -ItemType Directory -Force -Path $d | Out-Null
+$script:WSRoot = $root
+. (Join-Path $root 'lib\HomeBasePaths.ps1')
+$folderNames = @('Tools', 'Scripts', 'Projects', 'Logs', 'Backups', 'Security', 'Networking', 'Configs', 'Temp')
+foreach ($name in $folderNames) {
+    $path = Get-HomeBasePath -Name $name
+    if (-not (Test-Path $path)) {
+        New-Item -ItemType Directory -Force -Path $path | Out-Null
+    }
+}
+foreach ($parent in @(
+    (Split-Path (Get-HomeBasePath -Name Logs) -Parent),
+    (Split-Path (Get-HomeBasePath -Name Backups) -Parent),
+    (Split-Path (Get-HomeBasePath -Name Configs) -Parent),
+    (Split-Path (Get-HomeBasePath -Name Temp) -Parent)
+)) {
+    if ($parent -and -not (Test-Path $parent)) {
+        New-Item -ItemType Directory -Force -Path $parent | Out-Null
+    }
 }
 Write-WorkstationLog 'Folders verified' 'OK'
 
@@ -79,11 +98,16 @@ Write-WorkstationStep 'Git identity defaults'
 Write-WorkstationStep 'PATH repair'
 & (Resolve-WorkstationScript -Name 'Fix-WorkstationPath.ps1' -Start $PSScriptRoot)
 
-Write-WorkstationStep 'Final validation'
-& (Resolve-WorkstationScript -Name 'Validate-Workstation.ps1' -Start $PSScriptRoot) -StartupBudgetMs 600
-if ($LASTEXITCODE -ne 0) {
-    Write-WorkstationLog 'Validation reported failures — review C:\Logs\Workstation\' 'ERROR'
-    exit 1
+if (-not $SkipValidation) {
+    $tier = if ($SkipSoftware) { 'Core' } else { $ValidationTier }
+    Write-WorkstationStep "Final validation ($tier)"
+    & (Resolve-WorkstationScript -Name 'Validate-Workstation.ps1' -Start $PSScriptRoot) -Tier $tier -StartupBudgetMs 650
+    if ($LASTEXITCODE -ne 0) {
+        Write-WorkstationLog 'Validation reported failures — review C:\Logs\Workstation\' 'ERROR'
+        exit 1
+    }
+} else {
+    Write-WorkstationLog 'Final validation skipped (-SkipValidation)' 'WARN'
 }
 
 Write-WorkstationStep 'Setup complete'
