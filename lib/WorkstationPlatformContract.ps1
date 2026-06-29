@@ -16,8 +16,8 @@ function Get-WorkstationPlatformContract {
         Lock            = [ordered]@{
             Status    = 'LOCKED'
             SignedAt  = '2026-06-29'
-            SpecDoc   = 'docs/charter/PLATFORM-SPEC-SIGNOFF.md'
-            Baseline  = 'docs/baselines/platform-spec-wave-abcd-lock.json'
+            SpecDoc   = 'internal-docs/charter/PLATFORM-SPEC-SIGNOFF.md'
+            Baseline  = 'internal-docs/baselines/platform-spec-wave-abcd-lock.json'
             Hardening = 'Test-WorkstationPlatformHardening.ps1'
         }
         Waves           = [ordered]@{

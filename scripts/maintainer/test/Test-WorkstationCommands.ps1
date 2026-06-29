@@ -16,7 +16,7 @@ param(
 $repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
 
 $ErrorActionPreference = 'Continue'
-$wsRoot = 'C:\Scripts\Workstation'
+$wsRoot = $repoRoot
 . (Join-Path $wsRoot 'lib\HomeBasePaths.ps1')
 if (-not $OutputPath) { $OutputPath = Join-Path (Get-HomeBasePath -Name Logs) 'command-health.json' }
 $modulePath = Join-Path $wsRoot 'modules\KGreen.Workstation.psm1'

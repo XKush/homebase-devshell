@@ -5,13 +5,15 @@ $repoRoot = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
 # Daily trust + command health (for scheduled task / CI)
 
 $ErrorActionPreference = 'Continue'
-$logDir = 'C:\Logs\Workstation'
+. (Join-Path $repoRoot 'lib\HomeBasePaths.ps1')
+$logDir = Get-HomeBasePath -Name Logs
 if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Force -Path $logDir | Out-Null }
 
-Import-Module 'C:\Scripts\Workstation\modules\KGreen.Workstation.psm1' -DisableNameChecking -Force
+$modulePath = Join-Path $repoRoot 'modules\KGreen.Workstation.psm1'
+Import-Module $modulePath -DisableNameChecking -Force
 
 $trust = Get-SystemTrustReport -Live -Save
-& 'C:\Scripts\Workstation\Test-WorkstationCommands.ps1' -Quick | Out-Null
+& (Join-Path $repoRoot 'Test-WorkstationCommands.ps1') -Quick | Out-Null
 
 @{
     Timestamp = (Get-Date).ToString('o')

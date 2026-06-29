@@ -11,9 +11,7 @@
 | **`CHANGELOG.md`** (root) | Public product history (Keep a Changelog) | ✅ **Единственный canonical** |
 | **`internal-docs/charter/CHANGELOG.md`** | Stub → ссылка на root | ✅ OK (не дублирует контент) |
 
-**Проблема:** `Test-ReleaseVersion.ps1` всё ещё проверяет `docs/charter/CHANGELOG.md` (старый путь) и паттерны README «HOME BASE vX» — **release gate сейчас ложно FAIL** на DevShell README.
-
-**Рекомендация:** обновить `Test-ReleaseVersion.ps1` → root `CHANGELOG.md` + semver из `KGreen.Workstation.psd1` / git tag (отдельный chore, не architecture).
+**Статус:** `Test-ReleaseVersion.ps1` проверяет root `CHANGELOG.md`, pin в `install.ps1`, semver из `KGreen.Workstation.psd1`, и git tag — **PASS** на v2.0.0 (исправлено в `96fa237`).
 
 ---
 
@@ -25,7 +23,7 @@
 | **`Test-WorkstationCommands.ps1`** | CI, commit gate, upgrade, Singularity | Smoke module commands | 🟡 Maintainer / CI |
 | **`Test-HomeBasePaths.ps1`** | Phase2 gate, integration rehearsal, baseline | SSOT paths vs legacy folders | 🟡 Phase 2 / maintainer |
 | **`Test-LegacyEquivalence.ps1`** | Commit gate, baseline save, Step1 baseline | JSON baseline diff | 🟡 Phase 2 / maintainer |
-| **`Test-ReleaseVersion.ps1`** | Integration rehearsal, commit gate | Version consistency | 🟡 Release helper (**needs path fix**) |
+| **`Test-ReleaseVersion.ps1`** | Integration rehearsal, commit gate | Version consistency | 🟡 Release helper (**OK — root CHANGELOG**)
 | **`Test-RestoreRehearsal.ps1`** | Integration rehearsal | Backup restore dry-run | 🟡 Phase 2 / maintainer |
 
 **Не в git (WIP, .gitignore):** `Test-MenuAudit.ps1`, `Test-MenuDeepAudit.ps1`, `Test-AnonymityKitAudit.ps1` — sandbox; `Validate-Workstation.ps1` всё ещё **warn** если их нет.

@@ -40,6 +40,56 @@ function scripts {
     Write-CommandLog 'scripts' 'OK'
 }
 
+function downloads {
+    param([switch]$Help, [switch]$Archive)
+    if (Test-ShowCommandHelp -Name 'downloads' -Help:$Help) { return }
+    $std = Get-WorkstationStandardFolders
+    $path = if ($Archive) { $std.DownloadsArchive } else { $std.Downloads }
+    if (-not (Test-Path $path)) { New-Item -ItemType Directory -Force -Path $path | Out-Null }
+    Set-Location $path
+    Write-Host "  → $path (загрузки$(if ($Archive) { ', архив' }))" -ForegroundColor DarkGray
+    Write-CommandLog 'downloads' 'OK'
+}
+
+function desktop {
+    param([switch]$Help)
+    if (Test-ShowCommandHelp -Name 'desktop' -Help:$Help) { return }
+    $path = (Get-WorkstationStandardFolders).Desktop
+    Set-Location $path
+    Write-Host "  → $path (рабочий стол)" -ForegroundColor DarkGray
+    Write-CommandLog 'desktop' 'OK'
+}
+
+function backups {
+    param([switch]$Help)
+    if (Test-ShowCommandHelp -Name 'backups' -Help:$Help) { return }
+    $path = if ($script:WorkstationRoots.Backups) { $script:WorkstationRoots.Backups } else { (Get-WorkstationStandardFolders).Backups }
+    if (-not (Test-Path $path)) { New-Item -ItemType Directory -Force -Path $path | Out-Null }
+    Set-Location $path
+    Write-Host "  → $path (бэкапы)" -ForegroundColor DarkGray
+    Write-CommandLog 'backups' 'OK'
+}
+
+function configs {
+    param([switch]$Help)
+    if (Test-ShowCommandHelp -Name 'configs' -Help:$Help) { return }
+    $path = if ($env:CONFIGS_HOME) { $env:CONFIGS_HOME } else { (Get-WorkstationStandardFolders).Configs }
+    if (-not (Test-Path $path)) { New-Item -ItemType Directory -Force -Path $path | Out-Null }
+    Set-Location $path
+    Write-Host "  → $path (конфиги)" -ForegroundColor DarkGray
+    Write-CommandLog 'configs' 'OK'
+}
+
+function networking {
+    param([switch]$Help)
+    if (Test-ShowCommandHelp -Name 'networking' -Help:$Help) { return }
+    $path = if ($env:NETWORKING_HOME) { $env:NETWORKING_HOME } else { (Get-WorkstationStandardFolders).Networking }
+    if (-not (Test-Path $path)) { New-Item -ItemType Directory -Force -Path $path | Out-Null }
+    Set-Location $path
+    Write-Host "  → $path (networking)" -ForegroundColor DarkGray
+    Write-CommandLog 'networking' 'OK'
+}
+
 function Open-Project {
     param([Parameter(Mandatory)][string]$Name)
     $p = Join-Path $script:WorkstationRoots.Projects $Name
