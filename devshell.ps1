@@ -35,15 +35,12 @@ function Get-DevShellProductVersion {
 function Show-DevShellHelp {
     Write-Host @'
 
-HomeBase DevShell — product CLI
+HomeBase DevShell
 
-  devshell install   Bootstrap folders, profile, and baseline validation
-  devshell doctor    Full workstation health check (Validate-Workstation)
-  devshell status    Product + platform lock + runtime context
-  devshell reload    Reload profile stack (Invoke-WorkstationCommand profile.reload)
-  devshell trace     Show last execution trace rows (default: 20)
+  devshell install   Set up your shell
+  devshell doctor    Check if you are ready to work
+  devshell status    See if everything loaded
 
-  devshell version   Print product and platform spec versions
   devshell help      Show this help
 
 '@ -ForegroundColor DarkGray

@@ -29,7 +29,8 @@ function Get-BootstrapRepoRoot {
 }
 
 Write-Host ''
-Write-Host 'HomeBase DevShell v2.0.0 — install' -ForegroundColor Cyan
+Write-Host 'HomeBase DevShell — install' -ForegroundColor Cyan
+Write-Host 'Install. Check. Done.' -ForegroundColor DarkGray
 Write-Host ''
 
 if ($PSVersionTable.PSVersion.Major -lt 7) {
@@ -88,14 +89,13 @@ $doctorExit = $LASTEXITCODE
 
 Write-Host ''
 if ($doctorExit -eq 0) {
-    Write-Host 'SUCCESS: HomeBase DevShell is ready.' -ForegroundColor Green
+    Write-Host 'Ready to work.' -ForegroundColor Green
     Write-Host ''
-    Write-Host 'Next steps:' -ForegroundColor Cyan
-    Write-Host '  1. Restart Windows Terminal' -ForegroundColor DarkGray
-    Write-Host "  2. pwsh -File `"$repoRoot\devshell.ps1`" status" -ForegroundColor DarkGray
+    Write-Host 'Next: close this terminal, open a new one, and run doctor anytime.' -ForegroundColor DarkGray
+    Write-Host "  pwsh -File `"$repoRoot\devshell.ps1`" doctor" -ForegroundColor DarkGray
     exit 0
 }
 
-Write-Host 'FAIL: Health check did not pass.' -ForegroundColor Red
-Write-Host 'Review C:\Logs\Workstation\validation-*.json and re-run after fixes.' -ForegroundColor DarkGray
+Write-Host 'Not ready yet. Fix what doctor shows, then run install again.' -ForegroundColor Red
+Write-Host "  pwsh -File `"$repoRoot\devshell.ps1`" install" -ForegroundColor DarkGray
 exit $doctorExit

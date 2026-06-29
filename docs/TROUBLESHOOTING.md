@@ -1,31 +1,35 @@
 # Troubleshooting
 
-## Install fails
+## Install didn't work
 
-| Message | Fix |
-|---------|-----|
-| PowerShell 7+ required | Install from [aka.ms/powershell](https://aka.ms/powershell), reopen terminal |
-| git not found | Install [Git for Windows](https://git-scm.com/download/win), retry install line |
-| Clone failed | Clone manually: `git clone https://github.com/XKush/homebase-devshell.git $HOME\.homebase\devshell` then `pwsh -File install.ps1` from that folder |
+| Message | What to do |
+|---------|------------|
+| Need PowerShell 7 | Install from [aka.ms/powershell](https://aka.ms/powershell), try again |
+| git not found | Install [Git for Windows](https://git-scm.com/download/win), try again |
 
-## `devshell doctor` fails
+## Doctor didn't say "Ready to work"
 
-1. Note the report path: `C:\Logs\Workstation\validation-*.json`  
-2. Open the JSON and fix listed failures (missing folders, tools, slow profile)  
-3. Run `devshell install`, then `devshell doctor` again  
+1. Run install again  
+2. Run doctor again  
+3. Still stuck? Open the log file doctor mentions and fix what's listed  
 
-Exit code `0` and **`Failed: 0`** mean you are ready.
+```powershell
+pwsh -File $HOME\.homebase\devshell\devshell.ps1 install
+pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
+```
 
-## Commands not found
+## "Command not found"
 
-- Restart the terminal after install  
-- Use full path: `pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor`  
-- Or add the `devshell` alias from [GETTING-STARTED.md](GETTING-STARTED.md)
+Close terminal completely. Open a new one. Paste the full command from the [README](../README.md).
 
-## Wrong repository root
+## Optional: short `devshell` shortcut
 
-Set `$env:HOMEBASE_DEVSHELL_ROOT` to your checkout path and re-run `install.ps1`.
+Only if you want fewer keystrokes later:
+
+```powershell
+function devshell { pwsh -NoProfile -File "$HOME\.homebase\devshell\devshell.ps1" @args }
+```
 
 ## Still stuck?
 
-Open a [GitHub Issue](https://github.com/XKush/homebase-devshell/issues) with your doctor JSON (redact usernames/paths if you prefer).
+[Open an issue](https://github.com/XKush/homebase-devshell/issues)

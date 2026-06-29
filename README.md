@@ -2,9 +2,9 @@
 
 🌍 **Language:** English | [Русский](README.ru.md)
 
-**Your dev environment might be broken. You just don't know it yet.**
+**Is your setup ready to work?**
 
-**One install. One check. Instant answer.**
+**Install. Check. Done.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -12,105 +12,79 @@
 irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
 ```
 
-Restart terminal → run **`devshell doctor`** → see **Ready to work**.
-
----
-
-## Why this exists
-
-- **Broken setups hide in plain sight** — bad paths, missing tools, slow profiles  
-- **Onboarding eats your day** — new machine, new job, new reinstall  
-- **You can't trust what you can't verify** — "probably fine" isn't a strategy  
-- **Drift kills productivity** — config changes silently until something breaks  
-
-HomeBase DevShell fixes one thing: **know if you're ready to work — in seconds.**
-
----
-
-## See it work (3 seconds)
+Close terminal. Open it again. Run:
 
 ```powershell
-devshell doctor
+pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
 ```
+
+See **Ready to work**? You're done.
+
+---
+
+## Why
+
+- Your setup can be broken without you noticing  
+- New PC or reinstall shouldn't mean guessing for an hour  
+- You shouldn't start coding until you know things work  
+
+---
+
+## What you'll see
 
 ```
 ✔ Profile OK
 ✔ Tools OK
 ✔ Environment OK
 ✔ Ready to work
-
-Passed: 71 · Failed: 0 · Profile: 489ms
 ```
 
-That's it. No guesswork.
+Green checkmarks = go. Anything else = not ready yet.
 
 ---
 
-## Three commands. That's the product.
+## Three buttons (that's all)
+
+| | |
+|---|---|
+| **install** | First-time setup |
+| **doctor** | Am I ready to work? |
+| **status** | Did everything load? (optional) |
+
+Same commands, anytime:
 
 ```powershell
-devshell install   # set up (safe to re-run)
-devshell doctor    # pass or fail — are you ready?
-devshell status    # quick sanity check
+pwsh -File $HOME\.homebase\devshell\devshell.ps1 install
+pwsh -File $HOME\.homebase\devshell\devshell.ps1 doctor
+pwsh -File $HOME\.homebase\devshell\devshell.ps1 status
 ```
 
-| Command | One line |
-|---------|----------|
-| **`devshell install`** | Deploy profile + baseline setup |
-| **`devshell doctor`** | Full health check before you code |
-| **`devshell status`** | Version + load state |
-
-<details>
-<summary>Without alias (copy once after install)</summary>
-
-```powershell
-function devshell { pwsh -NoProfile -File "$HOME\.homebase\devshell\devshell.ps1" @args }
-```
-
-</details>
+No config. No setup wizard. Copy, run, read the answer.
 
 ---
 
-## Use it when
+## When to use it
 
-**New machine** — install → doctor → start coding  
-**Something feels wrong** — one command finds what's broken  
-**Every morning** — 5-second readiness check before deep work  
-
----
-
-## Trust
-
-- **Fail-safe install** — setup runs `doctor` automatically; no silent "success"  
-- **Idempotent** — run `devshell install` again anytime after fixes  
-- **No admin by default** — product install skips privileged system changes  
-- **Local only** — nothing leaves your machine  
-- **Clear reports** — failures write to `C:\Logs\Workstation\validation-*.json`  
+- **New Windows PC** — before your first commit  
+- **Something broke** — one check instead of guessing  
+- **Start of the day** — 10 seconds, peace of mind  
 
 ---
 
-## What this is **not**
+## Safe by default
 
-- ❌ Not a framework to learn before you work  
-- ❌ Not a shell replacement (it's PowerShell 7, enhanced)  
-- ❌ Not a dev platform / plugin ecosystem  
-- ❌ Not Linux or macOS  
-
-Just: **install → doctor → work.**
+- Runs on **your PC only** — nothing uploaded  
+- **No admin prompts** in the default install  
+- **Run install again** if something failed — it won't make things worse  
 
 ---
 
-## Quick start
+## Not for you if
 
-```powershell
-# 1 — install
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.0/install.ps1 | iex
+- You want a big framework to learn first  
+- You're not on Windows + PowerShell 7  
+- You want a replacement for bash/zsh on Mac/Linux  
 
-# 2 — new terminal, then verify
-devshell doctor
-devshell status
-```
+---
 
-**Needs:** Windows 10/11 · [PowerShell 7+](https://aka.ms/powershell) · Git  
-
-**Stuck?** [Troubleshooting](docs/TROUBLESHOOTING.md) · [Contributing](CONTRIBUTING.md)
+**Need help?** [Troubleshooting](docs/TROUBLESHOOTING.md) · Windows 10/11 · [PowerShell 7](https://aka.ms/powershell) · Git
