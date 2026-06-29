@@ -23,6 +23,7 @@ credentials.json
 
 # Scratch and WIP (do not ship to public users)
 *.tmp
+*.bak
 modules/Shell.ps1.tmp
 Test-MenuAudit.ps1
 Test-MenuDeepAudit.ps1
@@ -30,6 +31,13 @@ Test-AnonymityKitAudit.ps1
 lib/AnonymityKit.ps1
 lib/Invoke-MenuPreview.ps1
 modules/Private/MenuSystem.ps1
+
+# Generated audit copies (if synced into repo by mistake)
+audit-*.json
+**/reports/*.json
+
+# Editor / IDE local
+.cursor/
 
 # Optional local theme override (machine-specific)
 terminal/active-theme.omp.json

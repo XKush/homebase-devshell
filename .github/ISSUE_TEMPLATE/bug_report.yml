@@ -1,0 +1,34 @@
+name: Bug report
+description: Something broke after a successful install
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: command
+    attributes:
+      label: Related command
+      options:
+        - devshell install
+        - devshell doctor
+        - devshell status
+        - other
+    validations:
+      required: true

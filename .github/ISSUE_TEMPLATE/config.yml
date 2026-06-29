@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Troubleshooting guide
+    url: https://github.com/XKush/homebase-devshell/blob/main/docs/TROUBLESHOOTING.md
+    about: Install or doctor problems — start here before opening an issue
+  - name: README / Quick start
+    url: https://github.com/XKush/homebase-devshell#homebase-devshell
+    about: Install → doctor → Ready to work
