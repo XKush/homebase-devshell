@@ -1,9 +1,29 @@
 #Requires -Version 7.0
 # Production PowerShell 7 profile — KGreen workstation (sub-300ms load target)
-# Canonical: C:\Scripts\Workstation\profile\Microsoft.PowerShell_profile.ps1
+# Canonical profile — deploy via Install-ShellProfile.ps1
 
 $ErrorActionPreference = 'Continue'
 $env:PROFILE_LOADED = '1'
+
+# ── HOME BASE path SSOT bootstrap (before module load) ───────────────────────
+function Resolve-WorkstationRepositoryRoot {
+    if ($env:WORKSTATION_ROOT -and (Test-Path (Join-Path $env:WORKSTATION_ROOT 'Config\homebase.defaults.json'))) {
+        return $env:WORKSTATION_ROOT
+    }
+    if ($env:HOMEBASE_CONFIG -and (Test-Path $env:HOMEBASE_CONFIG)) {
+        $fromConfig = Split-Path (Split-Path $env:HOMEBASE_CONFIG -Parent) -Parent
+        if (Test-Path (Join-Path $fromConfig 'lib\HomeBasePaths.ps1')) { return $fromConfig }
+    }
+    $parent = Split-Path $PSScriptRoot -Parent
+    if (Test-Path (Join-Path $parent 'lib\HomeBasePaths.ps1')) { return $parent }
+    if ((Split-Path $PSScriptRoot -Leaf) -eq 'profile') {
+        return $parent
+    }
+    return 'C:\Scripts\Workstation'
+}
+
+$script:WSRoot = Resolve-WorkstationRepositoryRoot
+. (Join-Path $script:WSRoot 'lib\HomeBasePaths.ps1')
 
 $script:IsInteractive = [Environment]::UserInteractive -and -not $env:CI -and $Host.Name -ne 'ServerRemoteHost'
 $script:WorkstationSessionReady = $false
@@ -27,7 +47,7 @@ $script:WorkstationRoots = @{
     Tools    = 'C:\Tools'; Scripts = 'C:\Scripts'; Projects = 'C:\Projects'
     Logs     = 'C:\Logs'; Backups = 'C:\Backups'; Security = 'C:\Security'
 }
-$env:WORKSTATION_ROOT = 'C:\Scripts\Workstation'
+$env:WORKSTATION_ROOT = Get-HomeBasePath -Name RepositoryRoot
 $env:PROJECTS_HOME    = $script:WorkstationRoots.Projects
 $env:NETWORKING_HOME  = 'C:\Networking'
 $env:CONFIGS_HOME     = 'C:\Configs'
@@ -62,6 +82,9 @@ function Initialize-WorkstationSession {
     }
     if (Get-Command zoxide -ErrorAction SilentlyContinue) {
         Invoke-Expression (& zoxide init powershell --cmd z | Out-String)
+    }
+    if (Get-Command Register-WorkstationMenuHotkeys -ErrorAction SilentlyContinue) {
+        Register-WorkstationMenuHotkeys
     }
 }
 
@@ -173,11 +196,4 @@ function admin {
     Start-Process pwsh -Verb RunAs -ArgumentList @('-NoExit', '-Command', $boot)
 }
 
-# ── Command palette keybinding (module lazy-loaded on invoke) ─────────────────
-if ($script:IsInteractive -and (Get-Command fzf -ErrorAction SilentlyContinue) -and (Get-Module PSReadLine)) {
-    Set-PSReadLineKeyHandler -Chord 'Ctrl+Alt+H' -ScriptBlock {
-        if (-not $script:WorkstationModuleLoaded) { Initialize-WorkstationModule }
-        if (Get-Command Invoke-CommandPalette -ErrorAction SilentlyContinue) { Invoke-CommandPalette }
-        elseif (Get-Command palette -ErrorAction SilentlyContinue) { palette }
-    }
-}
+# ── Menu hotkeys — Register-WorkstationMenuHotkeys (first prompt via session init) ─
