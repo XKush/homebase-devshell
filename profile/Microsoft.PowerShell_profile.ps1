@@ -35,6 +35,9 @@ $script:WSRoot = Resolve-WorkstationRepositoryRoot
 # ── B-layer command registry (declarative definitions — no execution) ──────────
 . (Join-Path $script:WSRoot 'lib\WorkstationCommandRegistry.ps1')
 
+# ── B-layer capability observability (registry introspection — no control) ───
+. (Join-Path $script:WSRoot 'lib\WorkstationCapabilityObservability.ps1')
+
 # ── B-layer command router (dispatch only — reads registry) ───────────────────
 . (Join-Path $script:WSRoot 'lib\WorkstationCommandRouter.ps1')
 
