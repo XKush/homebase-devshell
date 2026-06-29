@@ -68,7 +68,7 @@ $script:WorkstationSessionReady = $false
 $OutputEncoding = [System.Text.Encoding]::UTF8
 $env:PYTHONUTF8 = '1'
 
-if (-not $env:WORKSTATION_LANG) { $env:WORKSTATION_LANG = 'ru' }
+if (-not $env:WORKSTATION_LANG) { $env:WORKSTATION_LANG = 'en' }
 if (-not $env:WORKSTATION_TRUST_MODE) { $env:WORKSTATION_TRUST_MODE = 'strict' }
 if (-not $env:WORKSTATION_HACKER_UI) { $env:WORKSTATION_HACKER_UI = '1' }
 if (-not $env:WORKSTATION_HACKER_SCAN) { $env:WORKSTATION_HACKER_SCAN = '1' }

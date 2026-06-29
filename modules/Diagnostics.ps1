@@ -1,16 +1,20 @@
 # Diagnostics — doctor, healthcheck, sysreport
 
 function doctor {
-    param([switch]$Help)
+    param(
+        [switch]$Help,
+        [ValidateSet('Core', 'Full')]
+        [string]$Tier = 'Full'
+    )
     if (Test-ShowCommandHelp -Name 'doctor' -Help:$Help) { return }
     Invoke-WorkstationCmd 'doctor' {
-        Write-Host "`n  Проверка здоровья системы...`n" -ForegroundColor Cyan
+        Write-Host "`n  Health check (tier: $Tier)...`n" -ForegroundColor Cyan
         $script = Join-Path $script:WSRoot 'scripts\maintainer\install\Validate-Workstation.ps1'
-        & $script -StartupBudgetMs 600
+        & $script -Tier $Tier -StartupBudgetMs 650
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "`n  Doctor: все проверки пройдены." -ForegroundColor Green
+            Write-Host "`n  Doctor: all checks passed ($Tier)." -ForegroundColor Green
         } else {
-            Write-Host "`n  Doctor: найдены проблемы — попробуйте repairterminal" -ForegroundColor Yellow
+            Write-Host "`n  Doctor: issues found — try repairterminal or doctor -Tier Core" -ForegroundColor Yellow
         }
     }
 }

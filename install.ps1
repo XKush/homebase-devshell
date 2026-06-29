@@ -3,18 +3,23 @@
 .SYNOPSIS
     HomeBase DevShell one-line bootstrap installer.
 .EXAMPLE
-    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.3/install.ps1 | iex
+    irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.0.4/install.ps1 | iex
 .EXAMPLE
     pwsh -File install.ps1
+.EXAMPLE
+    pwsh -File install.ps1 -SkipTools
 #>
 param(
     [string]$InstallPath = (Join-Path $env:USERPROFILE '.homebase\devshell'),
     [string]$RepoUrl = 'https://github.com/XKush/homebase-devshell.git',
-    [switch]$SkipClone
+    [switch]$SkipClone,
+    [switch]$WithTools,
+    [switch]$SkipTools,
+    [switch]$SkipDoctor
 )
 
 $ErrorActionPreference = 'Stop'
-$script:DevShellReleaseTag = 'v2.0.3'
+$script:DevShellReleaseTag = 'v2.0.4'
 
 function Test-DevShellRepo {
     param([string]$Path)
@@ -46,8 +51,39 @@ function Initialize-DevShellInstallPaths {
     }
 
     [Environment]::SetEnvironmentVariable('WORKSTATION_ROOT', $RepoRoot, 'User')
+    [Environment]::SetEnvironmentVariable('WORKSTATION_LANG', 'en', 'User')
     $env:WORKSTATION_ROOT = $RepoRoot
     $env:HOMEBASE_DEVSHELL_ROOT = $RepoRoot
+    $env:WORKSTATION_LANG = 'en'
+}
+
+function Install-DevShellPathShim {
+    param([Parameter(Mandatory)][string]$RepoRoot)
+
+    $shimDir = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps'
+    if (-not (Test-Path $shimDir)) {
+        New-Item -ItemType Directory -Force -Path $shimDir | Out-Null
+    }
+    $shimPath = Join-Path $shimDir 'devshell.cmd'
+    $devshellPs1 = Join-Path $RepoRoot 'devshell.ps1'
+    @"
+@echo off
+pwsh -NoLogo -File "$devshellPs1" %*
+"@ | Set-Content -Path $shimPath -Encoding ASCII
+
+    $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+    if ($userPath -notlike "*$shimDir*") {
+        $joined = if ([string]::IsNullOrWhiteSpace($userPath)) { $shimDir } else { "$userPath;$shimDir" }
+        [Environment]::SetEnvironmentVariable('Path', $joined, 'User')
+    }
+}
+
+$installTools = if ($PSBoundParameters.ContainsKey('WithTools')) {
+    $WithTools
+} elseif ($PSBoundParameters.ContainsKey('SkipTools')) {
+    -not $SkipTools
+} else {
+    $true
 }
 
 Write-Host ''
@@ -94,11 +130,17 @@ if (-not $repoRoot -or -not (Test-DevShellRepo -Path $repoRoot)) {
 
 $env:HOMEBASE_DEVSHELL_ROOT = $repoRoot
 Initialize-DevShellInstallPaths -RepoRoot $repoRoot
+Install-DevShellPathShim -RepoRoot $repoRoot
 Write-Host "Repository: $repoRoot" -ForegroundColor DarkGray
 
 Write-Host ''
-Write-Host '==> Bootstrap (folders + profile, user scope)' -ForegroundColor Cyan
-& (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin
+if ($installTools) {
+    Write-Host '==> Bootstrap (folders + profile + tools, user scope)' -ForegroundColor Cyan
+    & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipAdmin
+} else {
+    Write-Host '==> Bootstrap (folders + profile, user scope)' -ForegroundColor Cyan
+    & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin
+}
 if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
     Write-Host ''
     Write-Host 'FAIL: Bootstrap reported errors. See output above and C:\Logs\Workstation\' -ForegroundColor Red
@@ -115,16 +157,21 @@ if (Test-Path $cmdTest) {
 }
 
 Write-Host ''
-Write-Host '==> Health check (devshell doctor)' -ForegroundColor Cyan
-& (Join-Path $repoRoot 'devshell.ps1') doctor
-$doctorExit = $LASTEXITCODE
+if (-not $SkipDoctor) {
+    Write-Host '==> Health check (devshell doctor — Core tier)' -ForegroundColor Cyan
+    & (Join-Path $repoRoot 'devshell.ps1') doctor -Tier Core
+    $doctorExit = $LASTEXITCODE
+} else {
+    Write-Host '==> Health check skipped (-SkipDoctor)' -ForegroundColor DarkGray
+    $doctorExit = 0
+}
 
 Write-Host ''
 if ($doctorExit -eq 0) {
     Write-Host 'Ready to work.' -ForegroundColor Green
     Write-Host ''
-    Write-Host 'Next: close this terminal, open a new one, and run doctor anytime.' -ForegroundColor DarkGray
-    Write-Host "  pwsh -File `"$repoRoot\devshell.ps1`" doctor" -ForegroundColor DarkGray
+    Write-Host 'Next: close this terminal, open a new one, and run: devshell doctor' -ForegroundColor DarkGray
+    Write-Host 'Full validation (all tools): devshell doctor -Tier Full' -ForegroundColor DarkGray
     exit 0
 }
 

@@ -21,8 +21,8 @@ $root = Resolve-WorkstationRepoRoot -Start $PSScriptRoot
 Write-Host @'
 
  ╔══════════════════════════════════════════════════╗
- ║  ReviOS Professional Workstation Setup         ║
- ║  Privacy · Performance · Hardening (no Defender) ║
+ ║  HomeBase DevShell Setup                         ║
+ ║  Privacy · Performance · Hardening (no Defender)   ║
  ╚══════════════════════════════════════════════════╝
 
 '@ -ForegroundColor Green

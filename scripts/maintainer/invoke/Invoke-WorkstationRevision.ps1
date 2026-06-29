@@ -55,7 +55,7 @@ if (-not $Quick) {
 }
 
 # 4. Module trust + security
-Import-Module (Join-Path $PSScriptRoot 'modules\KGreen.Workstation.psm1') -Force
+Import-Module (Join-Path $repoRoot 'modules\KGreen.Workstation.psm1') -Force
 
 Write-WorkstationStep 'Trust probe'
 $trust = Get-SystemTrustReport -Live -Save
@@ -67,7 +67,7 @@ if (Get-Command Show-SecurityStatusPanel -ErrorAction SilentlyContinue) {
     $sec = Get-SecurityReadinessReport
 } else {
     $secJson = pwsh -NoProfile -Command @"
-Import-Module '$(Join-Path $PSScriptRoot 'modules\KGreen.Workstation.psm1')' -Force
+Import-Module '$(Join-Path $repoRoot 'modules\KGreen.Workstation.psm1')' -Force
 Get-SecurityReadinessReport | ConvertTo-Json -Compress
 "@
     try { $sec = $secJson | ConvertFrom-Json } catch { $sec = $null }

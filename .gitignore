@@ -25,9 +25,7 @@ credentials.json
 *.tmp
 *.bak
 modules/Shell.ps1.tmp
-Test-MenuAudit.ps1
 Test-MenuDeepAudit.ps1
-Test-AnonymityKitAudit.ps1
 
 # Optional local theme experiments
 terminal/homebase-clean.omp.json

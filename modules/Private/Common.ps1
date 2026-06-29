@@ -35,7 +35,7 @@ function Ensure-WorkstationModuleLoaded {
 $script:WSLog  = Get-WorkstationCommandsLogPath
 $script:WSOwner = 'KGreen'
 
-if (-not $env:WORKSTATION_LANG) { $env:WORKSTATION_LANG = 'ru' }
+if (-not $env:WORKSTATION_LANG) { $env:WORKSTATION_LANG = 'en' }
 if (-not $env:WORKSTATION_TRUST_MODE) { $env:WORKSTATION_TRUST_MODE = 'strict' }
 
 function Write-CommandLog {

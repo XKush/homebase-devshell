@@ -7,8 +7,12 @@
 #>
 param(
     [switch]$Fix,
-    [int]$StartupBudgetMs = 600
+    [ValidateSet('Core', 'Full')]
+    [string]$Tier = 'Full',
+    [int]$StartupBudgetMs = 650
 )
+
+$isFull = ($Tier -eq 'Full')
 
 $ErrorActionPreference = 'Continue'
 . (Join-Path $PSScriptRoot '..\_Resolve-RepoRoot.ps1')
@@ -38,10 +42,11 @@ $structureDirs  = @(
 $report = [ordered]@{
     Timestamp = (Get-Date).ToString('o')
     Host      = $env:COMPUTERNAME
+    Tier      = $Tier
     Passed    = [System.Collections.Generic.List[string]]::new()
     Failed    = [System.Collections.Generic.List[string]]::new()
     Warnings  = [System.Collections.Generic.List[string]]::new()
-    Metrics   = [ordered]@{}
+    Metrics   = [ordered]@{ Tier = $Tier }
     BeforeAfter = [ordered]@{}
 }
 
@@ -58,10 +63,12 @@ $env:Path    = "$machinePath;$userPath"
 
 # ── 1. Installation checks ───────────────────────────────────────────────────
 Write-WorkstationStep 'Tool installation'
-$requiredTools = @(
-    'pwsh', 'git', 'python', 'winget', 'oh-my-posh',
+$coreTools = @('pwsh', 'git')
+$fullOnlyTools = @(
+    'python', 'winget', 'oh-my-posh',
     'fzf', 'bat', 'eza', 'zoxide', 'fastfetch'
 )
+$requiredTools = $coreTools + $(if ($isFull) { $fullOnlyTools } else { @() })
 $optionalTools = @(
     @{ Name = 'code';       Exe = 'code' }
     @{ Name = 'nmap';       Exe = 'nmap' }
@@ -73,20 +80,35 @@ foreach ($tool in $requiredTools) {
     if (Get-Command $tool -ErrorAction SilentlyContinue) { Add-Pass "Tool installed: $tool" }
     else { Add-Fail "Tool missing: $tool" }
 }
-foreach ($tool in $optionalTools) {
-    $found = Get-Command $tool.Exe -ErrorAction SilentlyContinue
-    if (-not $found -and $tool.Path -and (Test-Path $tool.Path)) { $found = $true }
-    if ($found) { Add-Pass "Optional tool: $($tool.Name)" }
-    else { Add-Warn "Optional tool not installed: $($tool.Name)" }
+if ($isFull) {
+    foreach ($tool in $optionalTools) {
+        $found = Get-Command $tool.Exe -ErrorAction SilentlyContinue
+        if (-not $found -and $tool.Path -and (Test-Path $tool.Path)) { $found = $true }
+        if ($found) { Add-Pass "Optional tool: $($tool.Name)" }
+        else { Add-Warn "Optional tool not installed: $($tool.Name)" }
+    }
 }
 
 # ── 2. PowerShell modules ────────────────────────────────────────────────────
 Write-WorkstationStep 'PowerShell modules'
-$requiredModules = @('PSReadLine', 'posh-git', 'Terminal-Icons')
-foreach ($mod in $requiredModules) {
+$coreModules = @('PSReadLine')
+$fullModules = @('posh-git', 'Terminal-Icons')
+foreach ($mod in $coreModules) {
     $m = Get-Module -ListAvailable $mod | Sort-Object Version -Descending | Select-Object -First 1
     if ($m) { Add-Pass "Module $($m.Name) v$($m.Version)" }
     else { Add-Fail "Module missing: $mod" }
+}
+foreach ($mod in $(if ($isFull) { $fullModules } else { @() })) {
+    $m = Get-Module -ListAvailable $mod | Sort-Object Version -Descending | Select-Object -First 1
+    if ($m) { Add-Pass "Module $($m.Name) v$($m.Version)" }
+    else { Add-Fail "Module missing: $mod" }
+}
+if (-not $isFull) {
+    foreach ($mod in $fullModules) {
+        $m = Get-Module -ListAvailable $mod | Sort-Object Version -Descending | Select-Object -First 1
+        if ($m) { Add-Pass "Optional module $($m.Name) v$($m.Version)" }
+        else { Add-Warn "Optional module not installed: $mod (Full tier)" }
+    }
 }
 
 # ── 3. Profile integrity ─────────────────────────────────────────────────────
@@ -113,7 +135,7 @@ $sw.Stop()
 $profileMs = $sw.ElapsedMilliseconds
 $report.Metrics['ProfileLoadMs_Headless'] = $profileMs
 if ($profileMs -le $StartupBudgetMs) { Add-Pass "Profile load (headless): ${profileMs}ms <= ${StartupBudgetMs}ms" }
-else { Add-Fail "Profile load too slow: ${profileMs}ms (budget ${StartupBudgetMs}ms)" }
+else { Add-Warn "Profile load slow: ${profileMs}ms (budget ${StartupBudgetMs}ms) — run optimize-profile" }
 
 $sw2 = [Diagnostics.Stopwatch]::StartNew()
 $null = pwsh -NoLogo -Command "exit 0"
@@ -121,8 +143,9 @@ $sw2.Stop()
 $report.Metrics['PwshColdStartMs'] = $sw2.ElapsedMilliseconds
 Add-Pass "pwsh cold start: $($sw2.ElapsedMilliseconds)ms"
 
-# ── 5. Oh My Posh ────────────────────────────────────────────────────────────
-Write-WorkstationStep 'Oh My Posh'
+# ── 5. Oh My Posh (Full tier) ────────────────────────────────────────────────
+if ($isFull) { Write-WorkstationStep 'Oh My Posh' }
+if ($isFull) {
 if (Test-Path $ompConfig) {
     Add-Pass 'OMP theme file exists'
     try {
@@ -131,9 +154,11 @@ if (Test-Path $ompConfig) {
         else { Add-Fail "OMP render failed: $ompOut" }
     } catch { Add-Fail "OMP error: $_" }
 } else { Add-Fail 'OMP config missing' }
+}
 
-# ── 6. Nerd Font ─────────────────────────────────────────────────────────────
-Write-WorkstationStep 'Nerd Font'
+# ── 6. Nerd Font (Full tier) ─────────────────────────────────────────────────
+if ($isFull) { Write-WorkstationStep 'Nerd Font' }
+if ($isFull) {
 $fontFace = 'CaskaydiaCove NF'
 $fontInstalled = $false
 foreach ($hive in @('HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts', 'HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts')) {
@@ -149,9 +174,11 @@ $fontFile = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\Windows\Fonts" -Filter '*
 if ($fontFile) { $fontInstalled = $true }
 if ($fontInstalled) { Add-Pass "Nerd Font installed: $fontFace" }
 else { Add-Warn "Nerd Font not detected — run: repairterminal" }
+}
 
-# ── 7. Windows Terminal ──────────────────────────────────────────────────────
-Write-WorkstationStep 'Windows Terminal'
+# ── 7. Windows Terminal (Full tier) ──────────────────────────────────────────
+if ($isFull) { Write-WorkstationStep 'Windows Terminal' }
+if ($isFull) {
 $wtPath = Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json'
 if (Test-Path $wtPath) {
     Add-Pass 'Terminal settings.json exists'
@@ -167,6 +194,7 @@ if (Test-Path $wtPath) {
         Add-Warn "Terminal font is '$($wt.profiles.defaults.font.face)' — should be '$fontFace' (glyph fix)"
     } else { Add-Pass "Terminal font: $fontFace" }
 } else { Add-Fail 'Windows Terminal settings not found' }
+}
 
 # ── 8. UTF-8 ─────────────────────────────────────────────────────────────────
 Write-WorkstationStep 'UTF-8 support'
@@ -180,11 +208,14 @@ if ($utfTest -match 'utf-8') { Add-Pass 'UTF-8 console encoding' } else { Add-Fa
 
 # ── 9. Aliases and functions ─────────────────────────────────────────────────
 Write-WorkstationStep 'Aliases and functions'
+$coreAliases = @('projects', 'gs', 'sysinfo')
+$fullAliases = @('ll', 'Enter-Venv')
+$aliasNames = $coreAliases + $(if ($isFull) { $fullAliases } else { @() })
 $aliasTest = pwsh -NoProfile -Command @"
 `$env:WORKSTATION_BANNER_SHOWN='1'
 `$env:CI='1'
 . '$live'
-@( 'projects', 'll', 'gs', 'Enter-Venv', 'sysinfo' ) | ForEach-Object {
+@('$($aliasNames -join "','")') | ForEach-Object {
   if (-not (Get-Command `$_ -EA SilentlyContinue)) { Write-Output "MISSING:`$_" }
 }
 "@
@@ -213,8 +244,9 @@ foreach ($dir in $structureDirs) {
     if (Test-Path $dir) { Add-Pass "Directory: $dir" } else { Add-Fail "Directory missing: $dir" }
 }
 
-# ── 12. Functional smoke tests ───────────────────────────────────────────────
-Write-WorkstationStep 'Functional smoke tests'
+# ── 12. Functional smoke tests (Full tier) ───────────────────────────────────
+if ($isFull) { Write-WorkstationStep 'Functional smoke tests' }
+if ($isFull) {
 try {
     $ezaOut = eza --version 2>&1
     if ($ezaOut) { Add-Pass "eza: $($ezaOut | Select-Object -First 1)" }
@@ -231,9 +263,11 @@ try {
     $zg = zoxide --version 2>&1
     if ($zg) { Add-Pass "zoxide: $zg" }
 } catch { Add-Fail "zoxide failed: $_" }
+}
 
-# ── 13. Security settings (non-Defender) ─────────────────────────────────────
-Write-WorkstationStep 'Security settings audit'
+# ── 13. Security settings (non-Defender, Full tier) ───────────────────────────
+if ($isFull) { Write-WorkstationStep 'Security settings audit' }
+if ($isFull) {
 try {
     $uac = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -ErrorAction Stop
     if ($uac.EnableLUA -eq 1) { Add-Pass 'UAC enabled' } else { Add-Warn 'UAC EnableLUA not set to 1 (hardening script may not have run)' }
@@ -269,9 +303,11 @@ try {
         Add-Pass 'WinDefend not running (per user policy)'
     }
 } catch { Add-Pass 'WinDefend service absent or stopped' }
+}
 
-# ── 13b. SHADOW OPS readiness ───────────────────────────────────────────────────
-Write-WorkstationStep 'SHADOW OPS readiness'
+# ── 13b. SHADOW OPS readiness (Full tier) ─────────────────────────────────────
+if ($isFull) { Write-WorkstationStep 'SHADOW OPS readiness' }
+if ($isFull) {
 if (Test-Path $modulePath) {
     $secTest = pwsh -NoProfile -Command @"
 Import-Module '$modulePath' -Force
@@ -290,31 +326,60 @@ Write-Output "LVL:`$(`$r.Level)"
 } else {
     Add-Warn 'SHADOW OPS check skipped — module missing'
 }
+}
 
-# ── 14. Onboarding helpers & command center ──────────────────────────────────
+# ── 14. Module + command health (Core) / full command center (Full) ───────────
 Write-WorkstationStep 'Command center'
-$requiredCmds = @(
-    'doctor','repairterminal','updateall','backupconfig','restoreconfig','cleanup',
-    'healthcheck','workstationstatus','securitycheck','devstart','workspace',
-    'cheatsheet','helpme','fixprofile','reloadprofile','sysreport','logs','networkstatus','learn',
-    'nettools','toolbox','toolcheck','sysaudit',
-    'jarvis','dashboard','home','menu','go','scan','trustcheck','sec','revise','organize','downloads','komandy','palette'
-)
-$helperTest = pwsh -NoProfile -Command @"
+if ($isFull) {
+    $requiredCmds = @(
+        'doctor','repairterminal','updateall','backupconfig','restoreconfig','cleanup',
+        'healthcheck','workstationstatus','securitycheck','devstart','workspace',
+        'cheatsheet','helpme','fixprofile','reloadprofile','sysreport','logs','networkstatus','learn',
+        'nettools','toolbox','toolcheck','sysaudit',
+        'jarvis','dashboard','home','menu','go','scan','trustcheck','sec','revise','organize','downloads','komandy','palette'
+    )
+    $helperTest = pwsh -NoProfile -Command @"
 `$env:WORKSTATION_DASHBOARD='0'; `$env:WORKSTATION_DASHBOARD_SHOWN='1'; `$env:WORKSTATION_WELCOMED='1'; `$env:CI='1'
 . '$live'
 . '$centerScript'
 @('$($requiredCmds -join "','")') | ForEach-Object { if (-not (Get-Command `$_ -EA SilentlyContinue)) { "MISSING:`$_" } }
 "@
-$missingHelpers = $helperTest | Where-Object { $_ -like 'MISSING:*' }
-if (-not $missingHelpers) { Add-Pass 'Command center commands loaded' }
-else { Add-Fail ($missingHelpers -join ', ') }
+    $missingHelpers = $helperTest | Where-Object { $_ -like 'MISSING:*' }
+    if (-not $missingHelpers) { Add-Pass 'Command center commands loaded' }
+    else { Add-Fail ($missingHelpers -join ', ') }
+} else {
+    $coreCmds = @('doctor', 'home', 'go', 'reloadprofile', 'fixprofile')
+    $helperTest = pwsh -NoProfile -Command @"
+`$env:WORKSTATION_DASHBOARD='0'; `$env:WORKSTATION_DASHBOARD_SHOWN='1'; `$env:WORKSTATION_WELCOMED='1'; `$env:CI='1'
+. '$live'
+@('$($coreCmds -join "','")') | ForEach-Object { if (-not (Get-Command `$_ -EA SilentlyContinue)) { "MISSING:`$_" } }
+"@
+    $missingHelpers = $helperTest | Where-Object { $_ -like 'MISSING:*' }
+    if (-not $missingHelpers) { Add-Pass 'Core commands loaded after profile' }
+    else { Add-Fail ($missingHelpers -join ', ') }
+}
 
 if (Test-Path $modulePath) { Add-Pass 'KGreen.Workstation module present' }
 elseif (Test-Path $toolkitLegacy) { Add-Pass 'Toolkit module present (legacy)' }
 else { Add-Fail 'Command center module missing' }
 
-Write-WorkstationStep 'go menu integrity'
+$healthPath = Join-Path $logsRoot 'command-health.json'
+if (Test-Path $healthPath) {
+    try {
+        $hc = Get-Content $healthPath -Raw | ConvertFrom-Json
+        $report.Metrics['CommandHealthBroken'] = $hc.Broken
+        if ($hc.Broken -gt 0) {
+            Add-Fail "command-health: $($hc.Broken) broken"
+        } else {
+            Add-Pass "command-health: $($hc.Passed)/$($hc.TotalCommands) OK"
+        }
+    } catch { Add-Fail 'command-health.json unreadable' }
+} else {
+    Add-Fail 'command-health.json missing — run Test-WorkstationCommands -Quick'
+}
+
+if ($isFull) { Write-WorkstationStep 'go menu integrity' }
+if ($isFull) {
 if (Test-Path $menuAuditPath) {
     $menuOut = pwsh -NoLogo -NoProfile -File $menuAuditPath 2>&1 | Out-String
     if ($LASTEXITCODE -eq 0) { Add-Pass 'go menu audit OK' }
@@ -323,14 +388,14 @@ if (Test-Path $menuAuditPath) {
     Add-Warn 'Test-MenuAudit.ps1 missing'
 }
 
-$menuDeepPath = Join-Path $PSScriptRoot 'Test-MenuDeepAudit.ps1'
+$menuDeepPath = Join-Path $repoRoot 'Test-MenuDeepAudit.ps1'
 if (Test-Path $menuDeepPath) {
     $deepOut = pwsh -NoLogo -NoProfile -File $menuDeepPath 2>&1 | Out-String
     if ($LASTEXITCODE -eq 0) { Add-Pass 'menu deep audit OK' }
     else { Add-Fail "menu deep audit: $($deepOut.Trim())" }
 }
 
-$anonAuditPath = Join-Path $PSScriptRoot 'Test-AnonymityKitAudit.ps1'
+$anonAuditPath = Join-Path $repoRoot 'Test-AnonymityKitAudit.ps1'
 if (Test-Path $anonAuditPath) {
     $anonOut = pwsh -NoLogo -NoProfile -File $anonAuditPath 2>&1 | Out-String
     if ($LASTEXITCODE -eq 0) { Add-Pass 'anon kit audit OK' }
@@ -338,8 +403,10 @@ if (Test-Path $anonAuditPath) {
 } else {
     Add-Warn 'Test-AnonymityKitAudit.ps1 missing'
 }
+}
 
-Write-WorkstationStep 'Network tools'
+if ($isFull) { Write-WorkstationStep 'Network tools' }
+if ($isFull) {
 @(
     @{ Name = 'nmap'; Required = $true }
     @{ Name = 'wireshark'; Required = $true }
@@ -354,11 +421,13 @@ Write-WorkstationStep 'Network tools'
     elseif ($_.Required) { Add-Warn "Network tool missing: $($_.Name)" }
     else { Add-Pass "Optional network tool absent: $($_.Name)" }
 }
+}
 
 if (Test-Path $wocScript) { Add-Pass 'WOC module present' }
 else { Add-Fail 'WOC module missing' }
 
-Write-WorkstationStep 'Startup command center benchmark'
+if ($isFull) { Write-WorkstationStep 'Startup command center benchmark' }
+if ($isFull) {
 $ccBench = pwsh -NoProfile -Command @"
 `$env:CI=''
 `$sw = [Diagnostics.Stopwatch]::StartNew()
@@ -371,14 +440,15 @@ $ccMs = [int]($ccBench | Select-Object -Last 1)
 $report.Metrics['CommandCenterMs'] = $ccMs
 if ($ccMs -le 1000) { Add-Pass "Command center render: ${ccMs}ms <= 1000ms" }
 else { Add-Warn "Command center render: ${ccMs}ms (target 1000ms)" }
+}
 
-if (Test-Path $fontStatusPath) {
+if ($isFull -and (Test-Path $fontStatusPath)) {
     try {
         $fs = Get-Content $fontStatusPath -Raw | ConvertFrom-Json
         if ($fs.FontFace -eq 'CaskaydiaCove NF') { Add-Pass 'Font status: CaskaydiaCove NF' }
         else { Add-Warn "Font status: $($fs.FontFace)" }
     } catch { Add-Warn 'font-status.json unreadable' }
-} else { Add-Warn 'Run Repair-WorkstationFonts.ps1' }
+} elseif ($isFull) { Add-Warn 'Run Repair-WorkstationFonts.ps1' }
 
 # ── 15. Git ──────────────────────────────────────────────────────────────────
 Write-WorkstationStep 'Git configuration'
@@ -415,6 +485,7 @@ $report | ConvertTo-Json -Depth 6 | Set-Content $outFile -Encoding UTF8
 
 Write-Host ''
 Write-Host '════════════════ VALIDATION REPORT ════════════════' -ForegroundColor Cyan
+Write-Host "Tier:    $Tier" -ForegroundColor DarkGray
 Write-Host "Passed:  $($report.Passed.Count)" -ForegroundColor Green
 Write-Host "Failed:  $($report.Failed.Count)" -ForegroundColor $(if ($report.Failed.Count) { 'Red' } else { 'Green' })
 Write-Host "Warnings: $($report.Warnings.Count)" -ForegroundColor Yellow

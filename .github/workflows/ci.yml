@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  release-version:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test-ReleaseVersion
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File scripts/maintainer/test/Test-ReleaseVersion.ps1 -SkipGit
+
+  command-health:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test-WorkstationCommands -Quick
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File scripts/maintainer/test/Test-WorkstationCommands.ps1 -Quick
+
+  platform-hardening:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test-WorkstationPlatformHardening
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File scripts/maintainer/test/Test-WorkstationPlatformHardening.ps1
+
+  install-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Smoke install.ps1 in temp dir
+        shell: pwsh
+        run: |
+          $temp = Join-Path $env:RUNNER_TEMP "devshell-smoke"
+          if (Test-Path $temp) { Remove-Item $temp -Recurse -Force }
+          New-Item -ItemType Directory -Force -Path $temp | Out-Null
+          Copy-Item -Path (Get-Location) -Destination $temp -Recurse -Force
+          Push-Location $temp
+          try {
+            pwsh -NoProfile -File install.ps1 -SkipTools -SkipDoctor
+            if ($LASTEXITCODE -ne 0) { throw "install.ps1 exited $LASTEXITCODE" }
+          } finally {
+            Pop-Location
+          }

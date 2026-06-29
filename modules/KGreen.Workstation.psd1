@@ -1,6 +1,6 @@
 @{
     RootModule        = 'KGreen.Workstation.psm1'
-    ModuleVersion     = '2.0.3'
+    ModuleVersion     = '2.0.4'
     GUID              = '7f3a9c2e-4b81-4d5f-9e0a-1c8b6d4e2f90'
     Author            = 'KGreen'
     CompanyName       = 'KGreen'
@@ -39,10 +39,10 @@
     VariablesToExport = @('WSRoot', 'WSLog', 'WSOwner')
     PrivateData       = @{
         PSData = @{
-            Tags         = @('HOME-BASE', 'PowerShell', 'Workstation', 'Windows')
+            Tags         = @('HomeBase', 'DevShell', 'PowerShell', 'Windows', 'privacy', 'workstation')
             LicenseUri   = 'https://opensource.org/licenses/MIT'
-            ProjectUri   = ''
-            ReleaseNotes = 'HOME BASE v2.0.0 — OSS minimum release with Charter Pack.'
+            ProjectUri   = 'https://github.com/XKush/homebase-devshell'
+            ReleaseNotes = 'HomeBase DevShell v2.0.4 — Core/Full doctor tiers, OSS install with tools, CI.'
         }
     }
 }

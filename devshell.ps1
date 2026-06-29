@@ -8,6 +8,9 @@ param(
     [Parameter(Position = 0)]
     [ValidateSet('install', 'doctor', 'status', 'reload', 'trace', 'help', 'version')]
     [string]$Command = 'help',
+    [ValidateSet('Core', 'Full')]
+    [string]$Tier = 'Core',
+    [switch]$SkipTools,
     [int]$Last = 20
 )
 
@@ -29,7 +32,7 @@ function Get-DevShellProductVersion {
     param([string]$Root)
     $psd1 = Join-Path $Root 'modules\KGreen.Workstation.psd1'
     if (Test-Path $psd1) { return [string](Import-PowerShellDataFile $psd1).ModuleVersion }
-    return '2.0.3'
+    return '2.0.4'
 }
 
 function Show-DevShellHelp {
@@ -37,11 +40,12 @@ function Show-DevShellHelp {
 
 HomeBase DevShell
 
-  devshell install   Set up your shell
-  devshell doctor    Check if you are ready to work
-  devshell status    See if everything loaded
+  devshell install          Set up your shell (-SkipTools to skip winget packages)
+  devshell doctor           Check if you are ready (default: Core tier)
+  devshell doctor -Tier Full   All 75+ validation checks
+  devshell status           See if everything loaded
 
-  devshell help      Show this help
+  devshell help             Show this help
 
 '@ -ForegroundColor DarkGray
 }
@@ -66,11 +70,15 @@ if ($Command -in @('status', 'reload', 'trace', 'version')) {
 
 switch ($Command) {
     'install' {
-        & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin
+        if ($SkipTools) {
+            & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipSoftware -SkipAdmin
+        } else {
+            & (Join-Path $repoRoot 'scripts\maintainer\install\Install-Workstation.ps1') -Force -SkipAdmin
+        }
         if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
     'doctor' {
-        & (Join-Path $repoRoot 'scripts\maintainer\install\Validate-Workstation.ps1') -StartupBudgetMs 600
+        & (Join-Path $repoRoot 'scripts\maintainer\install\Validate-Workstation.ps1') -Tier $Tier -StartupBudgetMs 650
         exit $LASTEXITCODE
     }
     'status' {

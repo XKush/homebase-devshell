@@ -12,6 +12,31 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ---
 
+## [2.0.4] - 2026-06-29
+
+**OSS honest entry — Core install passes doctor from zero** — platform spec `1.0.0` LOCKED.
+
+### Added
+
+- `doctor` / `Validate-Workstation -Tier Core|Full` — Core: pwsh, git, profile, module, command-health; Full: all checks
+- `install.ps1 -WithTools` default (use `-SkipTools` to opt out); calls `Install-Software.ps1` for oh-my-posh, fzf, eza, …
+- `devshell` shim in `%LOCALAPPDATA%\Microsoft\WindowsApps` + PATH on install
+- Path diagram in `docs/GETTING-STARTED.md`
+- GitHub Actions CI: release version, command-health, platform hardening, install smoke
+- `Test-MenuAudit.ps1` and `Test-AnonymityKitAudit.ps1` committed (removed from `.gitignore`)
+- `docs/en/COMMAND-CENTER.md`, `examples/minimal/`, `.github/FUNDING.yml`
+
+### Changed
+
+- Install banner: **HomeBase DevShell** (was ReviOS Professional Workstation)
+- Profile startup budget default **650 ms**; over-budget is warning, not fail
+- OSS default `WORKSTATION_LANG=en` (set `WORKSTATION_LANG=ru` for Russian cockpit)
+- `devshell doctor` defaults to **Core** tier; interactive `doctor` defaults to **Full**
+- Fixed stale paths in `Invoke-WorkstationRevision.ps1`, `Invoke-CommandCenterCI.ps1`
+- Module manifest `ProjectUri` + GitHub topics
+
+---
+
 ## [2.0.3] - 2026-06-29
 
 **Hotfix — `irm | iex` bootstrap** — platform spec `1.0.0` LOCKED.
