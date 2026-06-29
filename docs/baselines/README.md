@@ -5,6 +5,8 @@ Canonical stable snapshots for regression comparison during Path Abstraction.
 | File | Label | Purpose |
 |------|-------|---------|
 | [phase2-step1-stable.json](./phase2-step1-stable.json) | **Phase2-Step1-Stable** | SSOT paths wired; legacy layout unchanged |
+| phase2-wave-a-pre.json | **Phase2-WaveA-Pre** | Profile layer baseline before Wave A migration |
+| phase2-wave-a-post.json | **Phase2-WaveA-Post** | Profile layer baseline after Wave A complete |
 
 ## Capture
 
@@ -16,6 +18,14 @@ Or manually after `reloadprofile` + `doctor` + `trustcheck`:
 
 ```powershell
 pwsh -File Save-Phase2Baseline.ps1 -StableLabel Phase2-Step1-Stable
+```
+
+### Wave A (Profile layer)
+
+```powershell
+pwsh -File Save-PhaseBaseline.ps1 -Wave Profile -Moment Pre
+# after Wave A complete:
+pwsh -File Save-PhaseBaseline.ps1 -Wave Profile -Moment Post
 ```
 
 ## Compare (Step 2+)

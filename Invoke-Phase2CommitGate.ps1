@@ -15,7 +15,9 @@ param(
     [switch]$FinalizePendingArtifacts,
     [string]$Component = 'unknown',
     [string]$Step = '2',
-    [string]$Phase = '2'
+    [string]$Phase = '2',
+    [ValidateSet('', 'Profile')]
+    [string]$Wave = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -41,7 +43,8 @@ function Save-Phase2GateArtifacts {
         [string]$FolderName,
         [string]$Component,
         [string]$Step,
-        [string]$Phase
+        [string]$Phase,
+        [string]$Wave = ''
     )
 
     $dir = Join-Path $artifactRoot $FolderName
@@ -104,6 +107,21 @@ function Save-Phase2GateArtifacts {
         folder              = $FolderName
         files               = @('doctor.json', 'trust.json', 'paths.json', 'equivalence.json', 'manifest.json')
     }
+
+    if ($Wave -eq 'Profile') {
+        . (Join-Path $wsRoot 'lib\Phase2ProfilePassport.ps1')
+        $pp = Get-Phase2ProfilePassport -WsRoot $wsRoot
+        foreach ($key in $pp.Keys) {
+            $manifest[$key] = $pp[$key]
+        }
+        & (Join-Path $wsRoot 'Save-ProfileSnapshot.ps1') -Label "$FolderName" -Wave Profile | Out-Null
+        $snapPath = Join-Path (Join-Path $logsRoot 'Phase2') "profile-snapshot-$FolderName.json"
+        if (Test-Path $snapPath) {
+            Copy-Item $snapPath (Join-Path $dir 'profile-snapshot.json') -Force
+            $manifest.files = @($manifest.files) + @('profile-snapshot.json')
+        }
+    }
+
     $manifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'manifest.json') -Encoding UTF8
 
     Write-Host "Artifacts saved: $dir" -ForegroundColor DarkGray
@@ -169,7 +187,7 @@ if ($SaveArtifacts) {
         New-Item -ItemType Directory -Force -Path $artifactRoot | Out-Null
     }
     $folder = "$(Get-GitShortHead)-pending"
-    Save-Phase2GateArtifacts -FolderName $folder -Component $Component -Step $Step -Phase $Phase | Out-Null
+    Save-Phase2GateArtifacts -FolderName $folder -Component $Component -Step $Step -Phase $Phase -Wave $Wave | Out-Null
 }
 
 Write-Host ''

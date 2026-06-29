@@ -1,0 +1,55 @@
+{
+  "Label": "Phase2-WaveA-Pre",
+  "Timestamp": "2026-06-29T02:02:26.2644638+02:00",
+  "Phase": "Phase2-WaveA-Pre",
+  "ProductTag": "v2.0.0",
+  "GitCommit": "30bd26a",
+  "PowerShell": "7.6.3",
+  "PathSsot": {
+    "ConfigFile": "C:\\Scripts\\Workstation\\Config\\homebase.defaults.json",
+    "SchemaVersion": 1,
+    "RuntimeRoot": "C:",
+    "Logs": "C:\\Logs\\Workstation",
+    "Backups": "C:\\Backups\\Workstation",
+    "Configs": "C:\\Configs\\Workstation",
+    "LegacyJunctions": 0
+  },
+  "Trust": {
+    "Level": "VERIFIED",
+    "Score": 100,
+    "CanTrustDashboard": true,
+    "SelfChecksPassed": 72,
+    "SelfChecksTotal": 72
+  },
+  "CommandHealth": {
+    "Total": 72,
+    "Broken": 0,
+    "ExecuteFailures": 0
+  },
+  "Validation": {
+    "File": "validation-20260629-015532.json",
+    "Passed": 75,
+    "Failed": 0,
+    "Warnings": 0
+  },
+  "Paths": {
+    "Projects": "C:\\Projects",
+    "Tools": "C:\\Tools",
+    "Scripts": "C:\\Scripts",
+    "Logs": "C:\\Logs\\Workstation",
+    "Security": "C:\\Security",
+    "Backups": "C:\\Backups\\Workstation",
+    "Configs": "C:\\Configs\\Workstation",
+    "Networking": "C:\\Networking",
+    "Temp": "C:\\Temp\\Scratch",
+    "Downloads": "C:\\Users\\Admin\\Downloads",
+    "DownloadsArchive": "C:\\Downloads\\Archive",
+    "Desktop": "C:\\Users\\Admin\\Desktop"
+  },
+  "BackupLatest": "20260629-020226",
+  "QualityGates": {
+    "DoctorPass": true,
+    "TrustVerified": true,
+    "CommandsHealthy": true
+  }
+}
