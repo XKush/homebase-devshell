@@ -6,7 +6,15 @@
 param([switch]$Force)
 
 $ErrorActionPreference = 'Stop'
+$script:WSRoot = $PSScriptRoot
+. "$PSScriptRoot\lib\HomeBasePaths.ps1"
 . "$PSScriptRoot\lib\WorkstationCommon.ps1"
+
+$backupRoot = Get-HomeBasePath -Name Backups
+if (-not (Test-Path $backupRoot)) { New-Item -ItemType Directory -Force -Path $backupRoot | Out-Null }
+$projectsRoot = Get-HomeBasePath -Name Projects
+$toolsRoot = Get-HomeBasePath -Name Tools
+$scriptsRoot = Get-HomeBasePath -Name Scripts
 
 Write-WorkstationStep 'Deploying PowerShell profile'
 $canonical = Join-Path $PSScriptRoot 'profile\Microsoft.PowerShell_profile.ps1'
@@ -20,7 +28,7 @@ foreach ($target in $targets) {
     $dir = Split-Path $target -Parent
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
     if ((Test-Path $target) -and -not $Force) {
-        $backup = "C:\Backups\Workstation\profile-$(Get-Date -Format 'yyyyMMdd-HHmmss')-$(Split-Path $target -Leaf)"
+        $backup = Join-Path $backupRoot "profile-$(Get-Date -Format 'yyyyMMdd-HHmmss')-$(Split-Path $target -Leaf)"
         Copy-Item $target $backup -Force
         Write-WorkstationLog "Backed up profile to $backup"
     }
@@ -29,20 +37,20 @@ foreach ($target in $targets) {
 }
 
 # Lightweight loader for PS5 that points to PS7 profile content when possible
-$ps5Loader = @'
+$ps5Loader = @"
 # PS5 loader — use pwsh for full workstation experience
-function projects { Set-Location C:\Projects }
-function tools    { Set-Location C:\Tools }
-function scripts  { Set-Location C:\Scripts }
+function projects { Set-Location '$projectsRoot' }
+function tools    { Set-Location '$toolsRoot' }
+function scripts  { Set-Location '$scriptsRoot' }
 Write-Host '[PS5] Launch pwsh for full profile (Oh My Posh, eza, fzf).' -ForegroundColor DarkGray
-'@
+"@
 Set-Content -Path (Join-Path $HOME 'Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1') -Value $ps5Loader -Encoding UTF8
 
 Write-WorkstationStep 'Configuring Windows Terminal'
 $wtPath = Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json'
 $template = Join-Path $PSScriptRoot 'terminal\settings.template.json'
 if (Test-Path $wtPath) {
-    $backup = "C:\Backups\Workstation\terminal-settings-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
+    $backup = Join-Path $backupRoot "terminal-settings-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
     Copy-Item $wtPath $backup -Force
     Write-WorkstationLog "Terminal settings backup: $backup"
     $current = Get-Content $wtPath -Raw | ConvertFrom-Json
@@ -55,6 +63,7 @@ if (Test-Path $wtPath) {
         if ($scheme.name -notin $existing) { $current.schemes += $scheme }
     }
     $current.profiles.defaults.colorScheme = 'ReviOS Hack Dark'
+    $current.profiles.defaults.startingDirectory = $projectsRoot
     $fontFace = 'CaskaydiaCove NF'
     $current.profiles.defaults | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{ face = $fontFace; size = 11; weight = 'normal' }) -Force
     foreach ($prof in $current.profiles.list) {

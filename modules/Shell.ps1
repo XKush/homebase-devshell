@@ -1,12 +1,19 @@
 # Shell — навигация и утилиты оболочки
 
-$script:WorkstationRoots = @{
-    Tools    = 'C:\Tools'
-    Scripts  = 'C:\Scripts'
-    Projects = 'C:\Projects'
-    Logs     = 'C:\Logs'
-    Backups  = 'C:\Backups'
-    Security = 'C:\Security'
+# Roots owned by profile environment layer — do not redefine (Wave A Commit 4)
+if ($global:WorkstationRoots) {
+    $script:WorkstationRoots = $global:WorkstationRoots
+}
+elseif (-not $script:WorkstationRoots) {
+    $repoRoot = Split-Path $PSScriptRoot -Parent
+    if (-not (Get-Command Get-HomeBasePath -ErrorAction SilentlyContinue)) {
+        $script:WSRoot = $repoRoot
+        . (Join-Path $repoRoot 'lib\HomeBasePaths.ps1')
+    }
+    if (-not (Get-Command Initialize-WorkstationProfileEnvironment -ErrorAction SilentlyContinue)) {
+        . (Join-Path $repoRoot 'lib\ProfileEnvironment.ps1')
+    }
+    Initialize-WorkstationProfileEnvironment | Out-Null
 }
 
 function projects {

@@ -25,6 +25,7 @@ function Resolve-WorkstationRepositoryRoot {
 $script:WSRoot = Resolve-WorkstationRepositoryRoot
 . (Join-Path $script:WSRoot 'lib\HomeBasePaths.ps1')
 . (Join-Path $script:WSRoot 'lib\WorkstationCommon.ps1')
+. (Join-Path $script:WSRoot 'lib\ProfileEnvironment.ps1')
 
 $script:IsInteractive = [Environment]::UserInteractive -and -not $env:CI -and $Host.Name -ne 'ServerRemoteHost'
 $script:WorkstationSessionReady = $false
@@ -41,19 +42,8 @@ if (-not $env:WORKSTATION_HACKER_UI) { $env:WORKSTATION_HACKER_UI = '1' }
 if (-not $env:WORKSTATION_HACKER_SCAN) { $env:WORKSTATION_HACKER_SCAN = '1' }
 if (-not $env:WORKSTATION_STARTUP_MODE) { $env:WORKSTATION_STARTUP_MODE = 'minimal' }
 
-$env:FASTFETCH_CONFIG = 'C:\Configs\Workstation\fastfetch-config.jsonc'
-
-# ── Workstation env ───────────────────────────────────────────────────────────
-$script:WorkstationRoots = @{
-    Tools    = 'C:\Tools'; Scripts = 'C:\Scripts'; Projects = 'C:\Projects'
-    Logs     = 'C:\Logs'; Backups = 'C:\Backups'; Security = 'C:\Security'
-}
-$env:WORKSTATION_ROOT = Get-HomeBasePath -Name RepositoryRoot
-$env:PROJECTS_HOME    = $script:WorkstationRoots.Projects
-$env:NETWORKING_HOME  = 'C:\Networking'
-$env:CONFIGS_HOME     = 'C:\Configs'
-$env:TOOLS_HOME       = 'C:\Tools'
-$env:WS_TEMP          = 'C:\Temp\Scratch'
+# ── Profile environment state (declarative — paths + WORKSTATION_* ) ───────────
+Initialize-WorkstationProfileEnvironment | Out-Null
 
 # ── Profile boot module order ─────────────────────────────────────────────────
 # 1. PSReadLine (interactive shell)
@@ -85,8 +75,10 @@ function Initialize-WorkstationSession {
     $script:WorkstationSessionReady = $true
 
     if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
-        $omp = 'C:\Scripts\Workstation\terminal\active-theme.omp.json'
-        if (-not (Test-Path $omp)) { $omp = 'C:\Scripts\Workstation\terminal\active-theme.omp.json' }
+        $omp = $script:ProfileOmpTheme
+        if (-not (Test-Path $omp)) {
+            $omp = Join-Path $script:WSRoot 'terminal\active-theme.omp.json'
+        }
         if (Test-Path $omp) { oh-my-posh init pwsh --config $omp | Invoke-Expression }
     }
     foreach ($mod in $script:ProfileBootSessionModules) {
