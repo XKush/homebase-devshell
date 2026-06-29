@@ -36,6 +36,6 @@ pwsh -NoProfile -File scripts/maintainer/test/Test-PrivacyAuditSmoke.ps1
 
 ## Ideas welcome
 
-Open a [Discussion](https://github.com/XKush/homebase-devshell/discussions) for “how should this work?” before a large PR.
+Open a [Discussion](https://github.com/XKush/homebase-devshell/discussions/5) for “how should this work?” before a large PR. See the pinned **Start here** guide.
 
 Label **`good first issue`** issues are curated for newcomers.

@@ -144,6 +144,7 @@ Full layout: [docs/product/REPOSITORY-SURFACE.md](docs/product/REPOSITORY-SURFAC
 | [Privacy](docs/PRIVACY.md) | Privacy configuration module |
 | [API stability](docs/API-STABILITY.md) | Frozen CLI contract (v3+) |
 | [JSON schemas](docs/JSON-SCHEMA.md) | Report compatibility policy |
+| [Start here (Discussion)](https://github.com/XKush/homebase-devshell/discussions/5) | Welcome guide for new users |
 | [ADR](docs/adr/) | Architecture decisions |
 | [Command center (EN)](docs/en/COMMAND-CENTER.md) | `go`, `home`, tiers |
 | [Command center (RU)](docs/ru/COMMAND-CENTER.md) | Russian cockpit |
@@ -170,7 +171,7 @@ Full layout: [docs/product/REPOSITORY-SURFACE.md](docs/product/REPOSITORY-SURFAC
 
 ## For contributors
 
-[CONTRIBUTING.md](CONTRIBUTING.md) · [Good first PR (~15 min)](docs/GOOD-FIRST-CONTRIBUTION.md) · [Discussions](https://github.com/XKush/homebase-devshell/discussions) · [SECURITY.md](SECURITY.md) · [scripts/README.md](scripts/README.md)
+[CONTRIBUTING.md](CONTRIBUTING.md) · [Good first PR (~15 min)](docs/GOOD-FIRST-CONTRIBUTION.md) · [Discussions — Start here](https://github.com/XKush/homebase-devshell/discussions/5) · [SECURITY.md](SECURITY.md) · [scripts/README.md](scripts/README.md)
 
 Platform execution architecture is **locked at spec v1.0.0** — product/UX/docs/CI changes welcome; orchestrator changes need maintainer sign-off.
 

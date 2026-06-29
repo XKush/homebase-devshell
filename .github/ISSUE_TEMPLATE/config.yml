@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Questions & ideas (Discussions)
-    url: https://github.com/XKush/homebase-devshell/discussions
-    about: Setup, usage, what to choose — prefer this over Issues for questions
+  - name: Start here (pinned Discussion)
+    url: https://github.com/XKush/homebase-devshell/discussions/5
+    about: Welcome guide — health vs doctor, where to ask, how to contribute
   - name: Good first PR guide
     url: https://github.com/XKush/homebase-devshell/blob/main/docs/GOOD-FIRST-CONTRIBUTION.md
     about: 15–20 minute contribution path for newcomers

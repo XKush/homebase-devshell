@@ -6,7 +6,7 @@ Thanks for helping improve HomeBase DevShell.
 
 | Channel | Use for |
 |---------|---------|
-| **[Discussions](https://github.com/XKush/homebase-devshell/discussions)** | How to set up, what to choose, usage questions, ideas |
+| **[Discussions](https://github.com/XKush/homebase-devshell/discussions/5)** | [Start here](https://github.com/XKush/homebase-devshell/discussions/5) — setup, usage, ideas |
 | **Issues** | Bugs, install failures, reproducible problems |
 | **Pull requests** | Docs, tests, fixes — see [Good first contribution](docs/GOOD-FIRST-CONTRIBUTION.md) (~15 min) |
 
