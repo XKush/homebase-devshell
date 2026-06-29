@@ -8,7 +8,7 @@ Thanks for helping improve HomeBase DevShell.
 2. Keep changes focused — one problem per PR  
 3. Do **not** change the locked platform execution stack without maintainer sign-off (see `internal-docs/charter/PLATFORM-SPEC-SIGNOFF.md`)
 
-Script layout: see [`scripts/README.md`](scripts/README.md) · polish notes: [`internal-docs/product/GIT-CLEANUP-AND-POLISH.md`](internal-docs/product/GIT-CLEANUP-AND-POLISH.md)
+Script layout: see [`scripts/README.md`](scripts/README.md) · [Repository surface](docs/product/REPOSITORY-SURFACE.md)
 
 ## Good first contributions
 

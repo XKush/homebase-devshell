@@ -1,0 +1,71 @@
+# Repository surface — what GitHub visitors see
+
+**HomeBase DevShell** is intentionally minimal on the repository root.
+
+---
+
+## Public product (this is the whole story)
+
+| Root file | Purpose |
+|-----------|---------|
+| **`README.md`** | Install → doctor → Ready to work |
+| **`install.ps1`** | One-line bootstrap |
+| **`devshell.ps1`** | Three commands: `install` · `doctor` · `status` |
+| **`CHANGELOG.md`** | Release history (single source of truth) |
+| **`LICENSE`** | MIT |
+
+Also: `README.ru.md`, `SECURITY.md`, `CONTRIBUTING.md` — support, not hero.
+
+---
+
+## User commands (only three)
+
+```powershell
+devshell install
+devshell doctor
+devshell status
+```
+
+Everything else in this repository is **operator / maintainer tooling**, not part of the public product.
+
+---
+
+## Why root still has other `.ps1` files
+
+Many scripts appear at the repository root as **thin shims** for backwards compatibility:
+
+```
+Root Invoke-Maintenance.ps1  →  scripts/maintainer/invoke/Invoke-Maintenance.ps1
+Root Configure-GitIdentity.ps1  →  scripts/maintainer/configure/...
+Root Test-WorkstationPlatformHardening.ps1  →  scripts/maintainer/test/...
+```
+
+Install chain (`Install-Workstation.ps1`, `Validate-Workstation.ps1`, …) stays at root because product install calls them by path.
+
+---
+
+## Where things live
+
+| Path | Audience |
+|------|----------|
+| `docs/` | First-time users (getting started, troubleshooting) |
+| `scripts/maintainer/` | Maintainer scripts (invoke, configure, test, phase2) |
+| `internal-docs/` | Platform lock, baselines, release engineering |
+| `lib/`, `modules/`, `profile/` | Shipped runtime (not marketed as a framework) |
+
+---
+
+## What we do **not** expect strangers to run
+
+- `Invoke-*` batch audits and maintenance passes  
+- `Configure-*` privacy/Tor/PGP (optional, module-driven)  
+- `Test-*` except indirectly via release CI / hardening gate  
+- Phase 2 migration tooling under `scripts/maintainer/phase2/`  
+
+If you only want a working dev shell: **use the README install line and `devshell doctor`.**
+
+---
+
+## Platform note
+
+Execution architecture is locked at spec **v1.0.0**. Product docs do not expose internal dispatch design. See `internal-docs/` for maintainers.
