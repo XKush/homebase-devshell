@@ -26,7 +26,7 @@ If **`devready`** shows **Ready to work**, post proof here. It helps the next pe
 **Install (for others reading this thread):**
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.1/install.ps1 | iex
 devready
 ```
 

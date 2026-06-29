@@ -12,12 +12,14 @@ Powered by **HomeBase DevShell** — a local health check for PowerShell 7 on Wi
 [![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?logo=windows&logoColor=white)](https://github.com/XKush/homebase-devshell)
 [![Release](https://img.shields.io/github/v/release/XKush/homebase-devshell?label=release)](https://github.com/XKush/homebase-devshell/releases/latest)
 
+![DevReady — install, run devready, see Ready to work](docs/assets/devready-demo.gif)
+
 ---
 
 ## 30-second start
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.1/install.ps1 | iex
 ```
 
 Close the terminal. Open a new one. Run:

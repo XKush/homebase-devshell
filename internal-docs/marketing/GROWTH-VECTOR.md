@@ -1,6 +1,6 @@
 # Growth vector — first 100 users
 
-**Product:** DevReady (HomeBase DevShell) · **Version:** 2.1.0 · **Updated:** 2026-06-29
+**Product:** DevReady (HomeBase DevShell) · **Version:** 2.1.1 · **Updated:** 2026-06-29
 
 Audience: maintainers. No runtime changes.
 
@@ -79,7 +79,7 @@ Discovery → Trust → Install → Aha → Share
 
 - [ ] Record 15s GIF: install → `devready` → PASS (embed in README)
 - [ ] Seed Issue #2 with 3 maintainer screenshots (your machines)
-- [ ] Pin release v2.1.0 + issues #1–#3 on GitHub
+- [ ] Pin release v2.1.1 + issues #1–#3 on GitHub
 - [ ] Upload `.github/social-preview.png` in Settings (manual, once)
 - [ ] Post launch copy from `github/LAUNCH-POST.md` to Discussion #4
 
@@ -135,7 +135,7 @@ Track weekly: stars, clone traffic (GitHub Insights), Discussion #4 replies.
 **Share line:**
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.1/install.ps1 | iex
 devready
 ```
 
@@ -145,7 +145,7 @@ devready
 
 **Reply to "irm iex is malware"**
 
-> Fair. Read `install.ps1` on GitHub, tag v2.1.0, or wait for zip release + hash in Wave 2.
+> Fair. Read `install.ps1` on GitHub, tag v2.1.1, or wait for zip release + hash in Wave 2.
 
 ---
 

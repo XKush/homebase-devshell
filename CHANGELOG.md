@@ -10,10 +10,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ## [Unreleased]
 
+---
+
+## [2.1.1] - 2026-06-29
+
+**Studio polish & first-user proof assets** — platform spec `1.0.0` LOCKED.
+
+### Added
+
+- `docs/assets/devready-demo.gif` + `.png` — README terminal demo
+- `internal-docs/marketing/GROWTH-VECTOR.md` — first-100-users plan
+
 ### Changed
 
-- Studio cleanup: growth copy moved to `internal-docs/marketing/`; no upload automation in repo
+- Growth copy moved from `.github/growth/` to `internal-docs/marketing/`
 - `.gitignore` blocks maintainer scratch (`.tmp-*.json`)
+- `BRAND.md` / `REPOSITORY-SURFACE.md` — studio-facing layout
 
 ---
 
@@ -176,7 +188,8 @@ Pre–HomeBase DevShell iterations. See git history before public OSS rename.
 
 ---
 
-[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/XKush/homebase-devshell/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/XKush/homebase-devshell/releases/tag/v2.1.1
 [2.1.0]: https://github.com/XKush/homebase-devshell/releases/tag/v2.1.0
 [2.0.6]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.6
 [2.0.5]: https://github.com/XKush/homebase-devshell/releases/tag/v2.0.5

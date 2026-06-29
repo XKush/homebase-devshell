@@ -3,7 +3,7 @@
 1. **Install** (one line):
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.1/install.ps1 | iex
 ```
 
 2. **Close and reopen** your terminal  

@@ -10,12 +10,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PowerShell 7](https://img.shields.io/badge/PowerShell-7+-5391FE?logo=powershell&logoColor=white)](https://aka.ms/powershell)
 
+![DevReady — install, devready, Ready to work](docs/assets/devready-demo.gif)
+
 ---
 
 ## Старт за 30 секунд
 
 ```powershell
-irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.0/install.ps1 | iex
+irm https://raw.githubusercontent.com/XKush/homebase-devshell/v2.1.1/install.ps1 | iex
 ```
 
 Закройте терминал. Откройте снова:
