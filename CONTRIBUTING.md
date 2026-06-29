@@ -39,3 +39,5 @@ Include: Windows version, PowerShell version (`$PSVersionTable`), `devshell heal
 ## v3 stabilization (current phase)
 
 We are **not** adding new public CLI commands in v3.0.x. Focus: bugfix, docs, tests, feedback. Feature ideas → Discussions first.
+
+Contract: [ROADMAP.md](docs/ROADMAP.md) · Principles: [PROJECT-PRINCIPLES.md](docs/PROJECT-PRINCIPLES.md) · [MANIFESTO.md](docs/MANIFESTO.md)

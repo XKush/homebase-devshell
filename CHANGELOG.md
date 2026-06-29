@@ -10,13 +10,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 
 ## [Unreleased]
 
-### Planned for v3.1 (engineering quality — no new public commands)
-
-- Pester unit tests for core logic (`PrivacyAudit`, health aggregation)
-- PSScriptAnalyzer in CI
-- Refactor large files (`MenuSystem.ps1`, `PrivacyAudit.ps1`) without API changes
-- Stable smoke tests on clean Windows VMs
-- Plugin manifest validation (scaffold only)
+See [docs/ROADMAP.md](docs/ROADMAP.md) for the stabilization contract.
 
 ---
 

@@ -60,6 +60,18 @@ devshell health -Json
 
 The JSON output is considered part of the public API. Compatibility rules are documented in [docs/JSON-SCHEMA.md](https://github.com/XKush/homebase-devshell/blob/main/docs/JSON-SCHEMA.md).
 
+## Russian documentation
+
+**Russian documentation:** [README.ru.md](https://github.com/XKush/homebase-devshell/blob/main/README.ru.md)
+
+The pinned guide stays in English for GitHub search and international users. A separate Russian Discussion will be added only if there is clear demand.
+
+## Roadmap and principles
+
+* [ROADMAP.md](https://github.com/XKush/homebase-devshell/blob/main/docs/ROADMAP.md) — what we ship in v3.x vs future
+* [PROJECT-PRINCIPLES.md](https://github.com/XKush/homebase-devshell/blob/main/docs/PROJECT-PRINCIPLES.md) — engineering guardrails
+* [MANIFESTO.md](https://github.com/XKush/homebase-devshell/blob/main/docs/MANIFESTO.md) — why we exist and what we never do
+
 ## Where should I ask questions?
 
 Use **Discussions** for:
@@ -92,6 +104,6 @@ The current priorities are:
 * test coverage;
 * community feedback.
 
-We are intentionally avoiding rapid feature expansion until we understand how people use the project in real-world environments.
+We are intentionally avoiding rapid feature expansion until we understand how people use the project in real-world environments. See [ROADMAP.md](https://github.com/XKush/homebase-devshell/blob/main/docs/ROADMAP.md).
 
 Thank you for trying HomeBase DevShell and for helping improve it.

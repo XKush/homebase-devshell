@@ -140,6 +140,9 @@ Full layout: [docs/product/REPOSITORY-SURFACE.md](docs/product/REPOSITORY-SURFAC
 | Doc | For |
 |-----|-----|
 | [Getting started](docs/GETTING-STARTED.md) | Paths, install flow, diagram |
+| [Roadmap](docs/ROADMAP.md) | v3.x contract — what we ship and what we defer |
+| [Project principles](docs/PROJECT-PRINCIPLES.md) | Engineering guardrails |
+| [Manifesto](docs/MANIFESTO.md) | Why we exist · what we never do |
 | [Troubleshooting](docs/TROUBLESHOOTING.md) | When doctor fails |
 | [Privacy](docs/PRIVACY.md) | Privacy configuration module |
 | [API stability](docs/API-STABILITY.md) | Frozen CLI contract (v3+) |

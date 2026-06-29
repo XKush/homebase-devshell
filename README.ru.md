@@ -84,6 +84,9 @@ devready
 | Файл | О чём |
 |------|--------|
 | [Старт](docs/GETTING-STARTED.md) | Пути, диаграмма |
+| [Roadmap](docs/ROADMAP.md) | План v3.x (стабилизация) |
+| [Принципы](docs/PROJECT-PRINCIPLES.md) | Правила проекта |
+| [Manifesto](docs/MANIFESTO.md) | Зачем проект и чего не делает |
 | [Проблемы](docs/TROUBLESHOOTING.md) | Если doctor падает |
 | [Command center](docs/ru/COMMAND-CENTER.md) | `go`, `home`, меню |
 | [Бренд](docs/product/BRAND.md) | DevReady vs HomeBase |
