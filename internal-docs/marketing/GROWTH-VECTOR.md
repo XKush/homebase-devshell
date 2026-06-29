@@ -77,11 +77,11 @@ Discovery → Trust → Install → Aha → Share
 
 ### Wave 1 — Proof (weeks 1–2) · no architecture changes
 
-- [ ] Record 15s GIF: install → `devready` → PASS (embed in README)
-- [ ] Seed Issue #2 with 3 maintainer screenshots (your machines)
-- [ ] Pin release v2.1.1 + issues #1–#3 on GitHub
-- [ ] Upload `.github/social-preview.png` in Settings (manual, once)
-- [ ] Post launch copy from `github/LAUNCH-POST.md` to Discussion #4
+- [x] Record 15s GIF: install → `devready` → PASS (embed in README)
+- [x] Seed Issue #2 with maintainer screenshot (demo PNG)
+- [x] Pin release v2.1.1 + issues #1–#3 on GitHub (issues were pinned; release v2.1.1 published)
+- [ ] Upload `.github/social-preview.png` in Settings (manual, once — no API)
+- [x] Post launch copy to Discussion #4 (v2.1.1 comment)
 
 ### Wave 2 — Reduce friction (weeks 3–6)
 
