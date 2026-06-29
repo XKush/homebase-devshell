@@ -83,9 +83,18 @@ jobs:
           if ($out -notmatch 'DRY-RUN') { throw 'init output missing DRY-RUN marker' }
           if ($out -notmatch 'Nothing was installed') { throw 'init should not install' }
 
+  privacy-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Privacy audit smoke (offline)
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File scripts/maintainer/test/Test-PrivacyAuditSmoke.ps1
+
   release-assets:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [release-version, command-health, platform-hardening, install-smoke, init-smoke]
+    needs: [release-version, command-health, platform-hardening, install-smoke, init-smoke, privacy-smoke]
     runs-on: windows-latest
     permissions:
       contents: write

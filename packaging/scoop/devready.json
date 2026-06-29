@@ -9,7 +9,7 @@
     "git": "git"
   },
   "url": "https://github.com/XKush/homebase-devshell/releases/download/v2.3.0/devready-v2.3.0.zip",
-  "hash": "sha256:a0099d72c9a960c35b8b0dd8e6c431c84d5037a8390dd327791556cd39d83ae0",
+  "hash": "sha256:bade0285dc0818d20195be3c2432ca47433b7ca0d851a374637b2d230cd718ba",
   "extract_dir": ".",
   "post_install": [
     "& pwsh -NoProfile -File \"$dir\\install.ps1\" -SkipClone -SkipTools -SkipDoctor"
